@@ -1,0 +1,12 @@
+<Context>
+    <Resource name="jdbc/timekeeping"
+              auth="Container"
+              type="javax.sql.DataSource"
+              maxActive="100" maxIdle="30" maxWait="10000"
+              username="root"
+              password="ffff"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              defaultAutoCommit="false"
+              defaultTransactionIsolation="READ_COMMITTED"
+              url="jdbc:mysql://localhost/timekeeping?useSSL=false&amp;serverTimezone=Europe/Kiev"/>
+</Context>
