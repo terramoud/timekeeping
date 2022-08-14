@@ -158,7 +158,7 @@ public class UserDaoImpl implements UserDao {
             pst.setLong(1, userId);
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query to read an user from database has already been completed successfully");
-            if (!rs.next()) throw new SQLException("There is not id: '" + userId + "' in table");
+            if (!rs.next()) throw new SQLException("There is not id: '" + userId + "' in db table");
             mapRowFromDB.map(rs, user);
             LOG.debug("The user: {} has been found by query to database", user);
         } catch (SQLException e) {
@@ -176,7 +176,7 @@ public class UserDaoImpl implements UserDao {
             pst.setString(1, login);
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query to read an user from database has already been completed successfully");
-            if (!rs.next()) throw new SQLException("There is not login: '" + login + "' in table");
+            if (!rs.next()) throw new SQLException("There is not login: '" + login + "' in db table");
             mapRowFromDB.map(rs, user);
             LOG.debug("The user: {} has been found by query to database", user);
         } catch (SQLException e) {
