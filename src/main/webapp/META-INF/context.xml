@@ -6,7 +6,7 @@
               username="root"
               password="ffff"
               driverClassName="com.mysql.cj.jdbc.Driver"
-              defaultAutoCommit="false"
+              defaultAutoCommit="true"
               defaultTransactionIsolation="READ_COMMITTED"
-              url="jdbc:mysql://localhost/timekeeping?useSSL=false&amp;serverTimezone=Europe/Kiev"/>
+              url="jdbc:mysql://localhost:3306/timekeeping?useSSL=false&amp;serverTimezone=Europe/Kiev"/>
 </Context>
