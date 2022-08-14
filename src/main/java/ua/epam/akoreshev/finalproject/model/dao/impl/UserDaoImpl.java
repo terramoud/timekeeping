@@ -141,6 +141,7 @@ public class UserDaoImpl implements UserDao {
             }
             if (rowCount == 0) {
                 result = false;
+                LOG.warn("The user wasn't created by query to database");
             }
             LOG.debug("The {} rows has been added to database to create user", rowCount);
         } catch (SQLException e) {
