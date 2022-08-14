@@ -18,6 +18,10 @@ public class Activity extends Entity {
         this.categoryId = categoryId;
     }
 
+    public Activity() {
+
+    }
+
     public String getName() {
         return name;
     }
