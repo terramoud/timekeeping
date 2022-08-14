@@ -11,6 +11,5 @@ public interface ActivityDao extends BaseDao<Activity, Long> {
     List<Activity> findAllActivitiesByUser(long userId);
     boolean removeActivityByUser(String login);
     boolean removeActivityByUser(long id);
-    boolean remove(String ...name);
 }
 
