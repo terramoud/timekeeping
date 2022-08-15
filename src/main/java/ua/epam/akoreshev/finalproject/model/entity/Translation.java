@@ -8,31 +8,31 @@ import java.util.Objects;
  * @author Alexander Koreshev
  */
 public class Translation extends Entity {
-    private String name;
-    private long languageId;
+    private String translatedEn;
+    private String translatedUk;
 
     public Translation() {
     }
 
-    public Translation(String name, long languageId) {
-        this.name = name;
-        this.languageId = languageId;
+    public Translation(String translatedEn, String translatedUk) {
+        this.translatedEn = translatedEn;
+        this.translatedUk = translatedUk;
     }
 
-    public String getName() {
-        return name;
+    public String getTranslatedEn() {
+        return translatedEn;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTranslatedEn(String translatedEn) {
+        this.translatedEn = translatedEn;
     }
 
-    public long getLanguageId() {
-        return languageId;
+    public String getTranslatedUk() {
+        return translatedUk;
     }
 
-    public void setLanguageId(long languageId) {
-        this.languageId = languageId;
+    public void setTranslatedUk(String translatedUk) {
+        this.translatedUk = translatedUk;
     }
 
     @Override
@@ -41,21 +41,21 @@ public class Translation extends Entity {
         if (o == null || getClass() != o.getClass()) return false;
         Translation that = (Translation) o;
         return id == that.id &&
-                languageId == that.languageId &&
-                name.equals(that.name);
+                translatedEn.equals(that.translatedEn) &&
+                translatedUk.equals(that.translatedUk);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, languageId);
+        return Objects.hash(id, translatedEn, translatedUk);
     }
 
     @Override
     public String toString() {
         return "Translation{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", languageId=" + languageId +
+                ", translated_en='" + translatedEn + '\'' +
+                ", translated_uk='" + translatedUk + '\'' +
                 '}';
     }
 }
