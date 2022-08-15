@@ -8,34 +8,34 @@ import java.util.Objects;
  * @author Alexander Koreshev
  */
 public class Activity extends Entity {
-    private String name;
-    private long translationId;
+    private String nameEn;
+    private String nameUk;
     private long categoryId;
 
-    public Activity(String name, long translationId, long categoryId) {
-        this.name = name;
-        this.translationId = translationId;
+    public Activity(long id, String nameEn, String nameUk, long categoryId) {
+        this.id = id;
+        this.nameEn = nameEn;
+        this.nameUk = nameUk;
         this.categoryId = categoryId;
     }
 
     public Activity() {
-
     }
 
-    public String getName() {
-        return name;
+    public String getNameEn() {
+        return nameEn;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 
-    public long getTranslationId() {
-        return translationId;
+    public String getNameUk() {
+        return nameUk;
     }
 
-    public void setTranslationId(long translationID) {
-        this.translationId = translationID;
+    public void setNameUk(String nameUk) {
+        this.nameUk = nameUk;
     }
 
     public long getCategoryId() {
@@ -51,20 +51,23 @@ public class Activity extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Activity activity = (Activity) o;
-        return id == activity.id && Objects.equals(name, activity.name) && translationId == activity.translationId;
+        return id == activity.id &&
+                categoryId == activity.categoryId &&
+                nameEn.equals(activity.nameEn) &&
+                nameUk.equals(activity.nameUk);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, translationId, categoryId);
+        return Objects.hash(id, nameEn, nameUk, categoryId);
     }
 
     @Override
     public String toString() {
         return "Activity{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", translationId=" + translationId +
+                ", nameEn='" + nameEn + '\'' +
+                ", nameUk='" + nameUk + '\'' +
                 ", categoryId=" + categoryId +
                 '}';
     }
