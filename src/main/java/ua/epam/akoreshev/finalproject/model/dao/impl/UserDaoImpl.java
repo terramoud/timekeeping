@@ -31,8 +31,7 @@ public class UserDaoImpl implements UserDao {
     private static final String SQL_FIND_ALL_USERS_BY_ACTIVITY_NAME = "SELECT * FROM users " +
             "INNER JOIN users_activities ON users.id = user_id " +
             "INNER JOIN activities ON users_activities.activity_id = activities.id " +
-            "INNER JOIN translations ON activities.translation_id = translations.id " +
-            "WHERE activities.name = ? OR translated_en = ? OR translated_uk = ?";
+            "WHERE activities.name_en = ? OR activities.name_uk = ?";
 
     private final Mapper<User, PreparedStatement> mapRowToDB = (User user, PreparedStatement preparedStatement) -> {
         preparedStatement.setString(1, user.getLogin());
@@ -71,7 +70,7 @@ public class UserDaoImpl implements UserDao {
             LOG.debug("The {} users has been found by query to database", usersList.size());
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to find all users from findAll() method, because {}", e.getMessage());
-            throw new DaoException("Cannot find users " + e.getMessage(), e);
+            throw new DaoException("Cannot find users. " + e.getMessage(), e);
         }
         if (usersList.isEmpty()) {
             LOG.warn("Empty list users has been returned by findAll() method");
@@ -95,7 +94,10 @@ public class UserDaoImpl implements UserDao {
             LOG.debug("The {} users has been found by query to database", usersList.size());
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to find all users by activity id, because {}", e.getMessage());
-            throw new DaoException("Cannot find users by activity id " + e.getMessage(), e);
+            throw new DaoException("Cannot find users by activity id. " + e.getMessage(), e);
+        }
+        if (usersList.isEmpty()) {
+            LOG.warn("Empty list users has been returned by find all users by activity id");
         }
         return usersList;
     }
@@ -107,7 +109,6 @@ public class UserDaoImpl implements UserDao {
         try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_USERS_BY_ACTIVITY_NAME)) {
             pst.setString(1, activityName);
             pst.setString(2, activityName);
-            pst.setString(3, activityName);
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query to database has already been completed successfully");
             while (rs.next()) {
@@ -118,7 +119,7 @@ public class UserDaoImpl implements UserDao {
             LOG.debug("The {} users has been found by query to database", usersList.size());
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to find all users by activity name, because {}", e.getMessage());
-            throw new DaoException("Cannot find users by activity name " + e.getMessage(), e);
+            throw new DaoException("Cannot find users by activity name. " + e.getMessage(), e);
         }
         if (usersList.isEmpty()) {
             LOG.warn("Empty list users has been returned by find all users by activity name");
@@ -146,7 +147,7 @@ public class UserDaoImpl implements UserDao {
             LOG.debug("The {} rows has been added to database to create user", rowCount);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to database to create user, because {}", e.getMessage());
-            throw new DaoException("Cannot create user at database " + e.getMessage(), e);
+            throw new DaoException("Cannot create user at database. " + e.getMessage(), e);
         }
         return result;
     }
@@ -164,7 +165,7 @@ public class UserDaoImpl implements UserDao {
             LOG.debug("The user: {} has been found by query to database", user);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to get user by id, because {}", e.getMessage());
-            throw new DaoException("Cannot read user by id " + e.getMessage(), e);
+            throw new DaoException("Cannot read user by id. " + e.getMessage(), e);
         }
         return user;
     }
@@ -182,7 +183,7 @@ public class UserDaoImpl implements UserDao {
             LOG.debug("The user: {} has been found by query to database", user);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to get user by login, because {} ", e.getMessage());
-            throw new DaoException("Cannot read user by login " + e.getMessage(), e);
+            throw new DaoException("Cannot read user by login. " + e.getMessage(), e);
         }
         return user;
     }
@@ -203,7 +204,7 @@ public class UserDaoImpl implements UserDao {
             LOG.debug("The {} rows has been changed to update user", rowCount);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to update user, because {}", e.getMessage());
-            throw new DaoException("Cannot update user at database " + e.getMessage(), e);
+            throw new DaoException("Cannot update user at database. " + e.getMessage(), e);
         }
         return result;
     }
@@ -223,7 +224,7 @@ public class UserDaoImpl implements UserDao {
             LOG.debug("The {} rows has been removed to delete user", rowCount);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to remove user by id, because {}", e.getMessage());
-            throw new DaoException("Cannot delete user from database " + e.getMessage(), e);
+            throw new DaoException("Cannot delete user from database. " + e.getMessage(), e);
         }
         return result;
     }
