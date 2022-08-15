@@ -27,8 +27,7 @@ public class RequestDaoImpl implements RequestDao {
     private static final String SQL_FIND_ALL_REQUESTS_BY_STATUS_NAME =
             "SELECT * FROM requests " +
                     "INNER JOIN statuses ON requests.status_id = statuses.id " +
-                    "INNER JOIN translations ON statuses.translation_id = translations.id " +
-                    "WHERE translated_uk = ? OR translated_en = ? OR statuses.name = ?";
+                    "WHERE statuses.name_en = ? OR statuses.name_uk = ?";
 
     private static final String SQL_UPDATE_REQUEST_BY_ID =
             "UPDATE requests SET user_id = ?, activity_id = ?, type_id = ?, status_id = ? WHERE id = ?";
@@ -39,9 +38,8 @@ public class RequestDaoImpl implements RequestDao {
     private static final String SQL_UPDATE_REQUEST_BY_STATUS_NAME =
             "UPDATE requests " +
                     "SET status_id = (" +
-                        "SELECT statuses.id FROM statuses " +
-                        "INNER JOIN translations ON statuses.translation_id = translations.id " +
-                        "WHERE translated_uk = ? OR translated_en = ? OR statuses.name = ?) " +
+                    "SELECT statuses.id FROM statuses " +
+                    "WHERE statuses.name_en = ? OR statuses.name_uk = ?) " +
                     "WHERE id = ?";
 
     private final Mapper<Request, PreparedStatement> mapRowToDB = (Request request, PreparedStatement preparedStatement) -> {
@@ -79,8 +77,8 @@ public class RequestDaoImpl implements RequestDao {
             }
             LOG.debug("The {} 'requests for activities from user' has already been found by query to database", requestsList.size());
         } catch (SQLException e) {
-            LOG.error("DAO exception has already been thrown by sql query to find all 'requests for activities from user'");
-            throw new DaoException("Cannot find 'requests for activities from user'", e);
+            LOG.error("DAO exception has already been thrown by sql query to find all 'requests for activities from user', {}", e.getMessage());
+            throw new DaoException("Cannot find 'requests for activities from user'. " + e.getMessage(), e);
         }
         if (requestsList.isEmpty()) {
             LOG.warn("Warning: empty list 'requests for activities from user' has already been returned  by findAll() method");
@@ -103,8 +101,8 @@ public class RequestDaoImpl implements RequestDao {
             }
             LOG.debug("The {} 'requests for activities from user' has already been found by query to database", requestsList.size());
         } catch (SQLException e) {
-            LOG.error("DAO exception has already been thrown by sql query to find all 'requests for activities' by status id");
-            throw new DaoException("Cannot find requests for activities from user by status id", e);
+            LOG.error("DAO exception has already been thrown by sql query to find all 'requests for activities' by status id, {}", e.getMessage());
+            throw new DaoException("Cannot find requests for activities from user by status id. " + e.getMessage(), e);
         }
         if (requestsList.isEmpty()) {
             LOG.warn("Empty list 'requests for activities from user' has already been returned by find all requests by status id");
@@ -119,7 +117,6 @@ public class RequestDaoImpl implements RequestDao {
         try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_REQUESTS_BY_STATUS_NAME)) {
             pst.setString(1, statusName);
             pst.setString(2, statusName);
-            pst.setString(3, statusName);
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query to database has already been completed successfully");
             while (rs.next()) {
@@ -129,8 +126,8 @@ public class RequestDaoImpl implements RequestDao {
             }
             LOG.debug("The {} 'requests for activities from user' has already been found by query to database", requestsList.size());
         } catch (SQLException e) {
-            LOG.error("DAO exception has already been thrown by sql query to find all 'requests for activities' by status name");
-            throw new DaoException("Cannot find requests for activities from user by status name", e);
+            LOG.error("DAO exception has already been thrown by sql query to find all 'requests for activities' by status name, {}", e.getMessage());
+            throw new DaoException("Cannot find requests for activities from user by status name. " + e.getMessage(), e);
         }
         if (requestsList.isEmpty()) {
             LOG.warn("Empty list 'requests for activities from user' has already been returned by find all requests by status name");
@@ -153,8 +150,8 @@ public class RequestDaoImpl implements RequestDao {
                 LOG.warn("The 'request status' wasn't updated by query to database");
             }
         } catch (SQLException e) {
-            LOG.error("DAO exception has already been thrown by sql query to change 'request status'");
-            throw new DaoException("Cannot update request for activities from user at database", e);
+            LOG.error("DAO exception has already been thrown by sql query to change 'request status', {}", e.getMessage());
+            throw new DaoException("Cannot update request for activities from user at database. " + e.getMessage(), e);
         }
         return result;
     }
@@ -166,8 +163,7 @@ public class RequestDaoImpl implements RequestDao {
         try (PreparedStatement pst = connection.prepareStatement(SQL_UPDATE_REQUEST_BY_STATUS_NAME)) {
             pst.setString(1, statusName);
             pst.setString(2, statusName);
-            pst.setString(3, statusName);
-            pst.setLong(4, requestId);
+            pst.setLong(3, requestId);
             LOG.trace("SQL query to update the 'request status' at database has already been completed successfully");
             int rowCount = pst.executeUpdate();
             LOG.debug("The {} rows has already been changed to update 'request status'", rowCount);
@@ -176,8 +172,8 @@ public class RequestDaoImpl implements RequestDao {
                 LOG.warn("The 'request status' wasn't updated by query to database");
             }
         } catch (SQLException e) {
-            LOG.error("DAO exception has already been thrown by sql query to change 'request status'");
-            throw new DaoException("Cannot update 'request status' at database", e);
+            LOG.error("DAO exception has already been thrown by sql query to change 'request status', {}", e.getMessage());
+            throw new DaoException("Cannot update 'request status' at database. " + e.getMessage(), e);
         }
         return result;
     }
@@ -201,8 +197,8 @@ public class RequestDaoImpl implements RequestDao {
             }
             LOG.debug("The {} rows has already been added to database to create request", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has already been thrown by sql query to create 'request for activities from user'");
-            throw new DaoException("Cannot create 'request for activities from user' at database", e);
+            LOG.error("DAO exception has already been thrown by sql query to create 'request for activities from user', {}", e.getMessage());
+            throw new DaoException("Cannot create 'request for activities from user' at database. " + e.getMessage(), e);
         }
         return result;
     }
@@ -218,9 +214,9 @@ public class RequestDaoImpl implements RequestDao {
             if (!rs.next()) throw new SQLException();
             mapRowFromDB.map(rs, request);
             LOG.debug("The request: {} has already been found by query to database", request);
-        } catch (SQLException ex) {
-            LOG.error("DAO exception has already been thrown by sql query to get request by id");
-            throw new DaoException("Cannot read 'request for activities from user' by id", ex);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has already been thrown by sql query to get request by id, {}", e.getMessage());
+            throw new DaoException("Cannot read 'request for activities from user' by id. " + e.getMessage(), e);
         }
         return request;
     }
@@ -240,8 +236,8 @@ public class RequestDaoImpl implements RequestDao {
             }
             LOG.debug("The {} rows has already been changed to update 'request for activities from user'", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown by sql query to update 'request for activities from user'");
-            throw new DaoException("Cannot update 'request for activities from user' at database", e);
+            LOG.error("DAO exception has been thrown by sql query to update 'request for activities from user', {}", e.getMessage());
+            throw new DaoException("Cannot update 'request for activities from user' at database. " + e.getMessage(), e);
         }
         return result;
     }
@@ -260,8 +256,8 @@ public class RequestDaoImpl implements RequestDao {
             }
             LOG.debug("The {} rows has already been removed to delete the 'request for activities from user'", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has already been thrown by sql query to remove 'request' by id");
-            throw new DaoException("Cannot delete 'request for activities from user' from database", e);
+            LOG.error("DAO exception has already been thrown by sql query to remove 'request' by id, {}", e.getMessage());
+            throw new DaoException("Cannot delete 'request for activities from user' from database. " + e.getMessage(), e);
         }
         return result;
     }
