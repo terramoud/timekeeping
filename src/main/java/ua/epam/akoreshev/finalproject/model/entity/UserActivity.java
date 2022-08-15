@@ -21,6 +21,16 @@ public class UserActivity extends Entity {
         this.isActive = isActive;
     }
 
+    @Override
+    public long getId() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setId(long id) {
+        throw new UnsupportedOperationException();
+    }
+
     public long getUserId() {
         return userId;
     }
@@ -50,22 +60,20 @@ public class UserActivity extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserActivity that = (UserActivity) o;
-        return id == that.id &&
-                userId == that.userId &&
+        return userId == that.userId &&
                 activityId == that.activityId &&
                 isActive == that.isActive;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, userId, activityId, isActive);
+        return Objects.hash(userId, activityId, isActive);
     }
 
     @Override
     public String toString() {
         return "UserActivity{" +
-                "id=" + id +
-                ", userId=" + userId +
+                "userId=" + userId +
                 ", activityId=" + activityId +
                 ", isActive=" + isActive +
                 '}';
