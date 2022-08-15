@@ -67,8 +67,8 @@ class RequestDaoImplTest {
      */
     @Test
     void testReadRequestShouldThrownExceptionWhenRequestIsMissing() {
-        assertThrows(DaoException.class,() -> requestDao.read(0L));
-        assertThrows(DaoException.class,() -> requestDao.read(-1L));
+        assertThrows(DaoException.class, () -> requestDao.read(0L));
+        assertThrows(DaoException.class, () -> requestDao.read(-1L));
     }
 
     /**
@@ -135,10 +135,11 @@ class RequestDaoImplTest {
      * @see RequestDaoImpl#updateRequestStatus(long, long)
      */
     @Test
-    void updateRequestStatus() throws DaoException {
+    void testUpdateRequestStatus() throws DaoException {
         Request sourceRequest = new Request(0, 1, 1, 1, 1);
         requestDao.create(sourceRequest);
         requestDao.updateRequestStatus(sourceRequest.getId(), 2);
+        sourceRequest.setStatusId(2); // expected updated status
         Request actualRequest = requestDao.read(sourceRequest.getId());
         assertEquals(sourceRequest, actualRequest);
     }
@@ -147,19 +148,19 @@ class RequestDaoImplTest {
      * @see RequestDaoImpl#updateRequestStatus(long, String)
      */
     @Test
-    void updateRequestStatusName() throws DaoException, SQLException {
+    void testUpdateRequestStatusName() throws DaoException, SQLException {
         Request sourceRequest = new Request(0, 1, 1, 1, 1);
         requestDao.create(sourceRequest);
+        sourceRequest.setStatusId(2); // expected updated status
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(
-                "SELECT name, translated_en, translated_uk AS status_name FROM requests " +
-                        "INNER JOIN statuses s on requests.status_id = s.id " +
-                        "INNER JOIN translations t on s.translation_id = t.id " +
+                "SELECT statuses.name_en FROM requests " +
+                        "INNER JOIN statuses ON requests.status_id = statuses.id " +
                         "WHERE status_id = 2");
         if (!resultSet.next()) {
             throw new SQLException("Fatal: Cannot read status name from db. The test is crashed");
         }
-        String newStatusName = resultSet.getString("status_name");
+        String newStatusName = resultSet.getString("name_en");
         requestDao.updateRequestStatus(sourceRequest.getId(), newStatusName);
         Request actualRequest = requestDao.read(sourceRequest.getId());
         assertEquals(sourceRequest, actualRequest);
@@ -183,7 +184,7 @@ class RequestDaoImplTest {
     void updateRequestStatusShouldThrowExceptionWhenStatusIsNull() throws DaoException {
         Request sourceRequest = new Request(0, 1, 1, 1, 1);
         requestDao.create(sourceRequest);
-        assertThrows(DaoException.class, () -> requestDao.updateRequestStatus(sourceRequest.getId(),null));
+        assertThrows(DaoException.class, () -> requestDao.updateRequestStatus(sourceRequest.getId(), null));
     }
 
     /**
@@ -267,14 +268,13 @@ class RequestDaoImplTest {
         requestDao.create(expectedRequest);
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(
-                "SELECT name, translated_en, translated_uk AS status_name FROM requests " +
-                "INNER JOIN statuses s on requests.status_id = s.id " +
-                "INNER JOIN translations t on s.translation_id = t.id " +
-                "WHERE status_id = 1");
+                "SELECT statuses.name_en FROM requests " +
+                        "INNER JOIN statuses ON requests.status_id = statuses.id " +
+                        "WHERE status_id = 1");
         if (!resultSet.next()) {
             throw new SQLException("Fatal: Cannot read status name from db. The test is crashed");
         }
-        String statusName = resultSet.getString("status_name");
+        String statusName = resultSet.getString("name_en");
         List<Request> requestsListByStatusName = requestDao.findAllRequestsByStatus(statusName);
         assertTrue(requestsListByStatusName.contains(expectedRequest));
 
