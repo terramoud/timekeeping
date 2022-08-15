@@ -81,7 +81,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} activities has been found by query to database", activitiesList.size());
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to find all activities by category name, because {}", e.getMessage());
-            throw new DaoException("Cannot find activities by category name " + e.getMessage(), e);
+            throw new DaoException("Cannot find activities by category name. " + e.getMessage(), e);
         }
         if (activitiesList.isEmpty()) {
             LOG.warn("Empty list activities has been returned by 'find all activities by category name'");
@@ -105,7 +105,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} activities has been found by query to database", activitiesList.size());
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to find all activities by category id, because {}", e.getMessage());
-            throw new DaoException("Cannot find activities by category id " + e.getMessage(), e);
+            throw new DaoException("Cannot find activities by category id. " + e.getMessage(), e);
         }
         if (activitiesList.isEmpty()) {
             LOG.warn("Empty list activities has been returned by 'find all activities by category id'");
@@ -129,7 +129,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} activities has been found by query to database", activitiesList.size());
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to find all activities by user id, because {}", e.getMessage());
-            throw new DaoException("Cannot find activities by user id " + e.getMessage(), e);
+            throw new DaoException("Cannot find activities by user id. " + e.getMessage(), e);
         }
         if (activitiesList.isEmpty()) {
             LOG.warn("Empty list activities has been returned by 'find all activities by user id'");
@@ -153,7 +153,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} activities has been found by query to database", activitiesList.size());
         } catch (SQLException | DaoException e) {
             LOG.error("DAO exception has been thrown to find all activities by user login, because {}", e.getMessage());
-            throw new DaoException("Cannot find activities by user login " + e.getMessage(), e);
+            throw new DaoException("Cannot find activities by user login. " + e.getMessage(), e);
         }
         if (activitiesList.isEmpty()) {
             LOG.warn("Empty list activities has been returned by 'find all activities by user login'");
@@ -175,7 +175,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} activities has been found by query to database", activitiesList.size());
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to find all activities, because {}", e.getMessage());
-            throw new DaoException("Cannot find activities " + e.getMessage(), e);
+            throw new DaoException("Cannot find activities. " + e.getMessage(), e);
         }
         if (activitiesList.isEmpty()) {
             LOG.warn("Empty list activities has been returned by findAll() method");
@@ -203,7 +203,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} rows has been added to database to create user", rowCount);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown by database to create activity, because {}", e.getMessage());
-            throw new DaoException("Cannot create activity database " + e.getMessage(), e);
+            throw new DaoException("Cannot create activity database. " + e.getMessage(), e);
         }
         return result;
     }
@@ -221,7 +221,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The activity: {} has been found by query to database", activity);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to get activity by id, because {}", e.getMessage());
-            throw new DaoException("Cannot read activity by id " + e.getMessage(), e);
+            throw new DaoException("Cannot read activity by id. " + e.getMessage(), e);
         }
         return activity;
     }
@@ -242,7 +242,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} rows has been changed to update activity", rowCount);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to update activity, because {}", e.getMessage());
-            throw new DaoException("Cannot update activity at database " + e.getMessage(), e);
+            throw new DaoException("Cannot update activity at database. " + e.getMessage(), e);
         }
         return result;
     }
@@ -262,7 +262,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} rows has been removed to delete activity", rowCount);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to remove activity by id, because {}", e.getMessage());
-            throw new DaoException("Cannot delete activity from database " + e.getMessage(), e);
+            throw new DaoException("Cannot delete activity from database. " + e.getMessage(), e);
         }
         return result;
     }
