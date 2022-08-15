@@ -130,7 +130,7 @@ public class UserDaoImplTest {
     }
 
     /**
-     * @see UserDaoImpl#create(User) (User)
+     * @see UserDaoImpl#create(User)
      */
     @ParameterizedTest
     @MethodSource("testCasesWhenUserHasNegativeOrZeroField")
@@ -294,10 +294,10 @@ public class UserDaoImplTest {
         userDao.create(expectedUser);
 
         Statement st = connection.createStatement();
-        ResultSet rs = st.executeQuery("SELECT name FROM activities WHERE id = 1");
+        ResultSet rs = st.executeQuery("SELECT name_en FROM activities WHERE id = 1");
         String activityName = null;
         if (rs.next()) {
-            activityName = rs.getString("name");
+            activityName = rs.getString("name_en");
         }
 
         PreparedStatement pst = connection.prepareStatement("INSERT INTO users_activities VALUES (?, ?, false)");
