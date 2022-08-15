@@ -12,8 +12,7 @@ public class Activity extends Entity {
     private String nameUk;
     private long categoryId;
 
-    public Activity(long id, String nameEn, String nameUk, long categoryId) {
-        this.id = id;
+    public Activity(String nameEn, String nameUk, long categoryId) {
         this.nameEn = nameEn;
         this.nameUk = nameUk;
         this.categoryId = categoryId;
