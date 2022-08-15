@@ -12,36 +12,47 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ActivityDaoImpl implements ActivityDao {
-    private static final String SQL_FIND_ALL_ACTIVITIES = "SELECT * FROM activities";
 
     private static final String SQL_CREATE_ACTIVITY = "INSERT INTO activities VALUES (DEFAULT, ?, ?, ?)";
 
     private static final String SQL_GET_ACTIVITY_BY_ID = "SELECT * FROM activities WHERE id = ?";
 
     private static final String SQL_UPDATE_ACTIVITY_BY_ID =
-            "UPDATE activities SET name = ?, translation_id = ?, category_id = ? WHERE id = ?";
+            "UPDATE activities SET name_en = ?, name_uk = ?, category_id = ? WHERE id = ?";
 
     private static final String SQL_DELETE_ACTIVITY_BY_ID = "DELETE FROM activities WHERE id = ?";
 
-    private static final String SQL_FIND_ALL_USERS_BY_ACTIVITY_ID =
-            "SELECT * FROM users INNER JOIN users_activities ON users.id = user_id WHERE activity_id = ?";
+    private static final String SQL_FIND_ALL_ACTIVITIES = "SELECT * FROM activities";
 
-    private static final String SQL_FIND_ALL_USERS_BY_ACTIVITY_NAME = "SELECT * FROM users " +
-            "INNER JOIN users_activities ON users.id = user_id " +
-            "INNER JOIN activities ON users_activities.activity_id = activities.id " +
-            "INNER JOIN translations ON activities.translation_id = translations.id " +
-            "WHERE activities.name = ? OR translated_en = ? OR translated_uk = ?";
+    private static final String SQL_FIND_ALL_ACTIVITIES_BY_CATEGORY_ID =
+            "SELECT * FROM activities WHERE category_id = ?";
+
+    private static final String SQL_FIND_ALL_ACTIVITIES_BY_CATEGORY_NAME =
+            "SELECT * FROM activities " +
+                    "INNER JOIN categories ON activities.category_id = categories.id " +
+                    "WHERE categories.name_en = ? OR categories.name_uk = ?";
+
+    private static final String SQL_FIND_ALL_ACTIVITIES_BY_USER_ID =
+            "SELECT * FROM activities " +
+                    "INNER JOIN users_activities ON activities.id = activity_id " +
+                    "WHERE user_id = ?";
+
+    private static final String SQL_FIND_ALL_ACTIVITIES_BY_USER_LOGIN =
+            "SELECT * FROM activities " +
+                    "INNER JOIN users_activities ON activities.id = activity_id " +
+                    "INNER JOIN users ON users_activities.user_id = users.id " +
+                    "WHERE users.login = ?";
 
     private final Mapper<Activity, PreparedStatement> mapRowToDB = (Activity activity, PreparedStatement preparedStatement) -> {
-        preparedStatement.setString(1, activity.getName());
-        preparedStatement.setLong(2, activity.getTranslationId());
+        preparedStatement.setString(1, activity.getNameEn());
+        preparedStatement.setString(2, activity.getNameUk());
         preparedStatement.setLong(3, activity.getCategoryId());
     };
 
     private final Mapper<ResultSet, Activity> mapRowFromDB = (ResultSet resultSet, Activity activity) -> {
         activity.setId(resultSet.getLong("id"));
-        activity.setName(resultSet.getString("name"));
-        activity.setTranslationId(resultSet.getLong("translation_id"));
+        activity.setNameEn(resultSet.getString("name_en"));
+        activity.setNameUk(resultSet.getString("name_uk"));
         activity.setCategoryId(resultSet.getLong("category_id"));
     };
 
@@ -54,33 +65,100 @@ public class ActivityDaoImpl implements ActivityDao {
     }
 
     @Override
-    public List<Activity> findAllActivitiesByCategory(String categoryName) {
-        return null;
+    public List<Activity> findAllActivitiesByCategory(String categoryName) throws DaoException {
+        LOG.debug("Obtained 'category name' to find activity is: {}", categoryName);
+        List<Activity> activitiesList = new LinkedList<>();
+        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_ACTIVITIES_BY_CATEGORY_NAME)) {
+            pst.setString(1, categoryName);
+            pst.setString(2, categoryName);
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query find all activities to database has already been completed successfully");
+            while (rs.next()) {
+                Activity activity = new Activity();
+                mapRowFromDB.map(rs, activity);
+                activitiesList.add(activity);
+            }
+            LOG.debug("The {} activities has been found by query to database", activitiesList.size());
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all activities by category name, because {}", e.getMessage());
+            throw new DaoException("Cannot find activities by category name " + e.getMessage(), e);
+        }
+        if (activitiesList.isEmpty()) {
+            LOG.warn("Empty list activities has been returned by 'find all activities by category name'");
+        }
+        return activitiesList;
     }
 
     @Override
-    public List<Activity> findAllActivitiesByCategory(long categoryId) {
-        return null;
+    public List<Activity> findAllActivitiesByCategory(long categoryId) throws DaoException {
+        LOG.debug("Obtained 'category id' to find activity is: {}", categoryId);
+        List<Activity> activitiesList = new LinkedList<>();
+        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_ACTIVITIES_BY_CATEGORY_ID)) {
+            pst.setLong(1, categoryId);
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query find all activities to database has already been completed successfully");
+            while (rs.next()) {
+                Activity activity = new Activity();
+                mapRowFromDB.map(rs, activity);
+                activitiesList.add(activity);
+            }
+            LOG.debug("The {} activities has been found by query to database", activitiesList.size());
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all activities by category id, because {}", e.getMessage());
+            throw new DaoException("Cannot find activities by category id " + e.getMessage(), e);
+        }
+        if (activitiesList.isEmpty()) {
+            LOG.warn("Empty list activities has been returned by 'find all activities by category id'");
+        }
+        return activitiesList;
     }
 
     @Override
-    public List<Activity> findAllActivitiesByUser(String login) {
-        return null;
+    public List<Activity> findAllActivitiesByUser(long userId) throws DaoException {
+        LOG.debug("Obtained 'user id' to find activity is: {}", userId);
+        List<Activity> activitiesList = new LinkedList<>();
+        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_ACTIVITIES_BY_USER_ID)) {
+            pst.setLong(1, userId);
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query to database has already been completed successfully");
+            while (rs.next()) {
+                Activity activity = new Activity();
+                mapRowFromDB.map(rs, activity);
+                activitiesList.add(activity);
+            }
+            LOG.debug("The {} activities has been found by query to database", activitiesList.size());
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all activities by user id, because {}", e.getMessage());
+            throw new DaoException("Cannot find activities by user id " + e.getMessage(), e);
+        }
+        if (activitiesList.isEmpty()) {
+            LOG.warn("Empty list activities has been returned by 'find all activities by user id'");
+        }
+        return activitiesList;
     }
 
     @Override
-    public List<Activity> findAllActivitiesByUser(long userId) {
-        return null;
-    }
-
-    @Override
-    public boolean removeActivityByUser(String login) {
-        return false;
-    }
-
-    @Override
-    public boolean removeActivityByUser(long id) {
-        return false;
+    public List<Activity> findAllActivitiesByUser(String login) throws DaoException {
+        LOG.debug("Obtained 'user login' to find activity is: {}", login);
+        List<Activity> activitiesList = new LinkedList<>();
+        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_ACTIVITIES_BY_USER_LOGIN)) {
+            pst.setString(1, login);
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query to database has already been completed successfully");
+            while (rs.next()) {
+                Activity activity = new Activity();
+                mapRowFromDB.map(rs, activity);
+                activitiesList.add(activity);
+            }
+            LOG.debug("The {} activities has been found by query to database", activitiesList.size());
+        } catch (SQLException | DaoException e) {
+            LOG.error("DAO exception has been thrown to find all activities by user login, because {}", e.getMessage());
+            throw new DaoException("Cannot find activities by user login " + e.getMessage(), e);
+        }
+        if (activitiesList.isEmpty()) {
+            LOG.warn("Empty list activities has been returned by 'find all activities by user login'");
+        }
+        return activitiesList;
     }
 
     @Override
@@ -125,7 +203,7 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.debug("The {} rows has been added to database to create user", rowCount);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown by database to create activity, because {}", e.getMessage());
-            throw new DaoException("Cannot create usactivityt database " + e.getMessage(), e);
+            throw new DaoException("Cannot create activity database " + e.getMessage(), e);
         }
         return result;
     }
