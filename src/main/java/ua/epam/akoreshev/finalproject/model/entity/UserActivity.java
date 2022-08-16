@@ -21,6 +21,10 @@ public class UserActivity extends Entity {
         this.isActive = isActive;
     }
 
+    public long getUserId() {
+        return userId;
+    }
+
     @Override
     public long getId() {
         throw new UnsupportedOperationException();
@@ -29,10 +33,6 @@ public class UserActivity extends Entity {
     @Override
     public void setId(long id) {
         throw new UnsupportedOperationException();
-    }
-
-    public long getUserId() {
-        return userId;
     }
 
     public void setUserId(long userId) {
@@ -51,7 +51,7 @@ public class UserActivity extends Entity {
         return isActive;
     }
 
-    public void setActive(boolean active) {
+    public void setIsActive(boolean active) {
         isActive = active;
     }
 
