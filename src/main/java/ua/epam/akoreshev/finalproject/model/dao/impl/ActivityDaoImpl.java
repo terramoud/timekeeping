@@ -200,7 +200,7 @@ public class ActivityDaoImpl implements ActivityDao {
                 result = false;
                 LOG.warn("The activity wasn't created by query to database");
             }
-            LOG.debug("The {} rows has been added to database to create user", rowCount);
+            LOG.debug("The {} rows has been added to database to create activity", rowCount);
         } catch (SQLException e) {
             LOG.error("DAO exception has been thrown by database to create activity, because {}", e.getMessage());
             throw new DaoException("Cannot create activity database. " + e.getMessage(), e);
