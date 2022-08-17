@@ -35,16 +35,22 @@ public class IntervalDaoImpl implements IntervalDao {
             "SELECT * FROM intervals WHERE user_id = ? AND activity_id = ?";
 
     private final Mapper<Interval, PreparedStatement> mapEntityToDB = (Interval interval, PreparedStatement preparedStatement) -> {
-        preparedStatement.setTimestamp(1, Timestamp.valueOf(interval.getStart()));
-        preparedStatement.setTimestamp(2, Timestamp.valueOf(interval.getFinish()));
+        LocalDateTime startTime = interval.getStart();
+        LocalDateTime finishTime = interval.getFinish();
+
+        preparedStatement.setTimestamp(1, (startTime == null) ? null : Timestamp.valueOf(startTime));
+        preparedStatement.setTimestamp(2, (finishTime == null) ? null : Timestamp.valueOf(finishTime));
         preparedStatement.setLong(3, interval.getUserId());
         preparedStatement.setLong(4, interval.getActivityId());
     };
 
     private final Mapper<ResultSet, Interval> mapEntityFromDB = (ResultSet resultSet, Interval interval) -> {
+        Timestamp startTime = resultSet.getTimestamp("start");
+        Timestamp finishTime = resultSet.getTimestamp("finish");
+
         interval.setId(resultSet.getLong("id"));
-        interval.setStart(resultSet.getTimestamp("start").toLocalDateTime());
-        interval.setFinish(resultSet.getTimestamp("finish").toLocalDateTime());
+        interval.setStart((startTime == null) ? null : startTime.toLocalDateTime());
+        interval.setFinish((finishTime == null) ? null : finishTime.toLocalDateTime());
         interval.setUserId(resultSet.getLong("user_id"));
         interval.setActivityId(resultSet.getLong("activity_id"));
     };
@@ -63,9 +69,9 @@ public class IntervalDaoImpl implements IntervalDao {
                 userId, activityId, startTime);
         boolean result = true;
         try (PreparedStatement pst = connection.prepareStatement(SQL_SET_START_TIME_FOR_INTERVAL)) {
-            pst.setLong(1, userId);
-            pst.setLong(2, activityId);
-            pst.setTimestamp(3, Timestamp.valueOf(startTime));
+            pst.setTimestamp(1, Timestamp.valueOf(startTime));
+            pst.setLong(2, userId);
+            pst.setLong(3, activityId);
             int rowCount = pst.executeUpdate();
             LOG.trace("SQL query to update a start time of 'interval' from database has already been completed successfully");
             if (rowCount == 0) {
@@ -86,9 +92,9 @@ public class IntervalDaoImpl implements IntervalDao {
                 userId, activityId, finishTime);
         boolean result = true;
         try (PreparedStatement pst = connection.prepareStatement(SQL_SET_FINISH_TIME_FOR_INTERVAL)) {
-            pst.setLong(1, userId);
-            pst.setLong(2, activityId);
-            pst.setTimestamp(3, Timestamp.valueOf(finishTime));
+            pst.setTimestamp(1, Timestamp.valueOf(finishTime));
+            pst.setLong(2, userId);
+            pst.setLong(3, activityId);
             int rowCount = pst.executeUpdate();
             LOG.trace("SQL query to update a finish time of 'interval' from database has already been completed successfully");
             if (rowCount == 0) {
