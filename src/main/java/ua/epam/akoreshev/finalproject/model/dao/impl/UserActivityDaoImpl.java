@@ -182,6 +182,9 @@ public class UserActivityDaoImpl implements UserActivityDao {
     @Override
     public boolean delete(long userId, long activityId) throws DaoException {
         LOG.debug("Obtained 'user id' and 'activity id' to delete it from database are: {}, {}", userId, activityId);
+        if (userId < 1 && activityId < 1) {
+            throw new DaoException("Obtained 'user id' and 'activity id' parameters must be more than 0");
+        }
         boolean result = true;
         try (PreparedStatement pst = connection.prepareStatement(SQL_DELETE_USER_ACTIVITY)) {
             pst.setLong(1, userId);
