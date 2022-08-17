@@ -222,6 +222,7 @@ VALUES (DEFAULT, 1, 2, 1, 2);
 INSERT INTO users_activities VALUES (1, 1, TRUE);
 INSERT INTO users_activities VALUES (1, 2, FALSE);
 INSERT INTO users_activities VALUES (2, 1, FALSE);
+INSERT INTO users_activities VALUES (2, 2, FALSE);
 
 
 -- -----------------------------------------------------
