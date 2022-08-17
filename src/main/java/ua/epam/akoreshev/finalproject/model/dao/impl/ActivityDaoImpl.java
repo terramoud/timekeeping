@@ -151,7 +151,7 @@ public class ActivityDaoImpl implements ActivityDao {
                 activitiesList.add(activity);
             }
             LOG.debug("The {} activities has been found by query to database", activitiesList.size());
-        } catch (SQLException | DaoException e) {
+        } catch (SQLException e) {
             LOG.error("DAO exception has been thrown to find all activities by user login, because {}", e.getMessage());
             throw new DaoException("Cannot find activities by user login. " + e.getMessage(), e);
         }
