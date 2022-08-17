@@ -78,7 +78,7 @@ public class ActivityDaoImplTest {
     void testCreateActivity() throws DaoException {
         Activity expectedActivity = new Activity("Activity1", "Активність1", 1);
         long rowsBeforeCreate = getCountRowsFromTable();
-        activityDao.create(expectedActivity); // And now expected has synchronized 'id' with db
+        assertTrue(activityDao.create(expectedActivity)); // And now expected has synchronized 'id' with db
         Activity actualActivity = activityDao.read(expectedActivity.getId());
         assertEquals(expectedActivity, actualActivity);
         long rowsAfterCreate = getCountRowsFromTable();
@@ -92,7 +92,7 @@ public class ActivityDaoImplTest {
     @MethodSource("testCasesWhenActivityIsNotUniqueRowInTable")
     void testCreateActivityShouldThrowExceptionWhenActivityIsDuplicated(Activity duplicatedActivity) throws DaoException {
         Activity testActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(testActivity);
+        assertTrue(activityDao.create(testActivity));
         long rowsBeforeCreate = getCountRowsFromTable();
         assertThrows(DaoException.class, () -> activityDao.create(duplicatedActivity));
         long rowsAfterCreate = getCountRowsFromTable();
@@ -130,12 +130,12 @@ public class ActivityDaoImplTest {
     @MethodSource("testCasesWhenActivityIsChanged")
     void testUpdateActivity(Activity changedActivity) throws DaoException {
         Activity sourceActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(sourceActivity); // And now source has synchronized 'id' with db
+        assertTrue(activityDao.create(sourceActivity)); // And now source has synchronized 'id' with db
         sourceActivity.setNameEn(changedActivity.getNameEn());
         sourceActivity.setNameUk(changedActivity.getNameUk());
         sourceActivity.setCategoryId(changedActivity.getCategoryId());
 
-        activityDao.update(sourceActivity);
+        assertTrue(activityDao.update(sourceActivity));
         Activity actualActivity = activityDao.read(sourceActivity.getId());
         assertEquals(sourceActivity, actualActivity);
     }
@@ -146,9 +146,9 @@ public class ActivityDaoImplTest {
     @ParameterizedTest
     @MethodSource("testCasesWhenUpdatedActivityIsNotUniqueRowInTable")
     void testUpdateActivityShouldThrowExceptionWhenActivityIsDuplicated(Activity duplicatedActivity) throws DaoException {
-        activityDao.create(new Activity("Activity2", "Активність2", 1)); // fill additional test row
+        assertTrue(activityDao.create(new Activity("Activity2", "Активність2", 1))); // fill additional test ro)w
         Activity sourceActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(sourceActivity);
+        assertTrue(activityDao.create(sourceActivity));
         sourceActivity.setNameEn(duplicatedActivity.getNameEn());
         sourceActivity.setNameUk(duplicatedActivity.getNameUk());
         sourceActivity.setCategoryId(duplicatedActivity.getCategoryId());
@@ -162,7 +162,7 @@ public class ActivityDaoImplTest {
     @MethodSource("testCasesWhenActivityIsNull")
     void testUpdateActivityShouldThrowExceptionWhenActivityIsNull(Activity activityHasNullField) throws DaoException {
         Activity sourceActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(sourceActivity);
+        assertTrue(activityDao.create(sourceActivity));
         sourceActivity.setNameEn(activityHasNullField.getNameEn());
         sourceActivity.setNameUk(activityHasNullField.getNameUk());
         sourceActivity.setCategoryId(activityHasNullField.getCategoryId());
@@ -176,7 +176,7 @@ public class ActivityDaoImplTest {
     @MethodSource("testCasesWhenActivityHasNegativeOrZeroField")
     void testUpdateRequestShouldThrowExceptionWhenActivityHasNegativeOrZeroField(Activity wrongFieldActivity) throws DaoException {
         Activity sourceActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(sourceActivity);
+        assertTrue(activityDao.create(sourceActivity));
         sourceActivity.setNameEn(wrongFieldActivity.getNameEn());
         sourceActivity.setNameUk(wrongFieldActivity.getNameUk());
         sourceActivity.setCategoryId(wrongFieldActivity.getCategoryId());
@@ -197,7 +197,7 @@ public class ActivityDaoImplTest {
             throw new SQLException("Fatal: Cannot create the test for activityDao. The test is crashed");
         }
         long rowsBeforeDelete = getCountRowsFromTable();
-        activityDao.delete(rs.getLong(1));
+        assertTrue(activityDao.delete(rs.getLong(1)));
         long rowsAfterDelete = getCountRowsFromTable();
         assertThrows(DaoException.class, () -> activityDao.read(rs.getLong(1)));
         assertEquals(rowsBeforeDelete - 1, rowsAfterDelete);
@@ -242,10 +242,10 @@ public class ActivityDaoImplTest {
     @Test
     void testFindAllActivitiesByCategoryId() throws DaoException {
         Activity expectedActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(expectedActivity);
+        assertTrue(activityDao.create(expectedActivity));
         List<Activity> activityListByCategory = activityDao.findAllActivitiesByCategory(1);
         assertTrue(activityListByCategory.contains(expectedActivity));
-        activityDao.delete(expectedActivity.getId());
+        assertTrue(activityDao.delete(expectedActivity.getId()));
         List<Activity> activityListByCategoryAfterDelete = activityDao.findAllActivitiesByCategory(1);
         assertFalse(activityListByCategoryAfterDelete.contains(expectedActivity));
         assertEquals(activityListByCategory.size() - 1, activityListByCategoryAfterDelete.size());
@@ -257,7 +257,7 @@ public class ActivityDaoImplTest {
     @Test
     void testFindAllActivitiesByCategoryName() throws DaoException, SQLException {
         Activity expectedActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(expectedActivity);
+        assertTrue(activityDao.create(expectedActivity));
 
         Statement st = connection.createStatement();
         ResultSet rs = st.executeQuery("SELECT name_en FROM categories WHERE id = 1");
@@ -268,7 +268,7 @@ public class ActivityDaoImplTest {
 
         List<Activity> activityListByCategory = activityDao.findAllActivitiesByCategory(categoryName);
         assertTrue(activityListByCategory.contains(expectedActivity));
-        activityDao.delete(expectedActivity.getId());
+        assertTrue(activityDao.delete(expectedActivity.getId()));
         List<Activity> activityListByCategoryAfterDelete = activityDao.findAllActivitiesByCategory(categoryName);
         assertFalse(activityListByCategoryAfterDelete.contains(expectedActivity));
         assertEquals(activityListByCategory.size() - 1, activityListByCategoryAfterDelete.size());
@@ -280,7 +280,7 @@ public class ActivityDaoImplTest {
     @Test
     void testFindAllActivitiesByUserId() throws DaoException, SQLException {
         Activity expectedActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(expectedActivity);
+        assertTrue(activityDao.create(expectedActivity));
 
         PreparedStatement pst = connection.prepareStatement("INSERT INTO users_activities VALUES (?, ?, false)");
         pst.setLong(1, 1);
@@ -289,7 +289,7 @@ public class ActivityDaoImplTest {
 
         List<Activity> activityListByUser = activityDao.findAllActivitiesByUser(1);
         assertTrue(activityListByUser.contains(expectedActivity));
-        activityDao.delete(expectedActivity.getId());
+        assertTrue(activityDao.delete(expectedActivity.getId()));
         List<Activity> activityListByUserAfterDelete = activityDao.findAllActivitiesByUser(1);
         assertFalse(activityListByUserAfterDelete.contains(expectedActivity));
         assertEquals(activityListByUser.size() - 1, activityListByUserAfterDelete.size());
@@ -301,7 +301,7 @@ public class ActivityDaoImplTest {
     @Test
     void testFindAllActivitiesByUserName() throws DaoException, SQLException {
         Activity expectedActivity = new Activity("Activity1", "Активність1", 1);
-        activityDao.create(expectedActivity);
+        assertTrue(activityDao.create(expectedActivity));
 
         PreparedStatement pst = connection.prepareStatement("INSERT INTO users_activities VALUES (?, ?, false)");
         pst.setLong(1, 1);
@@ -317,7 +317,7 @@ public class ActivityDaoImplTest {
 
         List<Activity> activityListByCategory = activityDao.findAllActivitiesByUser(login);
         assertTrue(activityListByCategory.contains(expectedActivity));
-        activityDao.delete(expectedActivity.getId());
+        assertTrue(activityDao.delete(expectedActivity.getId()));
         List<Activity> activityListByCategoryAfterDelete = activityDao.findAllActivitiesByUser(login);
         assertFalse(activityListByCategoryAfterDelete.contains(expectedActivity));
         assertEquals(activityListByCategory.size() - 1, activityListByCategoryAfterDelete.size());
