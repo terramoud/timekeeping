@@ -21,6 +21,12 @@ public class UserActivity extends Entity {
         this.isActive = isActive;
     }
 
+    public UserActivity(long userId, long activityId) {
+        this.userId = userId;
+        this.activityId = activityId;
+        this.isActive = false;
+    }
+
     public long getUserId() {
         return userId;
     }
