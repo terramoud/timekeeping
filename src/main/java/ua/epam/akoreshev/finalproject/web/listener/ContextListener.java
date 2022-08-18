@@ -1,7 +1,11 @@
 package ua.epam.akoreshev.finalproject.web.listener;
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ua.epam.akoreshev.finalproject.web.command.Command;
+import ua.epam.akoreshev.finalproject.web.command.CommandContainer;
+import ua.epam.akoreshev.finalproject.web.command.IndexCommand;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -23,12 +27,12 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
     @Override
     public void contextInitialized(ServletContextEvent sce) {
 //        jakarta.servlet.jsp.jstl.fmt.LocaleSupport l;
-        LOG.debug("Start context initialization");
+        LOG.trace("Start context initialization");
         ServletContext context = sce.getServletContext();
         initDatasource(context);
-        LOG.debug("DataSource initialized");
+        LOG.trace("DataSource initialized");
         initServices(context);
-        LOG.debug("Services initialized");
+        LOG.trace("Services initialized");
     }
 
     private void initDatasource(ServletContext context) throws IllegalStateException {
@@ -37,7 +41,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             Context initialContext = new InitialContext();
             DataSource dataSource = (DataSource) initialContext.lookup(dataSourceName);
             context.setAttribute(DATASOURCE, dataSource);
-            LOG.trace("context.setAttribute 'dataSource': {}", dataSource.getClass().getName());
+            LOG.debug("context.setAttribute 'dataSource': {}", dataSource.getClass().getName());
         } catch (NamingException e) {
             throw new IllegalStateException("Cannot initialize dataSource", e);
         }
@@ -46,6 +50,19 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 
     private void initServices(ServletContext context) {
         getConnection(context);
+
+        // create services
+//        ProductService productService = new ProductServiceImpl(productDao);
+//        context.setAttribute("addService", productService);
+//        LOG.trace("context.setAttribute 'addService': {}", productService);
+
+        CommandContainer commands = new CommandContainer();
+        Command command = new IndexCommand();
+        commands.addCommand(null, command);
+        commands.addCommand("", command);
+
+        context.setAttribute("commandContainer", commands);
+        LOG.debug("context.setAttribute 'commandContainer': {}", commands);
     }
 
     private Connection getConnection(ServletContext context) {
