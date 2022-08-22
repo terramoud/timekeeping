@@ -197,7 +197,7 @@ public class UserActivityDaoImplTest {
         pst.executeUpdate();
 
         long rowsBeforeDelete = getCountRowsFromTable();
-        assertTrue(userActivityDao.delete(generatedIds[0], generatedIds[1]));
+        assertTrue(userActivityDao.removeAllUsersActivitiesByUser(generatedIds[0]));
         long rowsAfterDelete = getCountRowsFromTable();
         assertTrue(rowsBeforeDelete > rowsAfterDelete);
         assertThrows(DaoException.class, () -> userActivityDao.read(generatedIds[0], generatedIds[1]));
