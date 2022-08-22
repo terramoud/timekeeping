@@ -12,12 +12,12 @@ public interface UserActivityDao extends BaseDao<UserActivity, Long> {
     UserActivity read(long userId, long activityId) throws DaoException;
 
     @Override
-    default boolean delete(Long id) throws DaoException {
+    default boolean delete(Long id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    default UserActivity read(Long id) throws DaoException {
+    default UserActivity read(Long id) {
         throw new UnsupportedOperationException();
     }
 }
