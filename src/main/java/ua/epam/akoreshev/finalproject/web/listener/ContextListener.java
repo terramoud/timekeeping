@@ -3,9 +3,7 @@ package ua.epam.akoreshev.finalproject.web.listener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ua.epam.akoreshev.finalproject.web.command.Command;
-import ua.epam.akoreshev.finalproject.web.command.CommandContainer;
-import ua.epam.akoreshev.finalproject.web.command.IndexCommand;
+import ua.epam.akoreshev.finalproject.web.command.*;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -60,6 +58,17 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
         Command command = new IndexCommand();
         commands.addCommand(null, command);
         commands.addCommand("", command);
+        commands.addCommand("login", new LoginCommand());
+//        commands.addCommand("register", new RegisterCommand());
+        commands.addCommand("logout", new LogoutCommand());
+        commands.addCommand("admin_dashboard", new AdminDashboardCommand());
+        commands.addCommand("open_list_activities", new ListActivitiesCommand());
+        commands.addCommand("open_list_categories", new ListCategoriesCommand());
+        commands.addCommand("open_list_users", new ListUsersCommand());
+        commands.addCommand("timekeeping_report", new TimekeepingReportCommand());
+        commands.addCommand("open_user_page", new UserPageCommand());
+        commands.addCommand("open_profile", new ProfileCommand());
+//        commands.addCommand("save_profile", new SaveProfileCommand());
 
         context.setAttribute("commandContainer", commands);
         LOG.debug("context.setAttribute 'commandContainer': {}", commands);
@@ -73,7 +82,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             LOG.debug("Connection has established successfully. Connection is: {}", connection);
             return connection;
         } catch (SQLException e) {
-            LOG.error(e);
+            LOG.error(e.getMessage());
             throw new IllegalStateException("Cannot get connection from pool", e);
         }
     }
