@@ -1,0 +1,17 @@
+<form action="controller" method="POST"
+	  class="nav-link dropdown-toggle d-flex align-items-center">
+	<input type="hidden" name="command" value="change_locale"/>
+	<input type="hidden" name="source_page" value="${currentPageCommandName}"/>
+	<label>
+		<select name="language" class="form-select shadow-none" onchange="this.form.submit()">
+			<c:if test="${language == 'en'}">
+				<option value="en" selected class="d-none d-md-block">EN</option>
+				<option value="uk" class="d-none d-md-block">UK</option>
+			</c:if>
+			<c:if test="${language == 'uk'}">
+				<option value="en" class="d-none d-md-block">EN</option>
+				<option value="uk" selected class="d-none d-md-block">UK</option>
+			</c:if>
+		</select>
+	</label>
+</form>
