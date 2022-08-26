@@ -1,6 +1,8 @@
 package ua.epam.akoreshev.finalproject.model.entity;
 
 
+import java.util.List;
+
 /**
  * Represents relevant entity from database's table
  *
@@ -9,13 +11,12 @@ package ua.epam.akoreshev.finalproject.model.entity;
 public enum Role {
     ADMIN, USER;
 
-    public static Role getRole(User user) {
-        int roleId = user.getRoleId();
+    public static Role getRole(int userRoleId) {
+        if (userRoleId < 1 || userRoleId > Role.values().length) {
+            return null;
+        }
+        int roleId = userRoleId - 1;
         return Role.values()[roleId];
-    }
-
-    public String getName() {
-        return name().toLowerCase();
     }
 
     @Override
