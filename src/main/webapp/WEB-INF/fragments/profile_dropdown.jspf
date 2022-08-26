@@ -1,0 +1,15 @@
+<span class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic"
+      id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+	<em class="text-light mdi mdi-account-circle fs-1"></em>
+</span>
+<ul class="dropdown-menu dropdown-menu-end user-dd animated" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="controller?command=profile">
+        <em class="mdi mdi-account me-1 ms-1"></em>
+        <fmt:message key="user.profile.dropdown.name"/>
+    </a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="controller?command=logout">
+        <em class="fa fa-power-off me-1 ms-1"></em>
+		<fmt:message key="user.profile.logout"/>
+    </a>
+</ul>
