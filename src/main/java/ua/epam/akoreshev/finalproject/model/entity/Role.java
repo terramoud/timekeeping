@@ -19,6 +19,10 @@ public enum Role {
         return Role.values()[roleId];
     }
 
+    public static int getRoleId(Role role) {
+        return List.of(Role.values()).indexOf(role) + 1;
+    }
+
     @Override
     public String toString() {
         return super.toString().toLowerCase();
