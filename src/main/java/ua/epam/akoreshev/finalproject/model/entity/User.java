@@ -78,7 +78,6 @@ public class User extends Entity {
                 "id=" + id +
                 ", login='" + login + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", roleId=" + roleId +
                 '}';
     }
