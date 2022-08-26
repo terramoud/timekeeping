@@ -1,8 +1,15 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/fragments/directive/taglib.jspf" %>
+<c:set var="language"
+       value="${not empty sessionScope.language ? sessionScope.language :
+                not empty cookie['defaultLocale'].getValue() ? cookie['defaultLocale'].getValue() :
+                pageContext.request.locale}"
+       scope="session"/>
+<fmt:setLocale value="${language}"/>
+
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
-<c:set var="title" value="Settings" scope="page" />
+<html lang="${language}">
+<c:set var="title" value="User profile page" scope="page"/>
 <%@ include file="/WEB-INF/fragments/head.jspf" %>
 
 <body>
@@ -36,29 +43,15 @@
                 <ul class="navbar-nav float-end">
                     <li class="nav-item dropdown">
                         <div class="nav-link dropdown-toggle d-flex align-items-center">
-                            <select class="form-select shadow-none">
-                                <option class="d-none d-md-block">EN</option>
-                                <option class="d-none d-md-block">UK</option>
-                            </select>
+                            <c:set var="currentPageCommandName" value="profile" scope="page"/>
+                            <%@ include file="/WEB-INF/fragments/language_switcher.jspf" %>
                         </div>
                     </li>
                     <!-- ============================================================== -->
                     <!-- User profile -->
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="#"
-                           id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="assets/images/users/1.jpg" alt="user" class="rounded-circle" width="31"/>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end user-dd animated" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="javascript:void(0)">
-                                <em class="mdi mdi-account me-1 ms-1"></em> My Profile
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="javascript:void(0)">
-                                <em class="fa fa-power-off me-1 ms-1"></em> Logout
-                            </a>
-                        </ul>
+                        <%@ include file="/WEB-INF/fragments/profile_dropdown.jspf" %>
                     </li>
                 </ul>
             </div>

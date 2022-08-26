@@ -1,8 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/fragments/directive/taglib.jspf" %>
+<c:set var="language"
+       value="${not empty sessionScope.language ? sessionScope.language :
+         not empty cookie['defaultLocale'].getValue() ? cookie['defaultLocale'].getValue() :pageContext.request.locale}"
+       scope="session"/>
+<fmt:setLocale value="${language}"/>
+
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
-<c:set var="title" value="Settings" scope="page" />
+<html lang="${language}">
+<c:set var="title" value="User page" scope="page"/>
 <%@ include file="/WEB-INF/fragments/head.jspf" %>
 
 <body>
@@ -22,9 +28,9 @@
         data-header-position="absolute"
         data-boxed-layout="full"
 >
-    <%@ include file="/WEB-INF/fragments/admin/header.jspf" %>
+    <%@ include file="/WEB-INF/fragments/admin_header.jspf" %>
 
-    <%@ include file="/WEB-INF/fragments/admin/sidebar.jspf" %>
+    <%@ include file="/WEB-INF/fragments/admin_sidebar.jspf" %>
 
     <!-- ============================================================== -->
     <!-- Page wrapper  -->

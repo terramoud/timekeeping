@@ -1,8 +1,7 @@
 <form action="controller" method="POST"
 	  class="nav-link dropdown-toggle d-flex align-items-center">
 	<input type="hidden" name="command" value="change_locale"/>
-	<input type="hidden" name="source_page" value="${currentPageCommandName}"/>
-	<label>
+	<label class="m-0">
 		<select name="language" class="form-select shadow-none" onchange="this.form.submit()">
 			<c:if test="${language == 'en'}">
 				<option value="en" selected class="d-none d-md-block">EN</option>

@@ -22,9 +22,9 @@
         data-header-position="absolute"
         data-boxed-layout="full"
 >
-    <%@ include file="/WEB-INF/fragments/admin/header.jspf" %>
+    <%@ include file="/WEB-INF/fragments/admin_header.jspf" %>
 
-    <%@ include file="/WEB-INF/fragments/admin/sidebar.jspf" %>
+    <%@ include file="/WEB-INF/fragments/admin_sidebar.jspf" %>
 
     <div class="page-wrapper">
         <div class="page-breadcrumb">
