@@ -12,6 +12,26 @@
         <param-value>java:/comp/env/jdbc/timekeeping</param-value>
     </context-param>
 
+    <context-param>
+        <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+        <param-value>resources</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.servlet.jsp.jstl.fmt.locale</param-name>
+        <param-value>en</param-value>
+    </context-param>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/error404.jsp</location>
+    </error-page>
+
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/WEB-INF/error404.jsp</location>
+    </error-page>
+
 </web-app>
 
 
