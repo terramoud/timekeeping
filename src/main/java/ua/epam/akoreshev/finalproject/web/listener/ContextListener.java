@@ -3,7 +3,14 @@ package ua.epam.akoreshev.finalproject.web.listener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ua.epam.akoreshev.finalproject.model.dao.ActivityDao;
+import ua.epam.akoreshev.finalproject.model.dao.UserDao;
+import ua.epam.akoreshev.finalproject.model.dao.impl.ActivityDaoImpl;
+import ua.epam.akoreshev.finalproject.model.dao.impl.UserDaoImpl;
 import ua.epam.akoreshev.finalproject.web.command.*;
+import ua.epam.akoreshev.finalproject.web.service.UserService;
+import ua.epam.akoreshev.finalproject.web.service.impl.ActivityServiceImpl;
+import ua.epam.akoreshev.finalproject.web.service.impl.UserServiceImpl;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -24,7 +31,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-//        jakarta.servlet.jsp.jstl.fmt.LocaleSupport l;
+        javax.servlet.jsp.jstl.fmt.LocaleSupport l;
         LOG.trace("Start context initialization");
         ServletContext context = sce.getServletContext();
         initDatasource(context);
@@ -47,27 +54,30 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 
 
     private void initServices(ServletContext context) {
-        getConnection(context);
+        UserDao userDao = new UserDaoImpl(getConnection(context));
+        ActivityDao activityDao = new ActivityDaoImpl(getConnection(context));
+        LOG.debug("Created 'userDao' is: {}", userDao);
+        LOG.debug("Created 'activityDao' is: {}", activityDao);
 
-        // create services
-//        ProductService productService = new ProductServiceImpl(productDao);
-//        context.setAttribute("addService", productService);
-//        LOG.trace("context.setAttribute 'addService': {}", productService);
+        UserService userService = new UserServiceImpl(userDao);
 
         CommandContainer commands = new CommandContainer();
         Command command = new IndexCommand();
         commands.addCommand(null, command);
         commands.addCommand("", command);
-        commands.addCommand("login", new LoginCommand());
-//        commands.addCommand("register", new RegisterCommand());
+        commands.addCommand("index_page", command);
+        commands.addCommand("login", new LoginCommand(userService));
+        commands.addCommand("register", new RegisterCommand(userService));
         commands.addCommand("logout", new LogoutCommand());
         commands.addCommand("admin_dashboard", new AdminDashboardCommand());
-        commands.addCommand("open_list_activities", new ListActivitiesCommand());
-        commands.addCommand("open_list_categories", new ListCategoriesCommand());
-        commands.addCommand("open_list_users", new ListUsersCommand());
+        commands.addCommand("list_activities", new ListActivitiesCommand());
+        commands.addCommand("list_categories", new ListCategoriesCommand());
+        commands.addCommand("list_users", new ListUsersCommand());
         commands.addCommand("timekeeping_report", new TimekeepingReportCommand());
-        commands.addCommand("open_user_page", new UserPageCommand());
-        commands.addCommand("open_profile", new ProfileCommand());
+        commands.addCommand("user_page", new UserPageCommand(new ActivityServiceImpl(activityDao)));
+        commands.addCommand("profile", new ProfileCommand());
+        commands.addCommand("change_locale", new ChangeLocaleCommand());
+        commands.addCommand("add_activity_request", new AddActivityRequestCommand());
 //        commands.addCommand("save_profile", new SaveProfileCommand());
 
         context.setAttribute("commandContainer", commands);
