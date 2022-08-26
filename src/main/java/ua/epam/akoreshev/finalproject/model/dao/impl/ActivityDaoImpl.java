@@ -6,6 +6,7 @@ import ua.epam.akoreshev.finalproject.exceptions.DaoException;
 import ua.epam.akoreshev.finalproject.model.dao.ActivityDao;
 import ua.epam.akoreshev.finalproject.model.dao.Mapper;
 import ua.epam.akoreshev.finalproject.model.entity.Activity;
+import ua.epam.akoreshev.finalproject.model.entity.Category;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ public class ActivityDaoImpl implements ActivityDao {
     private static final String SQL_DELETE_ACTIVITY_BY_ID = "DELETE FROM activities WHERE id = ?";
 
     private static final String SQL_FIND_ALL_ACTIVITIES = "SELECT * FROM activities";
+    private static final String SQL_FIND_ALL_CATEGORIES = "SELECT * FROM categories";
 
     private static final String SQL_FIND_ALL_ACTIVITIES_BY_CATEGORY_ID =
             "SELECT * FROM activities WHERE category_id = ?";
@@ -135,6 +137,30 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.warn("Empty list activities has been returned by 'find all activities by user id'");
         }
         return activitiesList;
+    }
+
+    @Override
+    public List<Category> findAllCategories() throws DaoException {
+        List<Category> categoryList = new LinkedList<>();
+        try (Statement st = connection.createStatement()) {
+            ResultSet rs = st.executeQuery(SQL_FIND_ALL_CATEGORIES);
+            LOG.trace("SQL query find all categories to database has already been completed successfully");
+            while (rs.next()) {
+                Category category = new Category();
+                category.setId(rs.getLong( "id"));
+                category.setNameEn(rs.getString( "name_en"));
+                category.setNameUk(rs.getString( "name_uk"));
+                categoryList.add(category);
+            }
+            LOG.debug("The {} categories has been found by query to database", categoryList.size());
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all categories, because {}", e.getMessage());
+            throw new DaoException("Cannot find categories. " + e.getMessage(), e);
+        }
+        if (categoryList.isEmpty()) {
+            LOG.warn("Empty list categories has been returned by findAllCategories() method");
+        }
+        return categoryList;
     }
 
     @Override
