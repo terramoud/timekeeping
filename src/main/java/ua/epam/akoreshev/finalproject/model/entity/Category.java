@@ -8,31 +8,32 @@ import java.util.Objects;
  * @author Alexander Koreshev
  */
 public class Category extends Entity {
-    private String name;
-    private long translationId;
+    private String nameEn;
+    private String nameUk;
 
     public Category() {
     }
 
-    public Category(String name, long translationId) {
-        this.name = name;
-        this.translationId = translationId;
+    public Category(long id, String nameEn, String nameUk) {
+        this.id = id;
+        this.nameEn = nameEn;
+        this.nameUk = nameUk;
     }
 
-    public String getName() {
-        return name;
+    public String getNameEn() {
+        return nameEn;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 
-    public long getTranslationId() {
-        return translationId;
+    public String getNameUk() {
+        return nameUk;
     }
 
-    public void setTranslationId(long translationId) {
-        this.translationId = translationId;
+    public void setNameUk(String nameUk) {
+        this.nameUk = nameUk;
     }
 
     @Override
@@ -40,21 +41,22 @@ public class Category extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
-        return category.id == id && translationId == category.translationId &&
-                name.equals(category.name);
+        return id == category.id &&
+                nameEn.equals(category.nameEn) &&
+                nameUk.equals(category.nameUk);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, translationId);
+        return Objects.hash(id, nameEn, nameUk);
     }
 
     @Override
     public String toString() {
         return "Category{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", translationId=" + translationId +
+                ", name_en='" + nameEn + '\'' +
+                ", name_uk='" + nameUk + '\'' +
                 '}';
     }
 }
