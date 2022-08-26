@@ -15,4 +15,6 @@ public final class Path {
 
     public static final String LOGIN_COMMAND = "/controller?command=login";
     public static final String LOGOUT_COMMAND = "/controller?command=logout";
+    public static final String USER_PAGE_COMMAND = "?command=user_page";
+    public static final String ADMIN_PAGE_COMMAND = "?command=admin_dashboard";
 }
