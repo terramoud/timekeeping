@@ -26,33 +26,52 @@ public class Controller extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
+            System.out.println("GET!!!!!!!!!!!!!!!!!!!!!!!!!!" + req.getHeader("referer"));
             String url = getUrl(req, resp);
             LOG.debug("url: {}", url);
             req.getRequestDispatcher(url).forward(req, resp);
             LOG.debug("forward: {}", url);
-        } catch (CommandException | IOException e) {
-            LOG.error("Error has been thrown by front controller: {}", e.getMessage());
-            resp.sendError(500, "Cannot process the command");
-			throw new ServletException("Cannot process the command", e);
+        } catch (CommandException | IOException | ServletException e) {
+            LOG.error("Error has been thrown by front controller", e);
+            try {
+                LOG.debug("REDIRECT TO {}", Path.ERROR_PAGE500);
+                req.getRequestDispatcher(Path.ERROR_PAGE500).forward(req, resp);
+            } catch (ServletException servletException) {
+                servletException.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+//            resp.sendError(500, "Cannot process the command");
+//			throw new ServletException("Cannot process the command", e);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
+            System.out.println("POST!!!!!!!!!!!!!!!!!!!!!!!!!!" + req.getHeader("referer"));
             String url = getUrl(req, resp);
             resp.sendRedirect(url);
             LOG.debug("redirected: {}", url);
         } catch (CommandException | IOException e) {
-            LOG.error("Error has been thrown by front controller: {}", e.getMessage());
-            resp.sendError(500, "Cannot process the command");
-			throw new ServletException("Cannot process the command", e);
+            LOG.error("Error has been thrown by front controller", e);
+            try {
+                LOG.debug("REDIRECT TO {}", Path.ERROR_PAGE500);
+                req.getRequestDispatcher(Path.ERROR_PAGE500).forward(req, resp);
+            } catch (ServletException servletException) {
+                servletException.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+//            resp.sendError(500, "Cannot process the command");
+//			throw new ServletException("Cannot process the command", e);
         }
     }
 
     private String getUrl(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
+        System.out.println(req.getMethod());
         String commandName = req.getParameter("command");
         LOG.debug("Request parameter: command name --> \"{}\"", commandName);
         Command command = commands.getCommand(commandName);
