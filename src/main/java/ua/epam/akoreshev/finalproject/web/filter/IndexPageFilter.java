@@ -12,15 +12,14 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Objects;
 
 @WebFilter(urlPatterns = "/*",
         initParams = {@WebInitParam(name = "index_page_URI", value = "/timekeeping/")},
         dispatcherTypes = {DispatcherType.REQUEST}
 )
-public class AuthorizationFilter implements Filter {
+public class IndexPageFilter implements Filter {
     private String indexPage;
-    private static final Logger LOG = LogManager.getLogger(AuthorizationFilter.class);
+    private static final Logger LOG = LogManager.getLogger(IndexPageFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -30,7 +29,8 @@ public class AuthorizationFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
+    public void doFilter(ServletRequest request,
+                         ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
         LOG.trace("Start doFilter");
         HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -44,7 +44,8 @@ public class AuthorizationFilter implements Filter {
         LOG.trace("End doFilter");
     }
 
-    private void forwardToUserRoleHomePage(ServletRequest request, ServletResponse response,
+    private void forwardToUserRoleHomePage(ServletRequest request,
+                                           ServletResponse response,
                                            HttpServletRequest httpRequest,
                                            FilterChain chain) throws ServletException, IOException {
         HttpSession session = httpRequest.getSession(false);
@@ -60,13 +61,13 @@ public class AuthorizationFilter implements Filter {
         }
         Role userRole = Role.getRole(user.getRoleId());
         LOG.debug("Current user role is {}", userRole);
-        if (Objects.equals(userRole, Role.USER)) {
+        if (userRole == Role.USER) {
             request.getRequestDispatcher(Path.USER_PAGE).forward(request, response);
-            LOG.debug("Forward user command is: {}", Path.USER_PAGE);
+            LOG.debug("Forward user page is: {}", Path.USER_PAGE);
         }
-        if (Objects.equals(userRole, Role.ADMIN)) {
+        if (userRole == Role.ADMIN) {
             request.getRequestDispatcher(Path.ADMIN_PAGE).forward(request, response);
-            LOG.debug("Forward admin command is: {}", Path.ADMIN_PAGE);
+            LOG.debug("Forward admin page is: {}", Path.ADMIN_PAGE);
         }
     }
 
