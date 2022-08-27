@@ -13,8 +13,11 @@ public final class Path {
     public static final String INDEX_PAGE = "/index.jsp";
 
 
-    public static final String LOGIN_COMMAND = "/controller?command=login";
-    public static final String LOGOUT_COMMAND = "/controller?command=logout";
+    public static final String INDEX_PAGE_COMMAND = "index_page";
+    public static final String LOGIN_COMMAND = "login";
+    public static final String CHANGE_LOCALE_COMMAND = "change_locale";
+    public static final String LOGOUT_COMMAND = "logout";
+    public static final String REGISTER_COMMAND = "register";
     public static final String USER_PAGE_COMMAND = "?command=user_page";
     public static final String ADMIN_PAGE_COMMAND = "?command=admin_dashboard";
 }
