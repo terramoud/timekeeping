@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 public class LogoutCommand extends Command {
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
+        req.getSession().invalidate();
         return Path.INDEX_PAGE;
     }
 }
