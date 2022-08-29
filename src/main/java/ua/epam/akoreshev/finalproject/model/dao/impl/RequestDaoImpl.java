@@ -13,7 +13,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class RequestDaoImpl implements RequestDao {
-    private static final String SQL_GET_REQUEST_BY_ID = "SELECT * FROM requests WHERE id=?";
+    private static final String SQL_GET_REQUEST_BY_ID = "SELECT * FROM requests WHERE id = ?";
+
+    private static final String SQL_GET_REQUEST_BY_USER_ACTIVITY_TYPE_STATUS_IDS =
+            "SELECT * FROM requests WHERE user_id = ? AND activity_id = ? AND type_id = ? AND status_id = ?";
 
     private static final String SQL_DELETE_REQUEST_BY_ID = "DELETE FROM requests WHERE id=?";
 
@@ -201,6 +204,27 @@ public class RequestDaoImpl implements RequestDao {
             throw new DaoException("Cannot create 'request for activities from user' at database. " + e.getMessage(), e);
         }
         return result;
+    }
+
+    @Override
+    public Request read(long userId, long activityId, long typeId, long statusId) throws DaoException {
+        LOG.debug("Obtained user id, activity id, type id and status id are: {}, {}, {}, {}", userId, activityId, typeId, statusId);
+        Request request = new Request();
+        try (PreparedStatement pst = connection.prepareStatement(SQL_GET_REQUEST_BY_USER_ACTIVITY_TYPE_STATUS_IDS)) {
+            pst.setLong(1, userId);
+            pst.setLong(2, activityId);
+            pst.setLong(3, typeId);
+            pst.setLong(4, statusId);
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query to read the request from database has already been completed successfully");
+            if (!rs.next()) return null;
+            mapRowFromDB.map(rs, request);
+            LOG.debug("The request: {} has already been found by query to database", request);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown by sql query to get request, {}", e.getMessage());
+            throw new DaoException("Cannot read 'request for activities from user'. " + e.getMessage(), e);
+        }
+        return request;
     }
 
     @Override

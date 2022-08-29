@@ -14,5 +14,7 @@ public interface RequestDao extends BaseDao<Request, Long> {
 
     boolean updateRequestStatus(long requestId, String status) throws DaoException;
 
+    Request read(long userId, long activityId, long typeId, long statusId) throws DaoException;
+
 }
 
