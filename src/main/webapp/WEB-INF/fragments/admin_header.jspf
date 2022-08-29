@@ -28,12 +28,7 @@ header (top area).
 			</ul>
 			<ul class="navbar-nav float-end">
 				<li class="nav-item dropdown">
-					<form action="locale" method="get" class="nav-link dropdown-toggle d-flex align-items-center">
-						<select name="lang" class="form-select shadow-none">
-							<option value="en" class="d-none d-md-block">EN</option>
-							<option value="uk" class="d-none d-md-block">UK</option>
-						</select>
-					</form>
+					<%@ include file="/WEB-INF/fragments/language_switcher.jspf" %>
 				</li>
 				<!-- ============================================================== -->
 				<!-- User profile -->
