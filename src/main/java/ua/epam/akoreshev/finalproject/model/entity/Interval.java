@@ -24,6 +24,11 @@ public class Interval extends Entity {
         this.activityId = activityId;
     }
 
+    public Interval(long userId, long activityId) {
+        this.userId = userId;
+        this.activityId = activityId;
+    }
+
     public long getUserId() {
         return userId;
     }
