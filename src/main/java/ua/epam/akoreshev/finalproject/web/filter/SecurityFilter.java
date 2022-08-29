@@ -10,6 +10,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
@@ -64,16 +65,29 @@ public class SecurityFilter implements Filter {
         boolean isForbiddenCommand = currentCmd != null && Arrays.stream(Role.values())
                 .filter(role -> role != userRole)
                 .anyMatch(otherRole -> currentCmd.startsWith(otherRole.toString()));
-
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
         if (isForbiddenCommand && userRole == Role.ADMIN) {
-            LOG.debug("Forward page is: {}", Path.ADMIN_PAGE);
-            request.getRequestDispatcher(Path.ADMIN_PAGE).forward(request, response);
+            LOG.debug("Redirect to: {}", Path.ADMIN_PAGE_COMMAND);
+            httpResponse.sendRedirect(Path.ADMIN_PAGE_COMMAND);
             LOG.trace("End doFilter");
             return;
         }
         if (isForbiddenCommand && userRole == Role.USER) {
-            LOG.debug("Forward page is: {}", Path.USER_PAGE);
-            request.getRequestDispatcher(Path.USER_PAGE).forward(request, response);
+            LOG.debug("Redirect to: {}", Path.USER_PAGE_COMMAND);
+            httpResponse.sendRedirect(Path.USER_PAGE_COMMAND);
+            LOG.trace("End doFilter");
+            return;
+        }
+        boolean badCommand = (currentCmd == null || currentCmd.isEmpty() || currentCmd.equals("index_page"));
+        if (badCommand && userRole == Role.ADMIN) {
+            LOG.debug("Redirect to: {}", Path.ADMIN_PAGE_COMMAND);
+            httpResponse.sendRedirect(Path.ADMIN_PAGE_COMMAND);
+            LOG.trace("End doFilter");
+            return;
+        }
+        if (badCommand && userRole == Role.USER) {
+            LOG.debug("Redirect to: {}", Path.USER_PAGE_COMMAND);
+            httpResponse.sendRedirect(Path.USER_PAGE_COMMAND);
             LOG.trace("End doFilter");
             return;
         }
