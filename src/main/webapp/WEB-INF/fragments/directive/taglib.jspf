@@ -12,3 +12,8 @@ JSTL functions tag library.
 JSTL i18n tag library.
 ===========================================================================--%> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<%--===========================================================================
+Custom Tag library descriptor (TLD)
+===========================================================================--%>
+<%@ taglib uri="/WEB-INF/time_formatter.tld" prefix="m" %>
