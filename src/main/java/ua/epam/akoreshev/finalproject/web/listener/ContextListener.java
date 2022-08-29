@@ -4,12 +4,19 @@ package ua.epam.akoreshev.finalproject.web.listener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.model.dao.ActivityDao;
+import ua.epam.akoreshev.finalproject.model.dao.IntervalDao;
+import ua.epam.akoreshev.finalproject.model.dao.RequestDao;
 import ua.epam.akoreshev.finalproject.model.dao.UserDao;
 import ua.epam.akoreshev.finalproject.model.dao.impl.ActivityDaoImpl;
+import ua.epam.akoreshev.finalproject.model.dao.impl.IntervalDaoImpl;
+import ua.epam.akoreshev.finalproject.model.dao.impl.RequestDaoImpl;
 import ua.epam.akoreshev.finalproject.model.dao.impl.UserDaoImpl;
+import ua.epam.akoreshev.finalproject.model.entity.Role;
 import ua.epam.akoreshev.finalproject.web.command.*;
 import ua.epam.akoreshev.finalproject.web.service.UserService;
 import ua.epam.akoreshev.finalproject.web.service.impl.ActivityServiceImpl;
+import ua.epam.akoreshev.finalproject.web.service.impl.IntervalServiceImpl;
+import ua.epam.akoreshev.finalproject.web.service.impl.RequestServiceImpl;
 import ua.epam.akoreshev.finalproject.web.service.impl.UserServiceImpl;
 
 import javax.naming.Context;
@@ -56,10 +63,17 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
     private void initServices(ServletContext context) {
         UserDao userDao = new UserDaoImpl(getConnection(context));
         ActivityDao activityDao = new ActivityDaoImpl(getConnection(context));
+        RequestDao requestDao = new RequestDaoImpl(getConnection(context));
+        IntervalDao intervalDao = new IntervalDaoImpl(getConnection(context));
         LOG.debug("Created 'userDao' is: {}", userDao);
         LOG.debug("Created 'activityDao' is: {}", activityDao);
+        LOG.debug("Created 'requestDao' is: {}", activityDao);
 
         UserService userService = new UserServiceImpl(userDao);
+        ActivityServiceImpl activityService = new ActivityServiceImpl(activityDao);
+        IntervalServiceImpl intervalService = new IntervalServiceImpl(intervalDao);
+        RequestServiceImpl requestService = new RequestServiceImpl(requestDao);
+
 
         CommandContainer commands = new CommandContainer();
         Command command = new IndexCommand();
@@ -69,15 +83,17 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
         commands.addCommand("login", new LoginCommand(userService));
         commands.addCommand("register", new RegisterCommand(userService));
         commands.addCommand("logout", new LogoutCommand());
-        commands.addCommand("admin_dashboard", new AdminDashboardCommand());
-        commands.addCommand("list_activities", new ListActivitiesCommand());
-        commands.addCommand("list_categories", new ListCategoriesCommand());
-        commands.addCommand("list_users", new ListUsersCommand());
-        commands.addCommand("timekeeping_report", new TimekeepingReportCommand());
-        commands.addCommand("user_page", new UserPageCommand(new ActivityServiceImpl(activityDao)));
-        commands.addCommand("profile", new ProfileCommand());
         commands.addCommand("change_locale", new ChangeLocaleCommand());
-        commands.addCommand("add_activity_request", new AddActivityRequestCommand());
+        commands.addCommand("profile", new ProfileCommand());
+        commands.addCommand(Role.ADMIN + "_dashboard", new AdminDashboardCommand());
+        commands.addCommand(Role.ADMIN + "_list_activities", new ListActivitiesCommand());
+        commands.addCommand(Role.ADMIN + "_list_categories", new ListCategoriesCommand());
+        commands.addCommand(Role.ADMIN + "_list_users", new ListUsersCommand());
+        commands.addCommand(Role.ADMIN + "_timekeeping_report", new TimekeepingReportCommand());
+        commands.addCommand(Role.USER + "_page", new UserPageCommand(activityService, intervalService));
+        commands.addCommand(Role.USER + "_add_request_for_activity", new AddRequestCommand(requestService));
+        commands.addCommand(Role.USER + "_set_start_time", new SetStartTimeCommand(intervalService));
+        commands.addCommand(Role.USER + "_set_stop_time", new SetStopTimeCommand(intervalService));
 //        commands.addCommand("save_profile", new SaveProfileCommand());
 
         context.setAttribute("commandContainer", commands);
