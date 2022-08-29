@@ -34,16 +34,12 @@ public class Controller extends HttpServlet {
             req.getRequestDispatcher(url).forward(req, resp);
             LOG.debug("forward: {}", url);
         } catch (CommandException | IOException | ServletException e) {
-            LOG.error("Error has been thrown by front controller", e);
+            LOG.error("Error has been thrown by front controller. {}", e.getMessage());
             try {
-                LOG.debug("REDIRECT TO {}", Path.ERROR_PAGE500);
-                req.getRequestDispatcher(Path.ERROR_PAGE500).forward(req, resp);
-            } catch (ServletException servletException) {
-                servletException.printStackTrace();
+                resp.sendError(500, "Cannot process the command");
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
-//            resp.sendError(500, "Cannot process the command");
 //			throw new ServletException("Cannot process the command", e);
         }
     }
@@ -56,16 +52,12 @@ public class Controller extends HttpServlet {
             resp.sendRedirect(url);
             LOG.debug("redirected: {}", url);
         } catch (CommandException | IOException e) {
-            LOG.error("Error has been thrown by front controller", e);
+            LOG.error("Error has been thrown by front controller. {}", e.getMessage());
             try {
-                LOG.debug("REDIRECT TO {}", Path.ERROR_PAGE500);
-                req.getRequestDispatcher(Path.ERROR_PAGE500).forward(req, resp);
-            } catch (ServletException servletException) {
-                servletException.printStackTrace();
+                resp.sendError(500, "Cannot process the command");
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
-//            resp.sendError(500, "Cannot process the command");
 //			throw new ServletException("Cannot process the command", e);
         }
     }
@@ -77,7 +69,7 @@ public class Controller extends HttpServlet {
         Command command = commands.getCommand(commandName);
         LOG.debug("Obtained command: {}", command);
         if (command == null) {
-            return Path.ERROR_PAGE500;
+            throw new CommandException("Non-existent command");
         }
         return command.execute(req, resp);
     }
