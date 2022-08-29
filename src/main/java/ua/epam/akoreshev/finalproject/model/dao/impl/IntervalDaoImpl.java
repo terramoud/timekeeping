@@ -5,7 +5,9 @@ import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
 import ua.epam.akoreshev.finalproject.model.dao.IntervalDao;
 import ua.epam.akoreshev.finalproject.model.dao.Mapper;
+import ua.epam.akoreshev.finalproject.model.dao.UserActivityDao;
 import ua.epam.akoreshev.finalproject.model.entity.Interval;
+import ua.epam.akoreshev.finalproject.model.entity.UserActivity;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -22,10 +24,21 @@ public class IntervalDaoImpl implements IntervalDao {
             "UPDATE intervals SET start = ?, finish = ?, user_id = ?, activity_id = ? WHERE id = ?";
 
     private static final String SQL_SET_START_TIME_FOR_INTERVAL =
-            "UPDATE intervals SET start = ? WHERE user_id = ? AND activity_id = ? ORDER BY id DESC";
+            "UPDATE intervals AS i INNER JOIN users_activities AS ua " +
+                    "ON i.user_id = ua.user_id AND i.activity_id = ua.activity_id " +
+                    "SET start = ? " +
+                    "WHERE i.user_id = ? AND i.activity_id = ? AND i.start IS NULL " +
+                    "AND i.finish IS NULL AND ua.is_active = TRUE";
+
+    public static final String SET_ACTIVE_STATUS_FOR_USER_ACTIVITY =
+            "UPDATE users_activities SET is_active = TRUE WHERE user_id = ? AND activity_id = ?";
 
     private static final String SQL_SET_FINISH_TIME_FOR_INTERVAL =
-            "UPDATE intervals SET finish = ? WHERE user_id = ? AND activity_id = ? ORDER BY id DESC";
+            "UPDATE intervals AS i INNER JOIN users_activities AS ua " +
+                    "ON i.user_id = ua.user_id AND i.activity_id = ua.activity_id " +
+                    "SET i.finish = ? " +
+                    "WHERE i.user_id = ? AND i.activity_id = ? AND i.finish IS NULL " +
+                    "AND i.start IS NOT NULL AND ua.is_active = TRUE";
 
     private static final String SQL_DELETE_INTERVAL_BY_ID = "DELETE FROM intervals WHERE id = ?";
 
@@ -33,6 +46,12 @@ public class IntervalDaoImpl implements IntervalDao {
 
     private static final String SQL_FIND_ALL_INTERVALS_BY_USER_ACTIVITY =
             "SELECT * FROM intervals WHERE user_id = ? AND activity_id = ?";
+
+    private static final String SQL_GET_INTERVAL_BY_USER_ACTIVITY =
+            "SELECT * FROM intervals WHERE user_id = ? AND activity_id = ? ORDER BY id DESC LIMIT 1";
+
+    private static final String FIND_ALL_USER_ACTIVITY_THAT_IS_ACTIVE_STATUS =
+            "SELECT * FROM users_activities WHERE is_active = TRUE";
 
     private final Mapper<Interval, PreparedStatement> mapEntityToDB = (Interval interval, PreparedStatement preparedStatement) -> {
         LocalDateTime startTime = interval.getStart();
@@ -68,20 +87,39 @@ public class IntervalDaoImpl implements IntervalDao {
         LOG.debug("Obtained 'user id', 'activity id' and 'time' to set interval's start time are: {}, {}, {}",
                 userId, activityId, startTime);
         boolean result = true;
-        try (PreparedStatement pst = connection.prepareStatement(SQL_SET_START_TIME_FOR_INTERVAL)) {
-            pst.setTimestamp(1, Timestamp.valueOf(startTime));
-            pst.setLong(2, userId);
-            pst.setLong(3, activityId);
-            int rowCount = pst.executeUpdate();
-            LOG.trace("SQL query to update a start time of 'interval' from database has already been completed successfully");
-            if (rowCount == 0) {
+        int changedRowSetIsActive = 0;
+        int changedRowSetTime = 0;
+        try (Statement st = connection.createStatement()) {
+            connection.setAutoCommit(false);
+            ResultSet rs = st.executeQuery(FIND_ALL_USER_ACTIVITY_THAT_IS_ACTIVE_STATUS);
+            if (rs.next()) {
                 result = false;
-                LOG.warn("The start time of 'interval' wasn't updated by query to database");
             }
-            LOG.debug("The {} rows has been changed to set start time of 'interval'", rowCount);
+            if (result) {
+                try (PreparedStatement ps = connection.prepareStatement(SET_ACTIVE_STATUS_FOR_USER_ACTIVITY)) {
+                    ps.setLong(1, userId);
+                    ps.setLong(2, activityId);
+                    changedRowSetIsActive = ps.executeUpdate();
+                }
+                try (PreparedStatement pst = connection.prepareStatement(SQL_SET_START_TIME_FOR_INTERVAL)) {
+                    pst.setTimestamp(1, Timestamp.valueOf(startTime));
+                    pst.setLong(2, userId);
+                    pst.setLong(3, activityId);
+                    changedRowSetTime = pst.executeUpdate();
+                }
+                LOG.trace("SQL query to update a start time of 'interval' from database has been completed successfully");
+            }
+            if (changedRowSetIsActive == 0 || changedRowSetTime == 0) {
+                result = false;
+                LOG.warn("The start time of 'interval' cannot set by query to database");
+            }
+            connection.commit();
         } catch (SQLException e) {
+            rollback(connection);
             LOG.error("DAO exception has been thrown to set start time of 'interval', because {}", e.getMessage());
             throw new DaoException("Cannot set start time of 'interval'. " + e.getMessage(), e);
+        } finally {
+            setAutoCommit(connection);
         }
         return result;
     }
@@ -92,6 +130,7 @@ public class IntervalDaoImpl implements IntervalDao {
                 userId, activityId, finishTime);
         boolean result = true;
         try (PreparedStatement pst = connection.prepareStatement(SQL_SET_FINISH_TIME_FOR_INTERVAL)) {
+            connection.setAutoCommit(false);
             pst.setTimestamp(1, Timestamp.valueOf(finishTime));
             pst.setLong(2, userId);
             pst.setLong(3, activityId);
@@ -99,12 +138,25 @@ public class IntervalDaoImpl implements IntervalDao {
             LOG.trace("SQL query to update a finish time of 'interval' from database has already been completed successfully");
             if (rowCount == 0) {
                 result = false;
-                LOG.warn("The finish time of 'interval' wasn't updated by query to database");
+            }
+            if (result) {
+                UserActivityDao userActivityDao = new UserActivityDaoImpl(connection);
+                UserActivity userActivity = new UserActivity(userId, activityId, false);
+                result = userActivityDao.update(userActivity);
+            }
+            if (result) {
+                result = this.create(new Interval(userId, activityId));
             }
             LOG.debug("The {} rows has been changed to set finish time of 'interval'", rowCount);
-        } catch (SQLException e) {
+            connection.commit();
+            if (!result)
+                rollback(connection);
+        } catch (SQLException | DaoException e) {
+            rollback(connection);
             LOG.error("DAO exception has been thrown to set finish time of 'interval', because {}", e.getMessage());
             throw new DaoException("Cannot set finish time of 'interval'. " + e.getMessage(), e);
+        } finally {
+            setAutoCommit(connection);
         }
         return result;
     }
@@ -132,6 +184,25 @@ public class IntervalDaoImpl implements IntervalDao {
             LOG.warn("Empty list 'intervals' has been returned by find all 'intervals' by user_activity");
         }
         return intervalList;
+    }
+
+    @Override
+    public Interval readIntervalByUserActivity(long userId, long activityId) throws DaoException {
+        LOG.debug("Obtained 'user id' and 'activity id' to get 'interval' are: {}, {}", userId, activityId);
+        Interval interval = new Interval();
+        try (PreparedStatement pst = connection.prepareStatement(SQL_GET_INTERVAL_BY_USER_ACTIVITY)) {
+            pst.setLong(1, userId);
+            pst.setLong(2, activityId);
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query to read an 'interval' from database has already been completed successfully");
+            if (!rs.next()) return null;
+            mapEntityFromDB.map(rs, interval);
+            LOG.debug("The 'interval': {} has been found by query to database", interval);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all 'intervals' by user_activity , because {}", e.getMessage());
+            throw new DaoException("Cannot find 'intervals' by user_activity. " + e.getMessage(), e);
+        }
+        return interval;
     }
 
     @Override

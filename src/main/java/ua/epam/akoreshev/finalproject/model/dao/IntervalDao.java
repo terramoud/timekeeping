@@ -12,5 +12,6 @@ public interface IntervalDao extends BaseDao<Interval, Long> {
     boolean setFinishTimeForUserActivity(long userId, long activityId, LocalDateTime finishTime) throws DaoException;
 
     List<Interval> findAllIntervalsByUserActivity(long userId, long activityId) throws DaoException;
+    Interval readIntervalByUserActivity(long userId, long activityId) throws DaoException;
 }
 
