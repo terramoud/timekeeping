@@ -3,7 +3,7 @@ package ua.epam.akoreshev.finalproject.web.command;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.CommandException;
-import ua.epam.akoreshev.finalproject.exceptions.DaoException;
+import ua.epam.akoreshev.finalproject.exceptions.ServiceException;
 import ua.epam.akoreshev.finalproject.model.entity.Role;
 import ua.epam.akoreshev.finalproject.model.entity.User;
 import ua.epam.akoreshev.finalproject.web.service.UserService;
@@ -31,7 +31,7 @@ public class RegisterCommand extends Command {
             if (userService.addUser(user)) {
                 LOG.trace("Registration completed");
             }
-        } catch (DaoException e) {
+        } catch (ServiceException e) {
             LOG.error(e);
             throw new CommandException("Cannot register new user", e);
         }
