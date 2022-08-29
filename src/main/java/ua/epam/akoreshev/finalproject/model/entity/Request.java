@@ -62,8 +62,7 @@ public class Request extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Request request = (Request) o;
-        return id == request.id &&
-                userId == request.userId &&
+        return userId == request.userId &&
                 activityId == request.activityId &&
                 typeId == request.typeId &&
                 statusId == request.statusId;
@@ -71,7 +70,7 @@ public class Request extends Entity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), userId, activityId, typeId, statusId);
+        return Objects.hash(userId, activityId, typeId, statusId);
     }
 
     @Override
