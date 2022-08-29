@@ -18,16 +18,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean addUser(User user) throws DaoException {
-        return validateUserData(user) && userDao.create(user);
+    public boolean addUser(User user) throws ServiceException {
+        try {
+            return validateUserData(user) && userDao.create(user);
+        } catch (DaoException e) {
+            LOG.error(e);
+            throw new ServiceException("Cannot add new user. " + e.getMessage());
+        }
     }
 
     @Override
     public User findUserByLoginAndPassword(String login, String password) throws ServiceException {
         try {
-            if (login == null || password == null) {
-                throw new DaoException("Login or password cannot be null");
-            }
             User user = userDao.read(login);
             LOG.debug("Obtained user from db by login is: {}", user);
             if (!user.getPassword().equals(password))
