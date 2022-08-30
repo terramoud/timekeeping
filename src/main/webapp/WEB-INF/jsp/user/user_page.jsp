@@ -5,7 +5,6 @@
          not empty cookie['defaultLocale'].getValue() ? cookie['defaultLocale'].getValue() :pageContext.request.locale}"
        scope="session"/>
 <fmt:setLocale value="${language}"/>
-<%@ taglib prefix="show" tagdir="/WEB-INF/tags" %>
 
 <!DOCTYPE html>
 <html lang="${language}">
