@@ -1,3 +1,4 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <span class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic"
       id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 	<em class="text-light mdi mdi-account-circle fs-1"></em>
