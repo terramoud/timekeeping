@@ -1,42 +1,40 @@
 <%--===========================================================================
 header (top area).
 ===========================================================================--%>
-
 <header class="topbar" data-navbarbg="skin5">
-	<nav class="navbar top-navbar navbar-expand-md navbar-dark">
-		<div class="navbar-header" data-logobg="skin5">
-			<a class="navbar-brand" href="index.html">
-				<span class="logo-text ms-2">Timekeeping app</span>
-			</a>
-			<a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)">
-				<i class="ti-menu ti-close"></i>
-			</a>
-		</div>
-		<div class="navbar-collapse collapse" id="navbarSupportedContent" data-navbarbg="skin5">
-			<!-- ============================================================== -->
-			<!-- toggle and nav items -->
-			<!-- ============================================================== -->
-			<ul class="navbar-nav float-start me-auto">
-				<li class="nav-item d-none d-lg-block">
-					<a
-							class="nav-link sidebartoggler waves-effect waves-light"
-							href="javascript:void(0)"
-							data-sidebartype="mini-sidebar"
-					><i class="mdi mdi-menu font-24"></i
-					></a>
-				</li>
-			</ul>
-			<ul class="navbar-nav float-end">
-				<li class="nav-item dropdown">
-					<%@ include file="/WEB-INF/fragments/language_switcher.jspf" %>
-				</li>
-				<!-- ============================================================== -->
-				<!-- User profile -->
-				<!-- ============================================================== -->
-				<li class="nav-item dropdown">
-					<%@ include file="/WEB-INF/fragments/profile_dropdown.jspf" %>
-				</li>
-			</ul>
-		</div>
-	</nav>
+    <nav class="navbar top-navbar navbar-expand-md navbar-dark">
+        <div class="navbar-header" data-logobg="skin5">
+            <a class="navbar-brand" href="controller?command=admin_dashboard">
+                <span class="logo-text ms-2"><fmt:message key="project.name"/></span>
+            </a>
+            <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)">
+                <em class="ti-menu ti-close"></em>
+            </a>
+        </div>
+        <div class="navbar-collapse collapse" id="navbarSupportedContent" data-navbarbg="skin5">
+            <!-- ============================================================== -->
+            <!-- toggle and nav items -->
+            <!-- ============================================================== -->
+            <ul class="navbar-nav float-start me-auto">
+                <li class="nav-item d-none d-lg-block">
+                    <a class="nav-link sidebartoggler waves-effect waves-light" href="javascript:void(0)"
+                       data-sidebartype="mini-sidebar"><em class="mdi mdi-menu font-24"></em></a>
+                </li>
+            </ul>
+            <ul class="navbar-nav float-end">
+                <!-- ============================================================== -->
+                <!-- Language switcher -->
+                <!-- ============================================================== -->
+                <li class="nav-item dropdown">
+                    <%@ include file="/WEB-INF/fragments/language_switcher.jspf" %>
+                </li>
+                <!-- ============================================================== -->
+                <!-- User profile -->
+                <!-- ============================================================== -->
+                <li class="nav-item dropdown">
+                    <%@ include file="/WEB-INF/fragments/profile_dropdown.jspf" %>
+                </li>
+            </ul>
+        </div>
+    </nav>
 </header>

@@ -1,8 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/fragments/directive/taglib.jspf" %>
+<c:set var="language"
+       value="${not empty sessionScope.language ? sessionScope.language :
+         not empty cookie['defaultLocale'].getValue() ? cookie['defaultLocale'].getValue() :pageContext.request.locale}"
+       scope="session"/>
+<fmt:setLocale value="${language}"/>
+
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
-<c:set var="title" value="Settings" scope="page" />
+<html lang="${language}">
+<c:set var="title" value="Admin page" scope="page"/>
 <%@ include file="/WEB-INF/fragments/head.jspf" %>
 
 <body>
@@ -13,29 +19,33 @@
     </div>
 </div>
 
-<div
-        id="main-wrapper"
-        data-layout="vertical"
-        data-navbarbg="skin5"
-        data-sidebartype="full"
-        data-sidebar-position="absolute"
-        data-header-position="absolute"
-        data-boxed-layout="full"
->
+<div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
+     data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
     <%@ include file="/WEB-INF/fragments/admin_header.jspf" %>
 
     <%@ include file="/WEB-INF/fragments/admin_sidebar.jspf" %>
 
+    <!-- ============================================================== -->
+    <!-- Page wrapper  -->
+    <!-- ============================================================== -->
     <div class="page-wrapper">
         <div class="page-breadcrumb">
             <div class="row">
                 <div class="col-12 d-flex no-block align-items-center">
-                    <h4 class="page-title">Admin dashboard</h4>
+                    <h4 class="page-title">
+                        <fmt:message key="admin.page.header"/>
+                    </h4>
                     <div class="ms-auto text-end">
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Library</li>
+                                <li class="breadcrumb-item">
+                                    <a href="controller?command=index_page">
+                                        <fmt:message key="project.home.page"/>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    <fmt:message key="breadcrumb.admin.page"/>
+                                </li>
                             </ol>
                         </nav>
                     </div>
@@ -50,15 +60,17 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Time has spent users for activities</h5>
+                            <h5 class="card-title">
+                                <fmt:message key="admin.page.requests.table.report.header"/>
+                            </h5>
                             <div class="table-responsive">
                                 <table id="zero_config" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
-                                        <th>User</th>
-                                        <th>Activity</th>
-                                        <th>Summary spent time</th>
-                                        <th>Attempts</th>
+                                        <th><fmt:message key="admin.page.requests.table.header.user"/></th>
+                                        <th><fmt:message key="admin.page.requests.table.header.activity"/></th>
+                                        <th><fmt:message key="admin.page.requests.table.header.summary_time"/></th>
+                                        <th><fmt:message key="admin.page.requests.table.header.attempts"/></th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -71,10 +83,10 @@
                                     </tbody>
                                     <tfoot>
                                     <tr>
-                                        <th>User</th>
-                                        <th>Activity</th>
-                                        <th>Summary spent time</th>
-                                        <th>Attempts</th>
+                                        <th><fmt:message key="admin.page.requests.table.header.user"/></th>
+                                        <th><fmt:message key="admin.page.requests.table.header.activity"/></th>
+                                        <th><fmt:message key="admin.page.requests.table.header.summary_time"/></th>
+                                        <th><fmt:message key="admin.page.requests.table.header.attempts"/></th>
                                     </tr>
                                     </tfoot>
                                 </table>
@@ -83,7 +95,9 @@
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination">
                                         <li class="page-item">
-                                            <a class="page-link" href="#">Previous</a>
+                                            <a class="page-link" href="#">
+                                                <fmt:message key="admin.page.requests.table.pagination.previous"/>
+                                            </a>
                                         </li>
                                         <li class="page-item">
                                             <a class="page-link" href="#">1</a>
@@ -95,7 +109,9 @@
                                             <a class="page-link" href="#">3</a>
                                         </li>
                                         <li class="page-item">
-                                            <a class="page-link" href="#">Next</a>
+                                            <a class="page-link" href="#">
+                                                <fmt:message key="admin.page.requests.table.pagination.next"/>
+                                            </a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -105,9 +121,7 @@
                 </div>
             </div>
         </div>
-        <footer class="footer text-center">
-            Timekeeping, EPAM Java final project, 2022
-        </footer>
+        <%@ include file="/WEB-INF/fragments/footer.jspf" %>
     </div>
 </div>
 <!-- ============================================================== -->

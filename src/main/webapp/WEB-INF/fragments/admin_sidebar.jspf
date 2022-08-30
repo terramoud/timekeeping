@@ -1,7 +1,7 @@
 <%--=========================================================================== 
 Sidebar (left area).
 ===========================================================================--%>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <aside class="left-sidebar" data-sidebarbg="skin5">
 	<!-- Sidebar scroll-->
 	<div class="scroll-sidebar">
@@ -9,38 +9,53 @@ Sidebar (left area).
 		<nav class="sidebar-nav">
 			<ul id="sidebarnav" class="pt-4">
 				<li class="sidebar-item">
-					<a class="sidebar-link waves-effect waves-dark sidebar-link" href="index.html"
+					<a class="sidebar-link waves-effect waves-dark sidebar-link"
+					   href="controller?command=admin_dashboard"
 					   aria-expanded="false">
 						<em class="mdi mdi-view-dashboard"></em>
-						<span class="hide-menu">Dashboard</span>
+						<span class="hide-menu">
+							<fmt:message key="admin.page.sidebar.title"/>
+						</span>
 					</a>
 				</li>
 				<li class="sidebar-item">
-					<a class="sidebar-link waves-effect waves-dark sidebar-link" href="charts.html"
+					<a class="sidebar-link waves-effect waves-dark sidebar-link"
+					   href="controller?command=admin_timekeeping_report"
 					   aria-expanded="false">
 						<em class="mdi mdi-chart-line"></em>
-						<span class="hide-menu">Users activity statistic</span>
+						<span class="hide-menu">
+							<fmt:message key="admin.page.sidebar.statistic"/>
+						</span>
 					</a>
 				</li>
 				<li class="sidebar-item">
-					<a class="sidebar-link waves-effect waves-dark sidebar-link" href="index.html"
+					<a class="sidebar-link waves-effect waves-dark sidebar-link"
+					   href="controller?command=admin_list_categories"
 					   aria-expanded="false">
 						<em class="mdi mdi-view-array"></em>
-						<span class="hide-menu">Categories</span>
+						<span class="hide-menu">
+							<fmt:message key="admin.page.sidebar.categories"/>
+						</span>
 					</a>
 				</li>
 				<li class="sidebar-item">
-					<a class="sidebar-link waves-effect waves-dark sidebar-link" href="charts.html"
+					<a class="sidebar-link waves-effect waves-dark sidebar-link"
+					   href="controller?command=admin_list_activities"
 					   aria-expanded="false">
 						<em class="mdi mdi-chart-bar"></em>
-						<span class="hide-menu">Activities</span>
+						<span class="hide-menu">
+							<fmt:message key="admin.page.sidebar.activities"/>
+						</span>
 					</a>
 				</li>
 				<li class="sidebar-item">
-					<a class="sidebar-link waves-effect waves-dark sidebar-link" href="charts.html"
+					<a class="sidebar-link waves-effect waves-dark sidebar-link"
+					   href="controller?command=admin_list_users"
 					   aria-expanded="false">
 						<em class="mdi mdi-chart-bar"></em>
-						<span class="hide-menu">Users</span>
+						<span class="hide-menu">
+							<fmt:message key="admin.page.sidebar.users"/>
+						</span>
 					</a>
 				</li>
 			</ul>
