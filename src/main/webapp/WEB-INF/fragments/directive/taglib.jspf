@@ -17,3 +17,8 @@ JSTL i18n tag library.
 Custom Tag library descriptor (TLD)
 ===========================================================================--%>
 <%@ taglib uri="/WEB-INF/time_formatter.tld" prefix="m" %>
+
+<%--===========================================================================
+Custom JSTL tag
+===========================================================================--%>
+<%@ taglib prefix="show" tagdir="/WEB-INF/tags" %>
