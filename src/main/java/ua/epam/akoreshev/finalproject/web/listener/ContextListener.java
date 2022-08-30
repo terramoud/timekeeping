@@ -85,7 +85,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
         commands.addCommand("logout", new LogoutCommand());
         commands.addCommand("change_locale", new ChangeLocaleCommand());
         commands.addCommand("profile", new ProfileCommand());
-        commands.addCommand(Role.ADMIN + "_dashboard", new AdminDashboardCommand());
+        commands.addCommand(Role.ADMIN + "_dashboard", new AdminDashboardCommand(requestService));
         commands.addCommand(Role.ADMIN + "_list_activities", new ListActivitiesCommand());
         commands.addCommand(Role.ADMIN + "_list_categories", new ListCategoriesCommand());
         commands.addCommand(Role.ADMIN + "_list_users", new ListUsersCommand());
