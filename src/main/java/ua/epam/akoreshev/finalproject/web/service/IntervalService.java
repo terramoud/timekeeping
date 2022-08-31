@@ -4,6 +4,7 @@ import ua.epam.akoreshev.finalproject.exceptions.ServiceException;
 import ua.epam.akoreshev.finalproject.model.entity.Activity;
 import ua.epam.akoreshev.finalproject.model.entity.Interval;
 import ua.epam.akoreshev.finalproject.model.entity.User;
+import ua.epam.akoreshev.finalproject.model.entity.UserStatistic;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,4 +16,8 @@ public interface IntervalService {
     boolean setStartTimeForUserActivity(long userId, long activityId, LocalDateTime startTime) throws ServiceException;
 
     boolean setFinishTimeForUserActivity(long userId, long activityId, LocalDateTime stopTime) throws ServiceException;
+
+    long getCountUsersActivities() throws ServiceException;
+
+    List<UserStatistic> getStatisticsByUsers(int limit, int offset) throws ServiceException;
 }

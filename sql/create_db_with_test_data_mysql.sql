@@ -119,10 +119,14 @@ CREATE TABLE IF NOT EXISTS intervals
     finish      DATETIME NULL,
     user_id     INT      NOT NULL,
     activity_id INT      NOT NULL,
-    FOREIGN KEY (user_id, activity_id)
-        REFERENCES users_activities (user_id, activity_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    FOREIGN KEY (user_id)
+        REFERENCES users (id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    FOREIGN KEY (activity_id)
+        REFERENCES activities (id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
 );
 
 

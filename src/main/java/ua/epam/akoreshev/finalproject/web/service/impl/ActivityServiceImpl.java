@@ -5,9 +5,7 @@ import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
 import ua.epam.akoreshev.finalproject.exceptions.ServiceException;
 import ua.epam.akoreshev.finalproject.model.dao.ActivityDao;
-import ua.epam.akoreshev.finalproject.model.entity.Activity;
-import ua.epam.akoreshev.finalproject.model.entity.Category;
-import ua.epam.akoreshev.finalproject.model.entity.User;
+import ua.epam.akoreshev.finalproject.model.entity.*;
 import ua.epam.akoreshev.finalproject.web.service.ActivityService;
 
 import java.util.LinkedHashMap;
@@ -50,6 +48,66 @@ public class ActivityServiceImpl implements ActivityService {
         } catch (DaoException e) {
             LOG.error(e);
             throw new ServiceException("Cannot find activities by user " + e.getMessage());
+        }
+    }
+
+    @Override
+    public long getNumberCategories() throws ServiceException {
+        try {
+            return activityDao.getNumberCategories();
+        } catch (DaoException e) {
+            LOG.error(e);
+            throw new ServiceException("Cannot count categories " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Category> getCategories(int limit, int offset) throws ServiceException {
+        try {
+            return activityDao.findAllCategories(limit, offset);
+        } catch (DaoException e) {
+            LOG.error(e);
+            throw new ServiceException("Cannot find categories " + e.getMessage());
+        }
+    }
+
+    @Override
+    public long getNumberActivities() throws ServiceException {
+        try {
+            return activityDao.getNumberActivities();
+        } catch (DaoException e) {
+            LOG.error(e);
+            throw new ServiceException("Cannot count activities " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<ActivityCategoryBean> getActivities(int limit, int offset) throws ServiceException {
+        try {
+            return activityDao.findAllActivities(limit, offset);
+        } catch (DaoException e) {
+            LOG.error(e);
+            throw new ServiceException("Cannot find activities " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean removeCategory(long categoryId) throws ServiceException {
+        try {
+            return activityDao.deleteCategory(categoryId);
+        } catch (DaoException e) {
+            LOG.error(e);
+            throw new ServiceException("Cannot remove category " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean removeActivity(long activityId) throws ServiceException {
+        try {
+            return activityDao.delete(activityId);
+        } catch (DaoException e) {
+            LOG.error(e);
+            throw new ServiceException("Cannot remove activity " + e.getMessage());
         }
     }
 }

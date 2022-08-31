@@ -6,6 +6,7 @@ import ua.epam.akoreshev.finalproject.exceptions.DaoException;
 import ua.epam.akoreshev.finalproject.model.dao.ActivityDao;
 import ua.epam.akoreshev.finalproject.model.dao.Mapper;
 import ua.epam.akoreshev.finalproject.model.entity.Activity;
+import ua.epam.akoreshev.finalproject.model.entity.ActivityCategoryBean;
 import ua.epam.akoreshev.finalproject.model.entity.Category;
 
 import java.sql.*;
@@ -23,7 +24,13 @@ public class ActivityDaoImpl implements ActivityDao {
 
     private static final String SQL_DELETE_ACTIVITY_BY_ID = "DELETE FROM activities WHERE id = ?";
 
+    private static final String SQL_DELETE_CATEGORY_BY_ID = "DELETE FROM categories WHERE id = ?";
+
     private static final String SQL_FIND_ALL_ACTIVITIES = "SELECT * FROM activities";
+
+    private static final String SQL_FIND_ALL_ACTIVITIES_CATEGORIES =
+            "SELECT * FROM activities INNER JOIN categories c ON activities.category_id = c.id";
+
     private static final String SQL_FIND_ALL_CATEGORIES = "SELECT * FROM categories";
 
     private static final String SQL_FIND_ALL_ACTIVITIES_BY_CATEGORY_ID =
@@ -37,13 +44,19 @@ public class ActivityDaoImpl implements ActivityDao {
     private static final String SQL_FIND_ALL_ACTIVITIES_BY_USER_ID =
             "SELECT * FROM activities " +
                     "INNER JOIN users_activities ON activities.id = activity_id " +
-                    "WHERE user_id = ?";
+                    "WHERE user_id = ? ORDER BY is_active DESC";
 
     private static final String SQL_FIND_ALL_ACTIVITIES_BY_USER_LOGIN =
             "SELECT * FROM activities " +
                     "INNER JOIN users_activities ON activities.id = activity_id " +
                     "INNER JOIN users ON users_activities.user_id = users.id " +
                     "WHERE users.login = ?";
+
+    private static final String SQL_GET_NUMBER_CATEGORIES_OF_ACTIVITIES =
+            "SELECT COUNT(*) AS numRows FROM categories";
+
+    private static final String SQL_GET_NUMBER_ACTIVITIES =
+            "SELECT COUNT(*) AS numRows FROM activities";
 
     private final Mapper<Activity, PreparedStatement> mapRowToDB = (Activity activity, PreparedStatement preparedStatement) -> {
         preparedStatement.setString(1, activity.getNameEn());
@@ -161,6 +174,111 @@ public class ActivityDaoImpl implements ActivityDao {
             LOG.warn("Empty list categories has been returned by findAllCategories() method");
         }
         return categoryList;
+    }
+
+    @Override
+    public long getNumberCategories() throws DaoException {
+        long result = 0;
+        try (Statement st = connection.createStatement()) {
+            ResultSet rs = st.executeQuery(SQL_GET_NUMBER_CATEGORIES_OF_ACTIVITIES);
+            LOG.trace("SQL query find all 'categories' to database has already been completed successfully");
+            if (rs.next()) {
+                result = rs.getLong("numRows");
+            }
+            LOG.debug("The {} rows has been found by query to database", result);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all 'categories', because {}", e.getMessage());
+            throw new DaoException("Cannot find 'categories'. " + e.getMessage(), e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Category> findAllCategories(int limit, int offset) throws DaoException {
+        List<Category> categories = new LinkedList<>();
+        String sqlParameters = " LIMIT " + limit + " OFFSET " + offset;
+        try (PreparedStatement pst = connection.prepareStatement(
+                SQL_FIND_ALL_CATEGORIES + sqlParameters)) {
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query find all activities to database has already been completed successfully");
+            while (rs.next()) {
+                Category category = new Category();
+                category.setId(rs.getLong( "id"));
+                category.setNameEn(rs.getString( "name_en"));
+                category.setNameUk(rs.getString( "name_uk"));
+                categories.add(category);
+            }
+            LOG.debug("The {} categories has been found by query to database", categories.size());
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all categories, because {}", e.getMessage());
+            throw new DaoException("Cannot find activities. " + e.getMessage(), e);
+        }
+        return categories;
+    }
+
+    @Override
+    public long getNumberActivities() throws DaoException {
+        long result = 0;
+        try (Statement st = connection.createStatement()) {
+            ResultSet rs = st.executeQuery(SQL_GET_NUMBER_ACTIVITIES);
+            LOG.trace("SQL query find all 'activities' to database has already been completed successfully");
+            if (rs.next()) {
+                result = rs.getLong("numRows");
+            }
+            LOG.debug("The {} rows has been found by query to database", result);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all 'activities', because {}", e.getMessage());
+            throw new DaoException("Cannot find 'activities'. " + e.getMessage(), e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<ActivityCategoryBean> findAllActivities(int limit, int offset) throws DaoException {
+        List<ActivityCategoryBean> activityCategoryBeans = new LinkedList<>();
+        String sqlParameters = " LIMIT " + limit + " OFFSET " + offset;
+        try (PreparedStatement pst = connection.prepareStatement(
+                SQL_FIND_ALL_ACTIVITIES_CATEGORIES + sqlParameters)) {
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query find all activities to database has already been completed successfully");
+            while (rs.next()) {
+                ActivityCategoryBean activityCategoryBean = new ActivityCategoryBean();
+                Activity activity = new Activity();
+                mapRowFromDB.map(rs, activity);
+                activityCategoryBean.setActivity(activity);
+                Category category = new Category();
+                category.setId(rs.getLong("category_id"));
+                category.setNameEn(rs.getString("c.name_en"));
+                category.setNameUk(rs.getString("c.name_uk"));
+                activityCategoryBean.setCategory(category);
+                activityCategoryBeans.add(activityCategoryBean);
+            }
+            LOG.debug("The {} categories has been found by query to database", activityCategoryBeans.size());
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all categories, because {}", e.getMessage());
+            throw new DaoException("Cannot find activities. " + e.getMessage(), e);
+        }
+        return activityCategoryBeans;
+    }
+
+    @Override
+    public boolean deleteCategory(long categoryId) throws DaoException {
+        LOG.debug("Obtained 'category id' to delete it from database is: {}", categoryId);
+        boolean result = true;
+        try (PreparedStatement pst = connection.prepareStatement(SQL_DELETE_CATEGORY_BY_ID)) {
+            pst.setLong(1, categoryId);
+            int rowCount = pst.executeUpdate();
+            LOG.trace("SQL query to delete an category from database has already been completed successfully");
+            if (rowCount == 0) {
+                result = false;
+                LOG.warn("The category wasn't deleted by query to database");
+            }
+            LOG.debug("The {} rows has been removed to delete category", rowCount);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to remove category by id, because {}", e.getMessage());
+            throw new DaoException("Cannot delete category from database. " + e.getMessage(), e);
+        }
+        return result;
     }
 
     @Override

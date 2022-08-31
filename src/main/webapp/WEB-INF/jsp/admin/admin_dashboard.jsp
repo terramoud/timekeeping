@@ -76,17 +76,22 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <c:forEach var="userActivReq" items="${userActivityRequests}" varStatus="status">
+                                    <c:forEach var="pendingRequest" items="${requestsByStatusPending}" varStatus="status">
                                         <tr>
-                                            <td><c:out value="${userActivReq.login}"/></td>
+                                            <td><c:out value="${pendingRequest.user.login}"/></td>
                                             <td><c:out
-                                                    value="${language == 'en' ? userActivReq.activityEn : userActivReq.activityUk}"/></td>
+                                                    value="${language == 'en' ? pendingRequest.activity.nameEn : pendingRequest.activity.nameUk}"/></td>
                                             <td><c:out
-                                                    value="${language == 'en' ? userActivReq.typeEn : userActivReq.typeUk}"/></td>
+                                                    value="${language == 'en' ? pendingRequest.type.nameEn : pendingRequest.type.nameUk}"/></td>
                                             <td class="text-warning"><c:out
-                                                    value="${language == 'en' ? userActivReq.statusEn : userActivReq.statusUk}"/></td>
+                                                    value="${language == 'en' ? pendingRequest.status.nameEn : pendingRequest.status.nameUk}"/></td>
                                             <td>
                                                 <form action="controller" method="POST" class="p-0 m-0 d-inline">
+                                                    <input type="hidden" name="command" value="admin_approve_request">
+                                                    <input type="hidden" name="request_id" value="${pendingRequest.requestId}">
+                                                    <input type="hidden" name="user_id" value="${pendingRequest.user.id}">
+                                                    <input type="hidden" name="activity_id" value="${pendingRequest.activity.id}">
+                                                    <input type="hidden" name="type_id" value="${pendingRequest.type.id}">
                                                     <button type="submit" class="border-0 bg-white text-primary"
                                                             data-toggle="tooltip" data-placement="top"
                                                             title="<fmt:message key="admin.page.button.approve.title"/>"
@@ -96,6 +101,8 @@
                                                     <show:request_result/>
                                                 </form>
                                                 <form action="controller" method="POST" class="p-0 m-0 d-inline">
+                                                    <input type="hidden" name="command" value="admin_deny_request">
+                                                    <input type="hidden" name="request_id" value="${pendingRequest.requestId}">
                                                     <button type="submit" class="border-0 bg-white text-primary"
                                                             data-toggle="tooltip" data-placement="top"
                                                             title="<fmt:message key="admin.page.button.cancel.title"/>"
@@ -108,22 +115,17 @@
                                         </tr>
                                     </c:forEach>
                                     </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <th><fmt:message key="admin.page.requests.table.header.user"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.activity"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.type"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.status"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.actions"/></th>
-                                    </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                             <%--Pagination--%>
                             <div class="row float-end">
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination">
-                                        <show:pagination_prev_button pageNum="${pageNumTableRequests}" paramName="pageNumTableRequests" paramsOtherPaginations="&pageNumTableArchive=${pageNumTableArchive}"/>
+                                        <show:pagination_prev_button pageNum="${pageNumTableRequests}"
+                                                                     commandName="admin_dashboard"
+                                                                     paramName="pageNumTableRequests"
+                                                                     paramsOtherPaginations="&pageNumTableArchive=${pageNumTableArchive}"/>
+
                                         <c:forEach var="i" begin="1" end="${totalPagesForTableRequests}">
                                             <c:if test="${i==pageNumTableRequests}">
                                                 <li class="page-item active">
@@ -138,7 +140,12 @@
                                                 </li>
                                             </c:if>
                                         </c:forEach>
-                                        <show:pagination_next_button pageNum="${pageNumTableRequests}" paramName="pageNumTableRequests" totalPages="${totalPagesForTableRequests}" paramsOtherPaginations="&pageNumTableArchive=${pageNumTableArchive}"/>
+
+                                        <show:pagination_next_button pageNum="${pageNumTableRequests}"
+                                                                     commandName="admin_dashboard"
+                                                                     paramName="pageNumTableRequests"
+                                                                     totalPages="${totalPagesForTableRequests}"
+                                                                     paramsOtherPaginations="&pageNumTableArchive=${pageNumTableArchive}"/>
                                     </ul>
                                 </nav>
                             </div>
@@ -163,45 +170,28 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <c:forEach var="userActivReqArch" items="${userActivityRequestsArchive}"
-                                               varStatus="status">
-                                        <tr>
-                                            <td><c:out value="${userActivReq.login}"/></td>
-                                            <td><c:out
-                                                    value="${language == 'en' ? userActivReq.activityEn : userActivReq.activityUk}"/></td>
-                                            <td><c:out
-                                                    value="${language == 'en' ? userActivReq.typeEn : userActivReq.typeUk}"/></td>
-                                            <td class="text-warning"><c:out
-                                                    value="${language == 'en' ? userActivReq.statusEn : userActivReq.statusUk}"/></td>
-                                        </tr>
-                                    </c:forEach>
-                                    <tr>
-                                        <td>User1</td>
-                                        <td>Reading</td>
-                                        <td>Add</td>
-                                        <td class="text-warning">Pending...</td>
-                                    </tr>
-                                    <tr>
-                                        <td>User1</td>
-                                        <td>Reading</td>
-                                        <td>Add</td>
-                                        <td class="text-warning">Pending...</td>
-                                    </tr>
+                                        <c:forEach var="completedRequest" items="${archiveOfRequests}" varStatus="status">
+                                            <tr>
+                                                <td><c:out value="${completedRequest.user.login}"/></td>
+                                                <td><c:out
+                                                        value="${language == 'en' ? completedRequest.activity.nameEn : completedRequest.activity.nameUk}"/></td>
+                                                <td><c:out
+                                                        value="${language == 'en' ? completedRequest.type.nameEn : completedRequest.type.nameUk}"/></td>
+                                                <td class="text-warning"><c:out
+                                                        value="${language == 'en' ? completedRequest.status.nameEn : completedRequest.status.nameUk}"/></td>
+                                            </tr>
+                                        </c:forEach>
                                     </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <th><fmt:message key="admin.page.requests.table.header.user"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.activity"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.type"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.status"/></th>
-                                    </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                             <div class="row float-end">
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination">
-                                        <show:pagination_prev_button pageNum="${pageNumTableArchive}" paramName="pageNumTableArchive" paramsOtherPaginations="&pageNumTableRequests=${pageNumTableRequests}"/>
+                                        <show:pagination_prev_button pageNum="${pageNumTableArchive}"
+                                                                     commandName="admin_dashboard"
+                                                                     paramName="pageNumTableArchive"
+                                                                     paramsOtherPaginations="&pageNumTableRequests=${pageNumTableRequests}"/>
+
                                         <c:forEach var="j" begin="1" end="${totalPagesForTableArchive}">
                                             <c:if test="${j==pageNumTableArchive}">
                                                 <li class="page-item active">
@@ -216,7 +206,12 @@
                                                 </li>
                                             </c:if>
                                         </c:forEach>
-                                        <show:pagination_next_button pageNum="${pageNumTableArchive}" paramName="pageNumTableArchive" totalPages="${totalPagesForTableArchive}" paramsOtherPaginations="&pageNumTableRequests=${pageNumTableRequests}"/>
+
+                                        <show:pagination_next_button pageNum="${pageNumTableArchive}"
+                                                                     commandName="admin_dashboard"
+                                                                     paramName="pageNumTableArchive"
+                                                                     totalPages="${totalPagesForTableArchive}"
+                                                                     paramsOtherPaginations="&pageNumTableRequests=${pageNumTableRequests}"/>
                                     </ul>
                                 </nav>
                             </div>

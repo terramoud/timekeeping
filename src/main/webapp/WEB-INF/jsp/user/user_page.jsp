@@ -68,8 +68,7 @@
         </div>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-1"></div>
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-0">
@@ -133,8 +132,7 @@
                                             </form>
 
                                             <form action="controller" method="POST" class="btn p-0">
-                                                <input type="hidden" name="command"
-                                                       value="user_add_request_for_activity">
+                                                <input type="hidden" name="command" value="user_remove_request_for_activity">
                                                 <input type="hidden" name="activity_id" value="${userActivity.id}">
                                                 <input type="hidden" name="type_id" value="2">
                                                 <input type="hidden" name="status_id" value="1">
@@ -152,7 +150,7 @@
 
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <form action="controller" method="POST" class="card">
                         <input type="hidden" name="command" value="user_add_request_for_activity">
                         <input type="hidden" name="type_id" value="1">
@@ -170,21 +168,21 @@
                                             style="width: 100%; height: 36px">
                                         <c:forEach var="entry" items="${allActivitiesByCategories}" varStatus="status">
                                             <c:set var="category" value="${entry.key}"/>
-                                            <c:forEach var="activity" items="${entry.value}">
-                                                <optgroup
-                                                        label="<c:out value="${language == 'en' ? category.nameEn : category.nameUk}"/>">
+                                            <optgroup label="<c:out value="${language == 'en' ? category.nameEn : category.nameUk}"/>">
+                                                <c:forEach var="activity" items="${entry.value}">
+                                                    <c:out value="activity.id ${activity.id}"/>
                                                     <c:if test="${status.first}">
-                                                        <option selected value="${activity.id}">
-                                                            <c:out value="${language == 'en' ? activity.nameEn : activity.nameUk}"/>
-                                                        </option>
-                                                    </c:if>
-                                                    <c:if test="${not  status.first}">
-                                                        <option value="${activity.id}">
-                                                            <c:out value="${language == 'en' ? activity.nameEn : activity.nameUk}"/>
-                                                        </option>
-                                                    </c:if>
-                                                </optgroup>
-                                            </c:forEach>
+                                                            <option selected value="${activity.id}">
+                                                                <c:out value="${language == 'en' ? activity.nameEn : activity.nameUk}"/>
+                                                            </option>
+                                                        </c:if>
+                                                        <c:if test="${not  status.first}">
+                                                            <option value="${activity.id}">
+                                                                <c:out value="${language == 'en' ? activity.nameEn : activity.nameUk}"/>
+                                                            </option>
+                                                        </c:if>
+                                                </c:forEach>
+                                            </optgroup>
                                         </c:forEach>
                                     </select>
                                 </div>
@@ -201,7 +199,6 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-1"></div>
             </div>
         </div>
         <footer class="footer text-center text-light">

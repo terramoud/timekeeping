@@ -5,14 +5,14 @@ import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
 import ua.epam.akoreshev.finalproject.model.dao.Mapper;
 import ua.epam.akoreshev.finalproject.model.dao.UserDao;
-import ua.epam.akoreshev.finalproject.model.entity.User;
+import ua.epam.akoreshev.finalproject.model.entity.*;
 
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
 public class UserDaoImpl implements UserDao {
-    private static final String SQL_FIND_ALL_USERS = "SELECT * FROM users";
+    private static final String SQL_FIND_ALL_USERS = "SELECT * FROM users WHERE role_id != 1";
 
     private static final String SQL_CREATE_USER = "INSERT INTO users VALUES (DEFAULT, ?, ?, ?, ?)";
 
@@ -32,6 +32,13 @@ public class UserDaoImpl implements UserDao {
             "INNER JOIN users_activities ON users.id = user_id " +
             "INNER JOIN activities ON users_activities.activity_id = activities.id " +
             "WHERE activities.name_en = ? OR activities.name_uk = ?";
+
+    private static final String SQL_GET_NUMBER_USERS = "SELECT COUNT(*) AS numRows FROM users";
+
+    private static final String SQL_FIND_ALL_USERS_ACTIVITIES =
+            "SELECT * FROM users " +
+                    "INNER JOIN users_activities ua ON users.id = ua.user_id " +
+                    "INNER JOIN activities a ON ua.activity_id = a.id";
 
     private final Mapper<User, PreparedStatement> mapRowToDB = (User user, PreparedStatement preparedStatement) -> {
         preparedStatement.setString(1, user.getLogin());
@@ -186,6 +193,46 @@ public class UserDaoImpl implements UserDao {
             throw new DaoException("Cannot read user by login. " + e.getMessage(), e);
         }
         return user;
+    }
+
+    @Override
+    public long getNumberUsers() throws DaoException {
+        long result = 0;
+        try (Statement st = connection.createStatement()) {
+            ResultSet rs = st.executeQuery(SQL_GET_NUMBER_USERS);
+            LOG.trace("SQL query find all 'users' to database has already been completed successfully");
+            if (rs.next()) {
+                result = rs.getLong("numRows");
+            }
+            LOG.debug("The {} rows has been found by query to database", result);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all 'users', because {}", e.getMessage());
+            throw new DaoException("Cannot find 'users'. " + e.getMessage(), e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<User> findAllUsers(int limit, int offset) throws DaoException {
+        List<User> usersList = new LinkedList<>();
+        String sqlParameters = " LIMIT " + limit + " OFFSET " + offset;
+        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_USERS + sqlParameters)) {
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query find all users to database has already been completed successfully");
+            while (rs.next()) {
+                User user = new User();
+                mapRowFromDB.map(rs, user);
+                usersList.add(user);
+            }
+            LOG.debug("The {} users has been found by query to database", usersList.size());
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all users from findAllUsers() method, because {}", e.getMessage());
+            throw new DaoException("Cannot find users. " + e.getMessage(), e);
+        }
+        if (usersList.isEmpty()) {
+            LOG.warn("Empty list users has been returned by findAllUsers() method");
+        }
+        return usersList;
     }
 
     @Override

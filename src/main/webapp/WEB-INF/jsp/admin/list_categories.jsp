@@ -107,95 +107,106 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td class="align-middle">Sport</td>
-                                    <td class="align-middle">Sport</td>
-                                    <td>
-                                        <button type="submit" class="btn btn-info me-1" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop">
-                                            <fmt:message key="admin.page.button.edit"/>
-                                        </button>
-                                        <!-- Modal -->
-                                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
-                                             data-bs-keyboard="false" tabindex="-1"
-                                             aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                                                <form class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="staticBackdropLabel">
-                                                            <fmt:message key="admin.page.category.modal"/>
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body pb-0">
-                                                        <div class="card mb-0">
-                                                            <div class="card-body">
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-3 text-end control-label col-form-label">
-                                                                        <fmt:message key="admin.page.category.name"/>
-                                                                    </label>
-                                                                    <div class="col-md-9">
-                                                                        <input type="text" class="form-control"
-                                                                               id="fname"
-                                                                               placeholder="<fmt:message key="admin.page.category.name.placeholder"/>"/>
+                                <c:forEach var="category" items="${categories}" varStatus="status">
+                                    <tr>
+                                        <td class="align-middle"><c:out value="${category.nameEn}"/></td>
+                                        <td class="align-middle"><c:out value="${category.nameUk}"/></td>
+                                        <td>
+                                            <button type="submit" class="btn btn-info me-1" data-bs-toggle="modal"
+                                                    data-bs-target="#staticBackdrop">
+                                                <fmt:message key="admin.page.button.edit"/>
+                                            </button>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                                                 data-bs-keyboard="false" tabindex="-1"
+                                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                                                    <form class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="staticBackdropLabel">
+                                                                <fmt:message key="admin.page.category.modal"/>
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body pb-0">
+                                                            <div class="card mb-0">
+                                                                <div class="card-body">
+                                                                    <div class="form-group row">
+                                                                        <label class="col-sm-3 text-end control-label col-form-label">
+                                                                            <fmt:message key="admin.page.category.name"/>
+                                                                        </label>
+                                                                        <div class="col-md-9">
+                                                                            <input type="text" class="form-control"
+                                                                                   id="fname"
+                                                                                   placeholder="<fmt:message key="admin.page.category.name.placeholder"/>"/>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-3 text-end control-label col-form-label">
-                                                                        <fmt:message key="admin.page.category.name_uk"/>
-                                                                    </label>
-                                                                    <div class="col-sm-9">
-                                                                        <input type="text" class="form-control"
-                                                                               id="fnameUK"
-                                                                               placeholder="<fmt:message key="admin.page.category.name.placeholder"/>"/>
+                                                                    <div class="form-group row">
+                                                                        <label class="col-sm-3 text-end control-label col-form-label">
+                                                                            <fmt:message key="admin.page.category.name_uk"/>
+                                                                        </label>
+                                                                        <div class="col-sm-9">
+                                                                            <input type="text" class="form-control"
+                                                                                   id="fnameUK"
+                                                                                   placeholder="<fmt:message key="admin.page.category.name.placeholder"/>"/>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">
-                                                            <fmt:message key="admin.page.button.close"/>
-                                                        </button>
-                                                        <button type="button" class="btn btn-primary">
-                                                            <fmt:message key="admin.page.button.save"/>
-                                                        </button>
-                                                    </div>
-                                                </form>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">
+                                                                <fmt:message key="admin.page.button.close"/>
+                                                            </button>
+                                                            <button type="button" class="btn btn-primary">
+                                                                <fmt:message key="admin.page.button.save"/>
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <%--Delete button--%>
-                                        <button type="submit" class="btn btn-danger text-white">
-                                            <fmt:message key="admin.page.button.delete"/>
-                                        </button>
-                                    </td>
-                                </tr>
+                                                <%--Delete button--%>
+                                            <form action="controller" method="POST" class="p-0 m-0 d-inline">
+                                                <input type="hidden" name="command" value="admin_remove_category">
+                                                <input type="hidden" name="category_id" value="${category.id}">
+                                                <button type="submit" class="btn btn-danger text-white">
+                                                    <fmt:message key="admin.page.button.delete"/>
+                                                </button>
+                                                <show:request_result/>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
                                 </tbody>
                             </table>
                             <div class="row float-end">
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination">
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <fmt:message key="admin.page.requests.table.pagination.previous"/>
-                                            </a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">1</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">2</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">3</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <fmt:message key="admin.page.requests.table.pagination.next"/>
-                                            </a>
-                                        </li>
+                                        <show:pagination_prev_button pageNum="${pageNumber}"
+                                                                     commandName="admin_list_categories"
+                                                                     paramName="pageNumber"/>
+
+                                        <c:forEach var="i" begin="1" end="${totalPages}">
+                                            <c:if test="${i==pageNumber}">
+                                                <li class="page-item active">
+                                                    <a class="page-link"
+                                                       href="controller?command=admin_list_categories&pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                            <c:if test="${i!=pageNumber}">
+                                                <li class="page-item">
+                                                    <a class="page-link"
+                                                       href="controller?command=admin_list_categories&pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                        </c:forEach>
+
+                                        <show:pagination_next_button pageNum="${pageNumber}"
+                                                                     paramName="pageNumber"
+                                                                     commandName="admin_list_categories"
+                                                                     totalPages="${totalPages}"/>
                                     </ul>
                                 </nav>
                             </div>

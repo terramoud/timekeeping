@@ -32,13 +32,13 @@
                 <c:if test="${not empty message}">
             <h4><fmt:message key="error_jsp.error.message"/> ${message}</h4>
             </c:if>
-            <c:if test="${not empty exception}">
-                <hr/>
-                <h4>Stack trace:</h4>
-                <c:forEach var="stackTraceElement" items="${exception.stackTrace}">
-                    ${stackTraceElement}
-                </c:forEach>
-            </c:if>
+<%--            <c:if test="${not empty exception}">--%>
+<%--                <hr/>--%>
+<%--                <h4>Stack trace:</h4>--%>
+<%--                <c:forEach var="stackTraceElement" items="${exception.stackTrace}">--%>
+<%--                    ${stackTraceElement}--%>
+<%--                </c:forEach>--%>
+<%--            </c:if>--%>
             </p>
             <a href="controller?command=index_page" class="btn btn-danger btn-roundedwaves-effect waves-lightmb-5text-white">
                 <fmt:message key="error_jsp.button.back"/>

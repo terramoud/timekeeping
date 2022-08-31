@@ -77,116 +77,125 @@
                                     <th scope="col"><fmt:message key="admin.page.user.login"/></th>
                                     <th scope="col"><fmt:message key="admin.page.user.email"/></th>
                                     <th scope="col"><fmt:message key="admin.page.user.role"/></th>
-                                    <th scope="col"><fmt:message key="admin.page.user.activities"/></th>
                                     <th scope="col"><fmt:message key="admin.page.requests.table.header.actions"/></th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td class="align-middle">User1</td>
-                                    <td class="align-middle">ssd@emai.com</td>
-                                    <td class="align-middle">user</td>
-                                    <td class="align-middle">10</td>
-                                    <td>
-                                        <button type="submit" class="btn btn-info  me-1" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop">
-                                            <fmt:message key="admin.page.button.edit"/>
-                                        </button>
-                                        <!-- Modal -->
-                                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
-                                             data-bs-keyboard="false" tabindex="-1"
-                                             aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                                                <form class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="staticBackdropLabel">
-                                                            <fmt:message key="admin.page.user.modal.change_user"/>
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body pb-0">
-                                                        <div class="card mb-0">
-                                                            <div class="card-body">
-                                                                <%--                                                                <h5 class="card-title">Edit activity</h5>--%>
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-3 text-end control-label col-form-label">
-                                                                        <fmt:message key="admin.page.user.login"/>
-                                                                    </label>
-                                                                    <div class="col-md-9">
-                                                                        <input type="text" class="form-control"
-                                                                               id="fname"
-                                                                               placeholder="<fmt:message key="admin.page.user.login.placeholder"/>"/>
+                                <c:forEach var="userRoleBean" items="${userRoleBeans}" varStatus="status">
+                                    <tr>
+                                        <td class="align-middle"><c:out value="${userRoleBean.user.login}"/></td>
+                                        <td class="align-middle"><c:out value="${userRoleBean.user.email}"/></td>
+                                        <td class="align-middle"><c:out value="${userRoleBean.role}"/></td>
+                                        <td>
+                                            <button type="submit" class="btn btn-info  me-1" data-bs-toggle="modal"
+                                                    data-bs-target="#staticBackdrop">
+                                                <fmt:message key="admin.page.button.edit"/>
+                                            </button>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                                                 data-bs-keyboard="false" tabindex="-1"
+                                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                                                    <form class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="staticBackdropLabel">
+                                                                <fmt:message key="admin.page.user.modal.change_user"/>
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body pb-0">
+                                                            <div class="card mb-0">
+                                                                <div class="card-body">
+                                                                        <%--                                                                <h5 class="card-title">Edit activity</h5>--%>
+                                                                    <div class="form-group row">
+                                                                        <label class="col-sm-3 text-end control-label col-form-label">
+                                                                            <fmt:message key="admin.page.user.login"/>
+                                                                        </label>
+                                                                        <div class="col-md-9">
+                                                                            <input type="text" class="form-control"
+                                                                                   id="fname"
+                                                                                   placeholder="<fmt:message key="admin.page.user.login.placeholder"/>"/>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-3 text-end control-label col-form-label">
-                                                                        <fmt:message key="admin.page.user.email"/>
-                                                                    </label>
-                                                                    <div class="col-sm-9">
-                                                                        <input type="text" class="form-control"
-                                                                               id="fnameEN"
-                                                                               placeholder="<fmt:message key="admin.page.user.email.placeholder"/>"/>
+                                                                    <div class="form-group row">
+                                                                        <label class="col-sm-3 text-end control-label col-form-label">
+                                                                            <fmt:message key="admin.page.user.email"/>
+                                                                        </label>
+                                                                        <div class="col-sm-9">
+                                                                            <input type="text" class="form-control"
+                                                                                   id="fnameEN"
+                                                                                   placeholder="<fmt:message key="admin.page.user.email.placeholder"/>"/>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-3 text-end control-label col-form-label">
-                                                                        <fmt:message key="admin.page.user.choose.role"/>
-                                                                    </label>
-                                                                    <div class="col-md-9">
-                                                                        <select class="select2 form-select shadow-none"
-                                                                                style="width: 100%; height: 36px">
-                                                                            <option selected disabled>Select</option>
-                                                                            <option value="AK">Admin</option>
-                                                                            <option value="HI">User</option>
-                                                                        </select>
+                                                                    <div class="form-group row">
+                                                                        <label class="col-sm-3 text-end control-label col-form-label">
+                                                                            <fmt:message key="admin.page.user.choose.role"/>
+                                                                        </label>
+                                                                        <div class="col-md-9">
+                                                                            <select class="select2 form-select shadow-none"
+                                                                                    style="width: 100%; height: 36px">
+                                                                                <option selected disabled>Select</option>
+                                                                                <option value="AK">Admin</option>
+                                                                                <option value="HI">User</option>
+                                                                            </select>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">
-                                                            <fmt:message key="admin.page.button.close"/>
-                                                        </button>
-                                                        <button type="button" class="btn btn-primary">
-                                                            <fmt:message key="admin.page.button.save"/>
-                                                        </button>
-                                                    </div>
-                                                </form>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">
+                                                                <fmt:message key="admin.page.button.close"/>
+                                                            </button>
+                                                            <button type="button" class="btn btn-primary">
+                                                                <fmt:message key="admin.page.button.save"/>
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <%--Delete button--%>
-                                        <button type="submit" class="btn btn-danger text-white">
-                                            <fmt:message key="admin.page.button.delete"/>
-                                        </button>
-                                    </td>
-                                </tr>
+                                                <%--Delete button--%>
+                                            <form action="controller" method="POST" class="p-0 m-0 d-inline">
+                                                <input type="hidden" name="command" value="admin_remove_user">
+                                                <input type="hidden" name="user_id" value="${userRoleBean.user.id}">
+                                                <button type="submit" class="btn btn-danger text-white">
+                                                    <fmt:message key="admin.page.button.delete"/>
+                                                </button>
+                                                <show:request_result/>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
                                 </tbody>
                             </table>
                             <div class="row float-end">
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination">
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <fmt:message key="admin.page.requests.table.pagination.previous"/>
-                                            </a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">1</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">2</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">3</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <fmt:message key="admin.page.requests.table.pagination.next"/>
-                                            </a>
-                                        </li>
+                                        <show:pagination_prev_button pageNum="${pageNumber}"
+                                                                     commandName="admin_list_users"
+                                                                     paramName="pageNumber"/>
+
+                                        <c:forEach var="i" begin="1" end="${totalPages}">
+                                            <c:if test="${i==pageNumber}">
+                                                <li class="page-item active">
+                                                    <a class="page-link"
+                                                       href="controller?command=admin_list_users&pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                            <c:if test="${i!=pageNumber}">
+                                                <li class="page-item">
+                                                    <a class="page-link"
+                                                       href="controller?command=admin_list_users&pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                        </c:forEach>
+
+                                        <show:pagination_next_button pageNum="${pageNumber}"
+                                                                     paramName="pageNumber"
+                                                                     commandName="admin_list_users"
+                                                                     totalPages="${totalPages}"/>
                                     </ul>
                                 </nav>
                             </div>

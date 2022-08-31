@@ -8,31 +8,31 @@ import java.util.Objects;
  * @author Alexander Koreshev
  */
 public class Status extends Entity {
-    private String name;
-    private long translationId;
+    private String nameEn;
+    private String nameUk;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getTranslationId() {
-        return translationId;
-    }
-
-    public void setTranslationId(long translationId) {
-        this.translationId = translationId;
+    public Status(String nameEn, String nameUk) {
+        this.nameEn = nameEn;
+        this.nameUk = nameUk;
     }
 
     public Status() {
     }
 
-    public Status(String name, long translationId) {
-        this.name = name;
-        this.translationId = translationId;
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
+    public String getNameUk() {
+        return nameUk;
+    }
+
+    public void setNameUk(String nameUk) {
+        this.nameUk = nameUk;
     }
 
     @Override
@@ -40,22 +40,21 @@ public class Status extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Status status = (Status) o;
-        return id == status.id &&
-                translationId == status.translationId &&
-                name.equals(status.name);
+        return nameEn.equals(status.nameEn) &&
+                nameUk.equals(status.nameUk);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, translationId);
+        return Objects.hash(nameEn, nameUk);
     }
 
     @Override
     public String toString() {
         return "Status{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", translationId=" + translationId +
+                "nameEn='" + nameEn + '\'' +
+                ", nameUk='" + nameUk + '\'' +
+                ", id=" + id +
                 '}';
     }
 }

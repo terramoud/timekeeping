@@ -3,14 +3,19 @@ package ua.epam.akoreshev.finalproject.model.dao.impl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
+import ua.epam.akoreshev.finalproject.model.dao.IntervalDao;
 import ua.epam.akoreshev.finalproject.model.dao.Mapper;
 import ua.epam.akoreshev.finalproject.model.dao.RequestDao;
-import ua.epam.akoreshev.finalproject.model.entity.Request;
+import ua.epam.akoreshev.finalproject.model.dao.UserActivityDao;
+import ua.epam.akoreshev.finalproject.model.entity.*;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestDaoImpl implements RequestDao {
     private static final String SQL_GET_REQUEST_BY_ID = "SELECT * FROM requests WHERE id = ?";
@@ -44,6 +49,20 @@ public class RequestDaoImpl implements RequestDao {
                     "SELECT statuses.id FROM statuses " +
                     "WHERE statuses.name_en = ? OR statuses.name_uk = ?) " +
                     "WHERE id = ?";
+
+    public static final String FIND_ALL_REQUESTS_FROM_USERS_BY_STATUSES =
+            "SELECT * FROM requests " +
+                    "INNER JOIN users u on requests.user_id = u.id   " +
+                    "INNER JOIN activities a on requests.activity_id = a.id   " +
+                    "INNER JOIN statuses s on requests.status_id = s.id   " +
+                    "INNER JOIN types t on requests.type_id = t.id   " +
+                    "WHERE status_id IN";
+
+    private static final String GET_NUM_REQUESTS_BY_STATUSES =
+            "SELECT COUNT(*) AS numRows FROM requests WHERE status_id IN";
+
+    private static final String SQL_SET_FINISH_TIME_BY_USER_AND_ACTIVITY_IDS =
+            "UPDATE intervals SET finish = ? WHERE user_id = ? AND activity_id = ? AND finish is null";
 
     private final Mapper<Request, PreparedStatement> mapRowToDB = (Request request, PreparedStatement preparedStatement) -> {
         preparedStatement.setLong(1, request.getUserId());
@@ -225,6 +244,153 @@ public class RequestDaoImpl implements RequestDao {
             throw new DaoException("Cannot read 'request for activities from user'. " + e.getMessage(), e);
         }
         return request;
+    }
+
+    @Override
+    public List<UserActivityRequest> findAllRequestsByStatuses(int limit,
+                                                               int offset,
+                                                               int[] statuses) throws DaoException {
+        String arrStatuses = Arrays.toString(statuses);
+        LOG.debug("Obtained limit, offset and statuses to find them at database are: {}, {} and {}",
+                limit, offset, arrStatuses);
+        List<UserActivityRequest> requestsList = new LinkedList<>();
+        String sqlParameters = Arrays.stream(statuses)
+                .boxed()
+                .map(String::valueOf)
+                .collect(Collectors.joining(",", "(", ")"))
+                .concat(" ORDER BY requests.id DESC ")
+                .concat("LIMIT " + limit + " OFFSET " + offset);
+        LOG.debug("SQL parameters are: {}", sqlParameters);
+        try (PreparedStatement pst = connection.prepareStatement(
+                FIND_ALL_REQUESTS_FROM_USERS_BY_STATUSES + sqlParameters)) {
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query to database has already been completed successfully");
+            while (rs.next()) {
+                UserActivityRequest userActivityRequest = new UserActivityRequest();
+                userActivityRequest.setRequestId(rs.getLong("requests.id"));
+                User user = new User();
+                user.setId(rs.getLong("user_id"));
+                user.setLogin(rs.getString("login"));
+                user.setEmail(rs.getString("email"));
+                user.setEmail(rs.getString("password"));
+                user.setRoleId(rs.getInt("role_id"));
+                userActivityRequest.setUser(user);
+                Activity activity = new Activity();
+                activity.setId(rs.getLong("activity_id"));
+                activity.setCategoryId(rs.getLong("category_id"));
+                activity.setNameEn(rs.getString("a.name_en"));
+                activity.setNameUk(rs.getString("a.name_uk"));
+                userActivityRequest.setActivity(activity);
+                Type type = new Type();
+                type.setId(rs.getLong("type_id"));
+                type.setNameEn(rs.getString("t.name_en"));
+                type.setNameUk(rs.getString("t.name_uk"));
+                userActivityRequest.setType(type);
+                Status status = new Status();
+                status.setId(rs.getLong("status_id"));
+                status.setNameEn(rs.getString("s.name_en"));
+                status.setNameUk(rs.getString("s.name_uk"));
+                userActivityRequest.setStatus(status);
+
+                requestsList.add(userActivityRequest);
+            }
+            LOG.debug("The {} 'requests for activities from user' has already been found by query to database", requestsList.size());
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown by sql query to find all 'requests for activities' by statuses, {}", e.getMessage());
+            throw new DaoException("Cannot find requests for activities from user by statuses. " + e.getMessage(), e);
+        }
+        if (requestsList.isEmpty())
+            LOG.warn("Empty list has been returned by find all requests by statuses");
+        return requestsList;
+    }
+
+    @Override
+    public int getCountRowsByStatuses(int... statuses) throws DaoException {
+        String arrStatuses = Arrays.toString(statuses);
+        LOG.debug("Obtained statuses to find them at database are: {}", arrStatuses);
+        int result = 0;
+        String sqlParameters = Arrays.stream(statuses)
+                .boxed()
+                .map(String::valueOf)
+                .collect(Collectors.joining(",", "(", ")"));
+        try (PreparedStatement pst = connection.prepareStatement(GET_NUM_REQUESTS_BY_STATUSES + sqlParameters)) {
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query to database has already been completed successfully");
+            if (rs.next()) {
+                result = rs.getInt("numRows");
+            }
+            LOG.debug("The {} 'requests found by statuses", result);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown by sql query to find all 'requests for activities' by statuses, {}", e.getMessage());
+            throw new DaoException("Cannot find requests for activities from user by statuses. " + e.getMessage(), e);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean approveAddActivityRequest(long requestId, int statusId, long userId, long activityId) throws DaoException {
+        boolean result;
+        try {
+            connection.setAutoCommit(false);
+            UserActivityDao userActivityDao = new UserActivityDaoImpl(connection);
+            result = userActivityDao.create(new UserActivity(userId, activityId));
+            if (result) {
+                IntervalDao intervalDao = new IntervalDaoImpl(connection);
+                result = intervalDao.create(new Interval(userId, activityId));
+            }
+            if (result) {
+                result = this.updateRequestStatus(requestId, statusId);
+            }
+            connection.commit();
+            if (!result) {
+                rollback(connection);
+            }
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error("Cannot approve adding new activity, {}", e.getMessage());
+            throw new DaoException("Cannot approve adding new activity. " + e.getMessage(), e);
+        } finally {
+            setAutoCommit(connection);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean approveRemovingActivityRequest(long requestId, int statusId, long userId, long activityId) throws DaoException {
+        boolean result = true;
+        try {
+            connection.setAutoCommit(false);
+            UserActivityDao userActivityDao = new UserActivityDaoImpl(connection);
+            result = userActivityDao.delete(userId, activityId);
+            if (result) {
+                try (PreparedStatement pst = connection.prepareStatement(
+                        SQL_SET_FINISH_TIME_BY_USER_AND_ACTIVITY_IDS)) {
+                    pst.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+                    pst.setLong(2, userId);
+                    pst.setLong(3, activityId);
+                    int rowCount = pst.executeUpdate();
+                    LOG.trace("SQL query to update an 'interval' from database has already been completed successfully");
+                    if (rowCount == 0) {
+                        result = false;
+                        LOG.warn("The 'interval' wasn't updated by query to database");
+                    }
+                }
+            }
+            if (result) {
+                result = this.updateRequestStatus(requestId, statusId);
+            }
+            connection.commit();
+            if (!result) {
+                rollback(connection);
+            }
+        } catch (SQLException e) {
+            rollback(connection);
+            LOG.error("Cannot approve request for removing activity, {}", e.getMessage());
+            throw new DaoException("Cannot approve request for removing activity. " + e.getMessage(), e);
+        } finally {
+            setAutoCommit(connection);
+        }
+        return result;
     }
 
     @Override

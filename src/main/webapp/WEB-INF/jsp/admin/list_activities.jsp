@@ -128,110 +128,123 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td class="align-middle">Swiming</td>
-                                    <td class="align-middle">Swiming</td>
-                                    <td class="align-middle">Sport</td>
-                                    <td>
-                                        <button type="submit" class="btn btn-info  me-1" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop">
-                                            <fmt:message key="admin.page.button.edit"/>
-                                        </button>
-                                        <!-- Modal -->
-                                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
-                                             data-bs-keyboard="false" tabindex="-1"
-                                             aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                                                <form class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="staticBackdropLabel">
-                                                            <fmt:message key="admin.page.activity.modal"/>
-                                                        </h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body pb-0">
-                                                        <div class="card mb-0">
-                                                            <div class="card-body">
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-3 text-end control-label col-form-label">
-                                                                        <fmt:message
-                                                                                key="admin.page.activity.chose_category"/>
-                                                                    </label>
-                                                                    <div class="col-md-9">
-                                                                        <select class="select2 form-select shadow-none"
-                                                                                style="width: 100%; height: 36px">
-                                                                            <option selected disabled>Select</option>
-                                                                            <option value="AK">Alaska</option>
-                                                                            <option value="HI">Hawaii</option>
-                                                                        </select>
+                                <c:forEach var="activCatBean" items="${activityCategoryBeans}" varStatus="status">
+                                    <tr>
+                                        <td class="align-middle"><c:out value="${activCatBean.activity.nameEn}"/></td>
+                                        <td class="align-middle"><c:out value="${activCatBean.activity.nameUk}"/></td>
+                                        <td class="align-middle">
+                                            <c:out value="${language == 'en' ? activCatBean.category.nameEn : activCatBean.category.nameUk}"/>
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn btn-info  me-1" data-bs-toggle="modal"
+                                                    data-bs-target="#staticBackdrop">
+                                                <fmt:message key="admin.page.button.edit"/>
+                                            </button>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                                                 data-bs-keyboard="false" tabindex="-1"
+                                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                                                    <form class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="staticBackdropLabel">
+                                                                <fmt:message key="admin.page.activity.modal"/>
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body pb-0">
+                                                            <div class="card mb-0">
+                                                                <div class="card-body">
+                                                                    <div class="form-group row">
+                                                                        <label class="col-sm-3 text-end control-label col-form-label">
+                                                                            <fmt:message
+                                                                                    key="admin.page.activity.chose_category"/>
+                                                                        </label>
+                                                                        <div class="col-md-9">
+                                                                            <select class="select2 form-select shadow-none"
+                                                                                    style="width: 100%; height: 36px">
+                                                                                <option selected disabled>Select</option>
+                                                                                <option value="AK">Alaska</option>
+                                                                                <option value="HI">Hawaii</option>
+                                                                            </select>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-3 text-end control-label col-form-label">
-                                                                        <fmt:message key="admin.page.activity.name"/>
-                                                                    </label>
-                                                                    <div class="col-md-9">
-                                                                        <input type="text" class="form-control"
-                                                                               id="fname"
-                                                                               placeholder="<fmt:message key="admin.page.activity.name.placeholder"/>"/>
+                                                                    <div class="form-group row">
+                                                                        <label class="col-sm-3 text-end control-label col-form-label">
+                                                                            <fmt:message key="admin.page.activity.name"/>
+                                                                        </label>
+                                                                        <div class="col-md-9">
+                                                                            <input type="text" class="form-control"
+                                                                                   id="fname"
+                                                                                   placeholder="<fmt:message key="admin.page.activity.name.placeholder"/>"/>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="form-group row">
-                                                                    <label class="col-sm-3 text-end control-label col-form-label">
-                                                                        <fmt:message key="admin.page.activity.name_uk"/>
-                                                                    </label>
-                                                                    <div class="col-sm-9">
-                                                                        <input type="text" class="form-control"
-                                                                               id="fnameUK"
-                                                                               placeholder="<fmt:message key="admin.page.activity.name.placeholder"/>"/>
+                                                                    <div class="form-group row">
+                                                                        <label class="col-sm-3 text-end control-label col-form-label">
+                                                                            <fmt:message key="admin.page.activity.name_uk"/>
+                                                                        </label>
+                                                                        <div class="col-sm-9">
+                                                                            <input type="text" class="form-control"
+                                                                                   id="fnameUK"
+                                                                                   placeholder="<fmt:message key="admin.page.activity.name.placeholder"/>"/>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">
-                                                            <fmt:message key="admin.page.button.close"/>
-                                                        </button>
-                                                        <button type="button" class="btn btn-primary">
-                                                            <fmt:message key="admin.page.button.save"/>
-                                                        </button>
-                                                    </div>
-                                                </form>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">
+                                                                <fmt:message key="admin.page.button.close"/>
+                                                            </button>
+                                                            <button type="button" class="btn btn-primary">
+                                                                <fmt:message key="admin.page.button.save"/>
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <%--Delete button--%>
-                                        <button type="submit" class="btn btn-danger text-white">
-                                            <fmt:message key="admin.page.button.delete"/>
-                                        </button>
-                                    </td>
-                                </tr>
+                                                <%--Delete button--%>
+                                            <form action="controller" method="POST" class="p-0 m-0 d-inline">
+                                                <input type="hidden" name="command" value="admin_remove_activity">
+                                                <input type="hidden" name="activity_id" value="${activCatBean.activity.id}">
+                                                <button type="submit" class="btn btn-danger text-white">
+                                                    <fmt:message key="admin.page.button.delete"/>
+                                                </button>
+                                                <show:request_result/>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
                                 </tbody>
                             </table>
                             <div class="row float-end">
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination">
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <fmt:message key="admin.page.requests.table.pagination.previous"/>
-                                            </a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">1</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">2</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">3</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <fmt:message key="admin.page.requests.table.pagination.next"/>
-                                            </a>
-                                        </li>
+                                        <show:pagination_prev_button pageNum="${pageNumber}"
+                                                                     commandName="admin_list_activities"
+                                                                     paramName="pageNumber"/>
+
+                                        <c:forEach var="i" begin="1" end="${totalPages}">
+                                            <c:if test="${i==pageNumber}">
+                                                <li class="page-item active">
+                                                    <a class="page-link"
+                                                       href="controller?command=admin_list_activities&pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                            <c:if test="${i!=pageNumber}">
+                                                <li class="page-item">
+                                                    <a class="page-link"
+                                                       href="controller?command=admin_list_activities&pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                        </c:forEach>
+
+                                        <show:pagination_next_button pageNum="${pageNumber}"
+                                                                     paramName="pageNumber"
+                                                                     commandName="admin_list_activities"
+                                                                     totalPages="${totalPages}"/>
                                     </ul>
                                 </nav>
                             </div>

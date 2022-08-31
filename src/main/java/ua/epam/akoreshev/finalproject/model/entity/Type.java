@@ -8,31 +8,31 @@ import java.util.Objects;
  * @author Alexander Koreshev
  */
 public class Type extends Entity {
-    private String name;
-    private long translationId;
+    private String nameEn;
+    private String nameUk;
+
+    public Type(String nameEn, String nameUk) {
+        this.nameEn = nameEn;
+        this.nameUk = nameUk;
+    }
 
     public Type() {
     }
 
-    public Type(String name, long translationId) {
-        this.name = name;
-        this.translationId = translationId;
+    public String getNameEn() {
+        return nameEn;
     }
 
-    public String getName() {
-        return name;
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getNameUk() {
+        return nameUk;
     }
 
-    public long getTranslationId() {
-        return translationId;
-    }
-
-    public void setTranslationId(long translationId) {
-        this.translationId = translationId;
+    public void setNameUk(String nameUk) {
+        this.nameUk = nameUk;
     }
 
     @Override
@@ -40,22 +40,21 @@ public class Type extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Type type = (Type) o;
-        return id == type.id &&
-                translationId == type.translationId &&
-                name.equals(type.name);
+        return nameEn.equals(type.nameEn) &&
+                nameUk.equals(type.nameUk);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, translationId);
+        return Objects.hash(nameEn, nameUk);
     }
 
     @Override
     public String toString() {
         return "Type{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", translationID=" + translationId +
+                "nameEn='" + nameEn + '\'' +
+                ", nameUk='" + nameUk + '\'' +
+                ", id=" + id +
                 '}';
     }
 }

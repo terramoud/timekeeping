@@ -74,45 +74,43 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>User1</td>
-                                        <td>Reading</td>
-                                        <td>3 hours</td>
-                                        <td>10</td>
-                                    </tr>
+                                        <c:forEach var="spentTime" items="${spentTimeForActivities}" varStatus="status">
+                                            <tr>
+                                                <td><c:out value="${spentTime.user.login}"/></td>
+                                                <td><c:out value="${language == 'en' ? spentTime.activity.nameEn : spentTime.activity.nameUk}"/></td>
+                                                <td><show:spent_time_formater time="${spentTime.total}"/></td>
+                                                <td class="text-warning"><c:out value="${spentTime.attempts}"/></td>
+                                            </tr>
+                                        </c:forEach>
                                     </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <th><fmt:message key="admin.page.requests.table.header.user"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.activity"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.summary_time"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.attempts"/></th>
-                                    </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                             <div class="row float-end">
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination">
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <fmt:message key="admin.page.requests.table.pagination.previous"/>
-                                            </a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">1</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">2</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">3</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">
-                                                <fmt:message key="admin.page.requests.table.pagination.next"/>
-                                            </a>
-                                        </li>
+                                        <show:pagination_prev_button pageNum="${pageNumber}"
+                                                                     commandName="admin_timekeeping_report"
+                                                                     paramName="pageNumber"/>
+
+                                        <c:forEach var="i" begin="1" end="${totalPages}">
+                                            <c:if test="${i==pageNumber}">
+                                                <li class="page-item active">
+                                                    <a class="page-link"
+                                                       href="controller?command=admin_timekeeping_report&pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                            <c:if test="${i!=pageNumber}">
+                                                <li class="page-item">
+                                                    <a class="page-link"
+                                                       href="controller?command=admin_timekeeping_report&pageNumber=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                        </c:forEach>
+
+                                        <show:pagination_next_button pageNum="${pageNumber}"
+                                                                     paramName="pageNumber"
+                                                                     commandName="admin_timekeeping_report"
+                                                                     totalPages="${totalPages}"/>
                                     </ul>
                                 </nav>
                             </div>

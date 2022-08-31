@@ -6,13 +6,14 @@ import ua.epam.akoreshev.finalproject.exceptions.DaoException;
 import ua.epam.akoreshev.finalproject.model.dao.IntervalDao;
 import ua.epam.akoreshev.finalproject.model.dao.Mapper;
 import ua.epam.akoreshev.finalproject.model.dao.UserActivityDao;
-import ua.epam.akoreshev.finalproject.model.entity.Interval;
-import ua.epam.akoreshev.finalproject.model.entity.UserActivity;
+import ua.epam.akoreshev.finalproject.model.entity.*;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class IntervalDaoImpl implements IntervalDao {
 
@@ -44,16 +45,19 @@ public class IntervalDaoImpl implements IntervalDao {
 
     private static final String SQL_FIND_ALL_INTERVALS = "SELECT * FROM intervals";
 
+    private static final String SQL_GET_NUMBER_USER_ACTIVITIES = "SELECT COUNT(*) AS numRows FROM users_activities";
+
     private static final String SQL_FIND_ALL_INTERVALS_BY_USER_ACTIVITY =
             "SELECT * FROM intervals WHERE user_id = ? AND activity_id = ?";
 
     private static final String SQL_GET_INTERVAL_BY_USER_ACTIVITY =
             "SELECT * FROM intervals WHERE user_id = ? AND activity_id = ? ORDER BY id DESC LIMIT 1";
 
-    private static final String FIND_ALL_USER_ACTIVITY_THAT_IS_ACTIVE_STATUS =
-            "SELECT * FROM users_activities WHERE is_active = TRUE";
+    private static final String FIND_USER_THAT_HAS_IS_ACTIVE_STATUS =
+            "SELECT * FROM users_activities WHERE user_id = ? AND is_active = TRUE";
 
-    private final Mapper<Interval, PreparedStatement> mapEntityToDB = (Interval interval, PreparedStatement preparedStatement) -> {
+    private final Mapper<Interval, PreparedStatement> mapEntityToDB = (Interval interval,
+                                                                       PreparedStatement preparedStatement) -> {
         LocalDateTime startTime = interval.getStart();
         LocalDateTime finishTime = interval.getFinish();
 
@@ -89,9 +93,10 @@ public class IntervalDaoImpl implements IntervalDao {
         boolean result = true;
         int changedRowSetIsActive = 0;
         int changedRowSetTime = 0;
-        try (Statement st = connection.createStatement()) {
+        try (PreparedStatement psts = connection.prepareStatement(FIND_USER_THAT_HAS_IS_ACTIVE_STATUS)) {
             connection.setAutoCommit(false);
-            ResultSet rs = st.executeQuery(FIND_ALL_USER_ACTIVITY_THAT_IS_ACTIVE_STATUS);
+            psts.setLong(1, userId);
+            ResultSet rs = psts.executeQuery();
             if (rs.next()) {
                 result = false;
             }
@@ -112,6 +117,7 @@ public class IntervalDaoImpl implements IntervalDao {
             if (changedRowSetIsActive == 0 || changedRowSetTime == 0) {
                 result = false;
                 LOG.warn("The start time of 'interval' cannot set by query to database");
+                rollback(connection);
             }
             connection.commit();
         } catch (SQLException e) {
@@ -203,6 +209,38 @@ public class IntervalDaoImpl implements IntervalDao {
             throw new DaoException("Cannot find 'intervals' by user_activity. " + e.getMessage(), e);
         }
         return interval;
+    }
+
+    @Override
+    public long getCountUserActivities() throws DaoException {
+        long result = 0;
+        try (Statement st = connection.createStatement()) {
+            ResultSet rs = st.executeQuery(SQL_GET_NUMBER_USER_ACTIVITIES);
+            LOG.trace("SQL query find all 'intervals' to database has already been completed successfully");
+            if (rs.next()) {
+                result = rs.getLong("numRows");
+            }
+            LOG.debug("The {} rows has been found by query to database", result);
+        } catch (SQLException e) {
+            LOG.error("DAO exception has been thrown to find all 'intervals', because {}", e.getMessage());
+            throw new DaoException("Cannot find 'intervals'. " + e.getMessage(), e);
+        }
+        return result;
+    }
+
+    @Override
+    public Map<UserActivityBean, List<Interval>> findUserStatistics(int limit, int offset) throws DaoException {
+        Map<UserActivityBean, List<Interval>> statistics = new LinkedHashMap<>();
+        UserActivityDao userActivityDao = new UserActivityDaoImpl(connection);
+        List<UserActivityBean> userActivityBeans = userActivityDao.findAll(limit, offset);
+        for (UserActivityBean userActivityBean : userActivityBeans) {
+            long userId = userActivityBean.getUser().getId();
+            long activityId = userActivityBean.getActivity().getId();
+            List<Interval> allIntervalsByUserActivity = this.findAllIntervalsByUserActivity(userId, activityId);
+            statistics.put(userActivityBean, allIntervalsByUserActivity);
+        }
+        LOG.debug("Obtained statistic by findUserStatistics are {}", statistics);
+        return statistics;
     }
 
     @Override

@@ -5,11 +5,16 @@ import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
 import ua.epam.akoreshev.finalproject.model.dao.Mapper;
 import ua.epam.akoreshev.finalproject.model.dao.UserActivityDao;
+import ua.epam.akoreshev.finalproject.model.entity.Activity;
+import ua.epam.akoreshev.finalproject.model.entity.User;
 import ua.epam.akoreshev.finalproject.model.entity.UserActivity;
+import ua.epam.akoreshev.finalproject.model.entity.UserActivityBean;
 
 import java.sql.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserActivityDaoImpl implements UserActivityDao {
     private static final String SQL_CREATE_USERS_ACTIVITIES = "INSERT INTO users_activities VALUES (?, ?, ?)";
@@ -24,7 +29,10 @@ public class UserActivityDaoImpl implements UserActivityDao {
     private static final String SQL_DELETE_USER_ACTIVITY =
             "DELETE FROM users_activities WHERE user_id = ? AND activity_id = ?";
 
-    private static final String SQL_FIND_ALL_USERS_ACTIVITIES = "SELECT * FROM users_activities";
+    private static final String SQL_FIND_ALL_USERS_ACTIVITIES =
+            "SELECT * FROM users_activities " +
+                    "INNER JOIN users u on users_activities.user_id = u.id " +
+                    "INNER JOIN activities a on users_activities.activity_id = a.id";
 
     private static final String SQL_DELETE_ALL_USERS_ACTIVITIES_BY_USER_ID =
             "DELETE FROM users_activities WHERE user_id = ?";
@@ -114,6 +122,40 @@ public class UserActivityDaoImpl implements UserActivityDao {
         }
         if (userActivities.isEmpty()) {
             LOG.warn("Empty list 'user_activities' has been returned by findAll() method");
+        }
+        return userActivities;
+    }
+
+    @Override
+    public List<UserActivityBean> findAll(int limit, int offset) throws DaoException {
+        List<UserActivityBean> userActivities = new LinkedList<>();
+        String sortParam = " ORDER BY user_id DESC";
+        String sqlParameters = " LIMIT " + limit + " OFFSET " + offset;
+        try (PreparedStatement pst = connection.prepareStatement(
+                SQL_FIND_ALL_USERS_ACTIVITIES + sortParam + sqlParameters)) {
+            ResultSet rs = pst.executeQuery();
+            LOG.trace("SQL query find all 'user_activities' has already been completed successfully");
+            while (rs.next()) {
+                UserActivityBean userActivityBean = new UserActivityBean();
+                User user = new User();
+                user.setId(rs.getLong("user_id"));
+                user.setLogin(rs.getString("login"));
+                user.setEmail(rs.getString("email"));
+                user.setEmail(rs.getString("password"));
+                user.setRoleId(rs.getInt("role_id"));
+                userActivityBean.setUser(user);
+                Activity activity = new Activity();
+                activity.setId(rs.getLong("activity_id"));
+                activity.setCategoryId(rs.getLong("category_id"));
+                activity.setNameEn(rs.getString("a.name_en"));
+                activity.setNameUk(rs.getString("a.name_uk"));
+                userActivityBean.setActivity(activity);
+                userActivities.add(userActivityBean);
+            }
+            LOG.debug("The {} 'user_activities' has been found by query to database", userActivities.size());
+        } catch (SQLException e) {
+            LOG.error("Cannot find all with offset and limit 'user_activities', because {}", e.getMessage());
+            throw new DaoException("Cannot find activities with offset and limit. " + e.getMessage(), e);
         }
         return userActivities;
     }
