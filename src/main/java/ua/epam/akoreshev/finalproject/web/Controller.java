@@ -48,7 +48,6 @@ public class Controller extends HttpServlet {
             LOG.debug("url: {}", url);
             resp.sendRedirect(url);
             LOG.debug("redirected: {}", url);
-            throw new IOException();
         } catch (CommandException e) {
             LOG.error("Error has been thrown by {} command", req.getParameter(COMMAND), e);
             send500Error(resp, e);
