@@ -2,7 +2,6 @@ package ua.epam.akoreshev.finalproject.web;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ua.epam.akoreshev.finalproject.Path;
 import ua.epam.akoreshev.finalproject.exceptions.CommandException;
 import ua.epam.akoreshev.finalproject.web.command.Command;
 import ua.epam.akoreshev.finalproject.web.command.CommandContainer;
@@ -18,6 +17,7 @@ import java.io.IOException;
 @WebServlet("/controller")
 public class Controller extends HttpServlet {
     private static final Logger LOG = LogManager.getLogger(Controller.class);
+    public static final String COMMAND = "command";
     private CommandContainer commands;
 
     @Override
@@ -28,49 +28,51 @@ public class Controller extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            System.out.println("GET!!!!!!!!!!!!!!!!!!!!!!!!!!" + req.getHeader("referer"));
             String url = getUrl(req, resp);
             LOG.debug("url: {}", url);
             req.getRequestDispatcher(url).forward(req, resp);
             LOG.debug("forward: {}", url);
-        } catch (CommandException | IOException | ServletException e) {
-            LOG.error("Error has been thrown by front controller. {}", e.getMessage());
-            try {
-                resp.sendError(500, "Cannot process the command");
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
-//			throw new ServletException("Cannot process the command", e);
+        } catch (CommandException e) {
+            LOG.error("Error has been thrown by {} command", req.getParameter(COMMAND), e);
+            send500Error(resp, e);
+        } catch (IOException | ServletException e) {
+            LOG.error("Error has been thrown by controller servlet", e);
+            send500Error(resp, e);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            System.out.println("POST!!!!!!!!!!!!!!!!!!!!!!!!!!" + req.getHeader("referer"));
             String url = getUrl(req, resp);
+            LOG.debug("url: {}", url);
             resp.sendRedirect(url);
             LOG.debug("redirected: {}", url);
-        } catch (CommandException | IOException e) {
-            LOG.error("Error has been thrown by front controller. {}", e.getMessage());
-            try {
-                resp.sendError(500, "Cannot process the command");
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
-//			throw new ServletException("Cannot process the command", e);
+        } catch (CommandException e) {
+            LOG.error("Error has been thrown by {} command", req.getParameter(COMMAND), e);
+            send500Error(resp, e);
+        } catch (IOException e) {
+            LOG.error("Error has been thrown by controller servlet", e);
+            send500Error(resp, e);
         }
     }
 
     private String getUrl(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
-        System.out.println(req.getMethod());
-        String commandName = req.getParameter("command");
-        LOG.debug("Request parameter: command name --> \"{}\"", commandName);
+        String commandName = req.getParameter(COMMAND);
+        LOG.debug("Request parameter: command name --> '{}'", commandName);
         Command command = commands.getCommand(commandName);
         LOG.debug("Obtained command: {}", command);
         if (command == null) {
             throw new CommandException("Non-existent command");
         }
         return command.execute(req, resp);
+    }
+
+    void send500Error(HttpServletResponse resp, Exception e) {
+        try {
+            resp.sendError(500, e.getMessage());
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
     }
 }
