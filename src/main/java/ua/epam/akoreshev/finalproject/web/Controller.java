@@ -37,7 +37,7 @@ public class Controller extends HttpServlet {
             send500Error(resp, e);
         } catch (IOException | ServletException e) {
             LOG.error("Error has been thrown by controller servlet", e);
-            send500Error(resp, e);
+            send500Error(resp);
         }
     }
 
@@ -48,12 +48,13 @@ public class Controller extends HttpServlet {
             LOG.debug("url: {}", url);
             resp.sendRedirect(url);
             LOG.debug("redirected: {}", url);
+            throw new IOException();
         } catch (CommandException e) {
             LOG.error("Error has been thrown by {} command", req.getParameter(COMMAND), e);
             send500Error(resp, e);
         } catch (IOException e) {
             LOG.error("Error has been thrown by controller servlet", e);
-            send500Error(resp, e);
+            send500Error(resp);
         }
     }
 
@@ -71,6 +72,14 @@ public class Controller extends HttpServlet {
     void send500Error(HttpServletResponse resp, Exception e) {
         try {
             resp.sendError(500, e.getMessage());
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    void send500Error(HttpServletResponse resp) {
+        try {
+            resp.sendError(500, "Something is wrong");
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
