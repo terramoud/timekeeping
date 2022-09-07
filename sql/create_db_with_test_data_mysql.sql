@@ -121,12 +121,12 @@ CREATE TABLE IF NOT EXISTS intervals
     activity_id INT      NOT NULL,
     FOREIGN KEY (user_id)
         REFERENCES users (id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     FOREIGN KEY (activity_id)
         REFERENCES activities (id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 
@@ -163,23 +163,17 @@ CREATE TABLE IF NOT EXISTS requests
 -- -----------------------------------------------------
 -- fill roles
 -- -----------------------------------------------------
-INSERT INTO roles
-VALUES (DEFAULT, 'admin');
-INSERT INTO roles
-VALUES (DEFAULT, 'user');
+INSERT INTO roles VALUES (DEFAULT, 'admin');
+INSERT INTO roles VALUES (DEFAULT, 'user');
 
 
 -- -----------------------------------------------------
 -- fill Users
 -- -----------------------------------------------------
-INSERT INTO users
-VALUES (DEFAULT, 'admin', 'admin@test.com', 'admin', 1);
-INSERT INTO users
-VALUES (DEFAULT, 'petro', 'testpetro@test.com', '1111', 2);
-INSERT INTO users
-VALUES (DEFAULT, 'testUser', 'testUser@test.com', '2222', 2);
-INSERT INTO users
-VALUES (DEFAULT, 'ivan', 'testIvan@test.com', '3333', 2);
+INSERT INTO users VALUES (DEFAULT, 'admin', 'admin@test.com', 'admin', 1);
+INSERT INTO users VALUES (DEFAULT, 'petro', 'testpetro@test.com', '1111', 2);
+INSERT INTO users VALUES (DEFAULT, 'testUser', 'testUser@test.com', '2222', 2);
+INSERT INTO users VALUES (DEFAULT, 'ivan', 'testIvan@test.com', '3333', 2);
 
 
 -- -----------------------------------------------------
@@ -202,37 +196,60 @@ INSERT INTO types VALUES (DEFAULT, 'Remove', 'Видалити');
 -- -----------------------------------------------------
 INSERT INTO categories VALUES (DEFAULT, 'Sport', 'Cпорт');
 INSERT INTO categories VALUES (DEFAULT, 'Art', 'Мистецтво');
+INSERT INTO categories VALUES (default, 'Team-Building Activities', 'Заходи з формування команди');
+INSERT INTO categories VALUES (default, 'Work', 'Робота');
+INSERT INTO categories VALUES (default, 'Education', 'Навчання');
+INSERT INTO categories VALUES (default, 'Vacation', 'Відпустка');
+INSERT INTO categories VALUES (default, 'Advertisement', 'Реклама');
 
 
 -- -----------------------------------------------------
 -- fill activities
 -- -----------------------------------------------------
 INSERT INTO activities VALUES (DEFAULT, 'Swimming', 'Плавання', 1);
+INSERT INTO activities VALUES (default, 'running', 'біг', 1);
+INSERT INTO activities VALUES (default, 'athletics', 'атлетика', 1);
+INSERT INTO activities VALUES (default, 'walking', 'прогулянки', 1);
+INSERT INTO activities VALUES (default, 'cycling', 'їзда на велосипеді', 1);
+INSERT INTO activities VALUES (default, 'yoga', 'йога', 1);
+INSERT INTO activities VALUES (default, 'golf', 'гольф', 1);
+INSERT INTO activities VALUES (default, 'tennis', 'теніс', 1);
+INSERT INTO activities VALUES (default, 'football', 'футбол', 1);
 INSERT INTO activities VALUES (DEFAULT, 'Drawing', 'Малювання', 2);
+INSERT INTO activities VALUES (default, 'Pan art', 'Панорамне мистецтво', 2);
+INSERT INTO activities VALUES (default, 'Creating a nature collage', 'Створення природного колажу', 2);
+INSERT INTO activities VALUES (default, 'Splatter painting', 'Малювання бризками', 2);
+INSERT INTO activities VALUES (default, 'Solving a puzzle', 'Розгадування головоломки', 3);
+INSERT INTO activities VALUES (default, 'Brainstorming Session', 'Мозковий штурм', 3);
+INSERT INTO activities VALUES (default, 'Sharing your personality', 'Ділитися своєю індивідуальністю', 3);
+INSERT INTO activities VALUES (default, 'Playing Team Games', 'Командні ігри', 3);
+INSERT INTO activities VALUES (default, 'Untangle a Human Knot', 'Розплутування людського вузла', 3);
 
 
 -- -----------------------------------------------------
 -- fill request
 -- -----------------------------------------------------
-INSERT INTO requests
-VALUES (DEFAULT, 1, 1, 1, 1);
-INSERT INTO requests
-VALUES (DEFAULT, 1, 2, 1, 2);
+INSERT INTO requests VALUES (DEFAULT, 2, 1, 1, 1);
+INSERT INTO requests VALUES (DEFAULT, 2, 2, 1, 1);
+INSERT INTO requests VALUES (DEFAULT, 3, 1, 1, 1);
+INSERT INTO requests VALUES (DEFAULT, 3, 2, 1, 1);
 
 
 -- -----------------------------------------------------
 -- fill users_activities
 -- -----------------------------------------------------
-INSERT INTO users_activities VALUES (1, 1, TRUE);
-INSERT INTO users_activities VALUES (1, 2, FALSE);
-INSERT INTO users_activities VALUES (2, 1, FALSE);
-INSERT INTO users_activities VALUES (2, 2, FALSE);
+insert into users_activities values (2, 1, default);
+insert into users_activities values (2, 2, default);
+insert into users_activities values (3, 1, default);
+insert into users_activities values (3, 2, default);
 
 
 -- -----------------------------------------------------
 -- fill intervals
 -- -----------------------------------------------------
-INSERT INTO intervals
-    VALUES (DEFAULT, CURRENT_TIMESTAMP, TIMESTAMP('2022-09-29 17:54:04'), 1, 1);
-INSERT INTO intervals
-    VALUES (DEFAULT, TIMESTAMP('2022-09-29 18:54:04'), TIMESTAMP('2022-09-29 18:54:04'), 1, 2);
+insert into intervals values (default, null, null, 2, 1);
+insert into intervals values (default, null, null, 2, 2);
+insert into intervals values (default, null, null, 3, 1);
+insert into intervals values (default, null, null, 3, 2);
+
+
