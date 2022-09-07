@@ -33,10 +33,10 @@ public class Controller extends HttpServlet {
             req.getRequestDispatcher(url).forward(req, resp);
             LOG.debug("forward: {}", url);
         } catch (CommandException e) {
-            LOG.error("Error has been thrown by {} command", req.getParameter(COMMAND), e);
+            LOG.error("Error has been thrown by '{}' command", req.getParameter(COMMAND), e);
             send500Error(resp, e);
         } catch (IOException | ServletException e) {
-            LOG.error("Error has been thrown by controller servlet", e);
+            LOG.error("Error has been thrown by front controller servlet", e);
             send500Error(resp);
         }
     }
@@ -49,10 +49,10 @@ public class Controller extends HttpServlet {
             resp.sendRedirect(url);
             LOG.debug("redirected: {}", url);
         } catch (CommandException e) {
-            LOG.error("Error has been thrown by {} command", req.getParameter(COMMAND), e);
+            LOG.error("Error has been thrown by '{}' command", req.getParameter(COMMAND), e);
             send500Error(resp, e);
         } catch (IOException e) {
-            LOG.error("Error has been thrown by controller servlet", e);
+            LOG.error("Error has been thrown by front controller servlet", e);
             send500Error(resp);
         }
     }
@@ -62,10 +62,12 @@ public class Controller extends HttpServlet {
         LOG.debug("Request parameter: command name --> '{}'", commandName);
         Command command = commands.getCommand(commandName);
         LOG.debug("Obtained command: {}", command);
-        if (command == null) {
+        if (command == null)
             throw new CommandException("Non-existent command");
-        }
-        return command.execute(req, resp);
+        String executeResult = command.execute(req, resp);
+        if (executeResult == null)
+            throw new CommandException("Url cannot be null");
+        return executeResult;
     }
 
     void send500Error(HttpServletResponse resp, Exception e) {
