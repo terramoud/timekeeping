@@ -18,6 +18,11 @@ public class Activity extends Entity {
         this.categoryId = categoryId;
     }
 
+    public Activity(long id, String nameEn, String nameUk, long categoryId) {
+        this(nameEn, nameUk, categoryId);
+        this.id = id;
+    }
+
     public Activity() {
     }
 
@@ -54,6 +59,13 @@ public class Activity extends Entity {
                 categoryId == activity.categoryId &&
                 nameEn.equals(activity.nameEn) &&
                 nameUk.equals(activity.nameUk);
+    }
+
+    public boolean equalsByLocalizedNames(Object o) {
+        if (o == null || this.getClass() != o.getClass()) return false;
+        Activity activity = (Activity) o;
+        return this.nameEn.equals(activity.nameEn) ||
+                this.nameUk.equals(activity.nameUk);
     }
 
     @Override
