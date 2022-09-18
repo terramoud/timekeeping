@@ -2,11 +2,14 @@ package ua.epam.akoreshev.finalproject.web.command;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ua.epam.akoreshev.finalproject.Path;
 import ua.epam.akoreshev.finalproject.exceptions.CommandException;
 import ua.epam.akoreshev.finalproject.exceptions.ServiceException;
+import ua.epam.akoreshev.finalproject.exceptions.UserException;
 import ua.epam.akoreshev.finalproject.model.entity.Role;
 import ua.epam.akoreshev.finalproject.model.entity.User;
 import ua.epam.akoreshev.finalproject.web.service.UserService;
+import ua.epam.akoreshev.finalproject.web.utils.RequestParameterValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,22 +23,30 @@ public class RegisterCommand extends Command {
     }
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
+    public String execute(HttpServletRequest req,
+                          HttpServletResponse resp) throws CommandException {
         LOG.debug("Command starts");
+        RequestParameterValidator validator = new RequestParameterValidator(req);
         User user = new User();
-        user.setLogin(req.getParameter("login"));
-        user.setEmail(req.getParameter("email"));
-        user.setPassword(req.getParameter("password"));
+        user.setLogin(validator.getString("login"));
+        user.setEmail(validator.getString("email"));
+        user.setPassword(validator.getString("password"));
         user.setRoleId(Role.getRoleId(Role.USER));
+        String passwordConfirm = validator.getString("password_confirm");
         try {
-            if (userService.addUser(user)) {
+            putToSession(req, "registration.failed", true, LOG);
+            if (userService.addUser(user, passwordConfirm)) {
                 LOG.trace("Registration completed");
+                putToSession(req, "registration.success", false, LOG);
             }
+        } catch (UserException e) {
+            LOG.warn(e);
+            putToSession(req, e.getMessage(), true, LOG);
         } catch (ServiceException e) {
-            LOG.error(e);
+            LOG.error("Cannot register new user {}" , user);
             throw new CommandException("Cannot register new user", e);
         }
         LOG.debug("Command finished");
-        return req.getHeader("referer");
+        return "?command=" + Path.INDEX_PAGE_COMMAND;
     }
 }
