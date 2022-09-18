@@ -5,9 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
-import ua.epam.akoreshev.finalproject.model.dao.DBUtil;
-import ua.epam.akoreshev.finalproject.model.dao.IntervalDao;
-import ua.epam.akoreshev.finalproject.model.entity.Interval;
+import ua.epam.akoreshev.finalproject.model.dao.*;
+import ua.epam.akoreshev.finalproject.model.entity.*;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -21,11 +20,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class IntervalDaoImplTest {
     private static IntervalDao intervalDao;
     private static Connection connection;
+    private static ActivityDao activityDao;
+    private static UserDao userDao;
+    private static UserActivityDao userActivityDao;
 
     @BeforeAll
     public static void setUpBeforeAll() throws DaoException {
         connection = DBUtil.getConnection();
         intervalDao = new IntervalDaoImpl(connection);
+        activityDao = new ActivityDaoImpl(connection);
+        userDao = new UserDaoImpl(connection);
+        userActivityDao = new UserActivityDaoImpl(connection);
     }
 
     @BeforeEach
@@ -102,19 +107,38 @@ public class IntervalDaoImplTest {
     /**
      * @see IntervalDaoImpl#update(Interval)
      */
-    @ParameterizedTest
-    @MethodSource("testCasesWhenIntervalIsChanged")
-    void testUpdateActivity(Interval changedInterval) throws DaoException {
-        Interval sourceInterval = new Interval(null, null, 1, 1);
-        assertTrue(intervalDao.create(sourceInterval)); // And now source has synchronized 'id' with db
-        sourceInterval.setStart(changedInterval.getStart());
-        sourceInterval.setFinish(changedInterval.getFinish());
-        sourceInterval.setUserId(changedInterval.getUserId());
-        sourceInterval.setActivityId(changedInterval.getActivityId());
+    @Test
+    void testUpdateActivity() throws DaoException {
+        Activity activity1 = new Activity("TestActivity1", "Тестова діяльність1", 1);
+        Activity activity2 = new Activity("TestActivity2", "Тестова діяльність2", 1);
+        activityDao.create(activity1);
+        activityDao.create(activity2);
+        User user1 = new User(0, "testUser1!", "test@mail.com1!", "*", 2);
+        User user2 = new User(0, "testUser2!", "test@mail.com2!", "*", 2);
+        userDao.create(user1);
+        userDao.create(user2);
 
-        assertTrue(intervalDao.update(sourceInterval));
-        Interval actualInterval = intervalDao.read(sourceInterval.getId());
-        assertEquals(sourceInterval, actualInterval);
+        LocalDateTime time = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        List<Interval> requestList = new LinkedList<>();
+        requestList.add(new Interval(null, null, user1.getId(), activity1.getId()));
+        requestList.add(new Interval(null, null, user2.getId(), activity1.getId()));
+        requestList.add(new Interval(null, null, user2.getId(), activity2.getId()));
+        requestList.add(new Interval(time, null, user1.getId(), activity1.getId()));
+        requestList.add(new Interval(time, time, user1.getId(), activity1.getId()));
+        requestList.add(new Interval(time, null, user2.getId(), activity2.getId()));
+
+        Interval sourceInterval = new Interval(null, null, user1.getId(), activity1.getId());
+        assertTrue(intervalDao.create(sourceInterval)); // And now source has synchronized 'id' with db
+        for (Interval changedInterval : requestList) {
+            sourceInterval.setStart(changedInterval.getStart());
+            sourceInterval.setFinish(changedInterval.getFinish());
+            sourceInterval.setUserId(changedInterval.getUserId());
+            sourceInterval.setActivityId(changedInterval.getActivityId());
+
+            assertTrue(intervalDao.update(sourceInterval));
+            Interval actualInterval = intervalDao.read(sourceInterval.getId());
+            assertEquals(sourceInterval, actualInterval);
+        }
     }
 
 
@@ -186,41 +210,27 @@ public class IntervalDaoImplTest {
     }
 
     /**
-     * @see IntervalDaoImpl#findAllIntervalsByUserActivity(long, long)
-     */
-    @Test
-    void testFindAllIntervalsByUserActivity() throws DaoException, SQLException {
-        List<Interval> intervalListBeforeAdded = intervalDao.findAllIntervalsByUserActivity(1L, 1L);
-        PreparedStatement pst = connection.prepareStatement(
-                "INSERT INTO intervals VALUES (DEFAULT, null, null, 1, 1)",
-                Statement.RETURN_GENERATED_KEYS);
-        pst.executeUpdate();
-        ResultSet rs = pst.getGeneratedKeys();
-        if (!rs.next()) {
-            throw new SQLException("Fatal: Cannot create the test for IntervalDao. The test is crashed");
-        }
-        Interval expectedInterval = new Interval(null, null, 1, 1);
-        expectedInterval.setId(rs.getLong(1));
-
-        List<Interval> intervalListAfterAdded = intervalDao.findAllIntervalsByUserActivity(1L, 1L);
-        LinkedList<Interval> differences = new LinkedList<>(intervalListAfterAdded);
-        differences.removeAll(intervalListBeforeAdded);
-        assertEquals(1, differences.size());
-        assertEquals(expectedInterval, differences.getFirst());
-    }
-
-    /**
      * @see IntervalDaoImpl#setStartTimeForUserActivity(long, long, LocalDateTime)
      */
     @Test
-    void testSetStartTimeForUserActivity() throws DaoException {
-        LocalDateTime expectedTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        Interval sourceInterval = new Interval(null, null, 1, 1);
+    void testSetStartTimeForUserActivity() throws DaoException, SQLException {
+        Activity activity1 = new Activity("TestActivity1", "Тестова діяльність1", 1);
+        assertTrue(activityDao.create(activity1));
+        User user1 = new User(0, "testUser1!", "test@mail.com1!", "*", 2);
+        assertTrue(userDao.create(user1));
+        assertTrue(userActivityDao.create(new UserActivity(user1.getId(), activity1.getId(), false)));
+
+        Interval sourceInterval = new Interval(null, null, user1.getId(), activity1.getId());
         assertTrue(intervalDao.create(sourceInterval));
 
-        assertTrue(intervalDao.setStartTimeForUserActivity(1, 1, expectedTime));
+        LocalDateTime expectedTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        assertTrue(intervalDao.setStartTimeForUserActivity(user1.getId(), activity1.getId(), expectedTime));
         LocalDateTime actualStartTime = intervalDao.read(sourceInterval.getId()).getStart();
         assertEquals(expectedTime, actualStartTime);
+
+        assertTrue(userDao.delete(user1.getId()));
+        assertTrue(activityDao.delete(activity1.getId()));
+        connection.setAutoCommit(false);
     }
 
 
@@ -228,29 +238,25 @@ public class IntervalDaoImplTest {
      * @see IntervalDaoImpl#setFinishTimeForUserActivity(long, long, LocalDateTime)
      */
     @Test
-    void testSetFinishTimeForUserActivity() throws DaoException {
+    void testSetFinishTimeForUserActivity() throws DaoException, SQLException {
+        Activity activity1 = new Activity("TestActivity1", "Тестова діяльність1", 1);
+        assertTrue(activityDao.create(activity1));
+        User user1 = new User(0, "testUser1!", "test@mail.com1!", "*", 2);
+        assertTrue(userDao.create(user1));
+        assertTrue(userActivityDao.create(new UserActivity(user1.getId(), activity1.getId(), true)));
+
         LocalDateTime startTime = LocalDateTime.of(2022, 7, 19, 14, 5);
-        LocalDateTime expectedTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        Interval sourceInterval = new Interval(startTime, null, 1, 1);
+        Interval sourceInterval = new Interval(startTime, null, user1.getId(), activity1.getId());
         assertTrue(intervalDao.create(sourceInterval));
 
-        assertTrue(intervalDao.setFinishTimeForUserActivity(1, 1, expectedTime));
+        LocalDateTime expectedTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        assertTrue(intervalDao.setFinishTimeForUserActivity(user1.getId(), activity1.getId(), expectedTime));
         LocalDateTime actualFinishTime = intervalDao.read(sourceInterval.getId()).getFinish();
         assertEquals(expectedTime, actualFinishTime);
-    }
 
-
-    private static Stream<Arguments> testCasesWhenIntervalIsChanged() {
-        LocalDateTime time = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        return Stream.of(
-                Arguments.of(new Interval(null, null, 1, 1)), // update cloned interval
-                Arguments.of(new Interval(null, null, 2, 1)),
-                Arguments.of(new Interval(null, null, 2, 2)),
-                Arguments.of(new Interval(time, null, 1, 1)),
-                Arguments.of(new Interval(time, time, 1, 1)),
-                Arguments.of(new Interval(time, null, 2, 2)),
-                Arguments.of(new Interval(time, time, 2, 2))
-        );
+        assertTrue(userDao.delete(user1.getId()));
+        assertTrue(activityDao.delete(activity1.getId()));
+        connection.setAutoCommit(false);
     }
 
     private static Stream<Arguments> testCasesWhenIntervalHasNegativeOrZeroField() {
