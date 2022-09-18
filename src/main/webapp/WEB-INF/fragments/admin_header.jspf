@@ -7,9 +7,13 @@ header (top area).
             <a class="navbar-brand" href="controller?command=admin_dashboard">
                 <span class="logo-text ms-2"><fmt:message key="project.name"/></span>
             </a>
-            <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)">
-                <em class="ti-menu ti-close"></em>
-            </a>
+            <div class="d-flex d-md-none align-items-center">
+                <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)">
+                    <em class="ti-menu ti-close"></em>
+                </a>
+                <%@ include file="/WEB-INF/fragments/profile_dropdown.jspf" %>
+                <%@ include file="/WEB-INF/fragments/language_switcher.jspf" %>
+            </div>
         </div>
         <div class="navbar-collapse collapse" id="navbarSupportedContent" data-navbarbg="skin5">
             <!-- ============================================================== -->
