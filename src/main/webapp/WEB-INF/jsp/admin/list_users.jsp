@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/fragments/directive/taglib.jspf" %>
 <c:set var="language"
        value="${not empty sessionScope.language ? sessionScope.language :
-         not empty cookie['defaultLocale'].getValue() ? cookie['defaultLocale'].getValue() :pageContext.request.locale}"
+         not empty cookie['defaultLocale'].getValue() ? cookie['defaultLocale'].getValue() : pageContext.request.locale}"
        scope="session"/>
 <fmt:setLocale value="${language}"/>
 
@@ -74,9 +74,21 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <th scope="col"><fmt:message key="admin.page.user.login"/></th>
-                                    <th scope="col"><fmt:message key="admin.page.user.email"/></th>
-                                    <th scope="col"><fmt:message key="admin.page.user.role"/></th>
+                                    <th scope="col">
+                                        <a href="controller?command=admin_list_users&pageNumber=${requestScope.pageNumber}&order_by=login&desc=${requestScope.desc}">
+                                            <fmt:message key="admin.page.user.login"/>
+                                        </a>
+                                    </th>
+                                    <th scope="col">
+                                        <a href="controller?command=admin_list_users&pageNumber=${requestScope.pageNumber}&order_by=email&desc=${requestScope.desc}">
+                                            <fmt:message key="admin.page.user.email"/>
+                                        </a>
+                                    </th>
+                                    <th scope="col">
+                                        <a href="controller?command=admin_list_users&pageNumber=${requestScope.pageNumber}&order_by=role_id&desc=${requestScope.desc}">
+                                            <fmt:message key="admin.page.user.role"/>
+                                        </a>
+                                    </th>
                                     <th scope="col"><fmt:message key="admin.page.requests.table.header.actions"/></th>
                                 </tr>
                                 </thead>
@@ -88,17 +100,22 @@
                                         <td class="align-middle"><c:out value="${userRoleBean.role}"/></td>
                                         <td>
                                             <button type="submit" class="btn btn-info  me-1" data-bs-toggle="modal"
-                                                    data-bs-target="#staticBackdrop">
+                                                    data-bs-target="#staticBackdrop${userRoleBean.user.id}">
                                                 <fmt:message key="admin.page.button.edit"/>
                                             </button>
                                             <!-- Modal -->
-                                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                                            <div class="modal fade" id="staticBackdrop${userRoleBean.user.id}" data-bs-backdrop="static"
                                                  data-bs-keyboard="false" tabindex="-1"
-                                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                 aria-labelledby="staticBackdrop${userRoleBean.user.id}Label" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                                                    <form class="modal-content">
+                                                    <form name="formEditUser${userRoleBean.user.id}" method="POST" action="controller"
+                                                          class="modal-content"
+                                                          onSubmit="return editUserFormValidation(event, 'formEditUser${userRoleBean.user.id}')"
+                                                          onkeydown="return event.key != 'Enter'">
+                                                        <input type="hidden" name="command" value="admin_change_user">
+                                                        <input type="hidden" name="user_id" value="${userRoleBean.user.id}">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="staticBackdropLabel">
+                                                            <h5 class="modal-title" id="staticBackdrop${userRoleBean.user.id}Label">
                                                                 <fmt:message key="admin.page.user.modal.change_user"/>
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -107,14 +124,14 @@
                                                         <div class="modal-body pb-0">
                                                             <div class="card mb-0">
                                                                 <div class="card-body">
-                                                                        <%--                                                                <h5 class="card-title">Edit activity</h5>--%>
                                                                     <div class="form-group row">
                                                                         <label class="col-sm-3 text-end control-label col-form-label">
                                                                             <fmt:message key="admin.page.user.login"/>
                                                                         </label>
                                                                         <div class="col-md-9">
                                                                             <input type="text" class="form-control"
-                                                                                   id="fname"
+                                                                                   name="login"
+                                                                                   value="<c:out value="${userRoleBean.user.login}"/>"
                                                                                    placeholder="<fmt:message key="admin.page.user.login.placeholder"/>"/>
                                                                         </div>
                                                                     </div>
@@ -124,7 +141,8 @@
                                                                         </label>
                                                                         <div class="col-sm-9">
                                                                             <input type="text" class="form-control"
-                                                                                   id="fnameEN"
+                                                                                   name="email"
+                                                                                   value="<c:out value="${userRoleBean.user.email}"/>"
                                                                                    placeholder="<fmt:message key="admin.page.user.email.placeholder"/>"/>
                                                                         </div>
                                                                     </div>
@@ -133,11 +151,16 @@
                                                                             <fmt:message key="admin.page.user.choose.role"/>
                                                                         </label>
                                                                         <div class="col-md-9">
-                                                                            <select class="select2 form-select shadow-none"
+                                                                            <select required="required" name="role_id" class="select2 form-select shadow-none"
                                                                                     style="width: 100%; height: 36px">
-                                                                                <option selected disabled>Select</option>
-                                                                                <option value="AK">Admin</option>
-                                                                                <option value="HI">User</option>
+                                                                                <c:forEach var="userRoleEntry" items="${userRoles}" varStatus="status">
+                                                                                    <c:if test="${userRoleBean.user.roleId == userRoleEntry.key}">
+                                                                                        <option selected value="${userRoleEntry.key}">${userRoleEntry.value}</option>
+                                                                                    </c:if>
+                                                                                    <c:if test="${userRoleBean.user.roleId != userRoleEntry.key}">
+                                                                                        <option value="${userRoleEntry.key}">${userRoleEntry.value}</option>
+                                                                                    </c:if>
+                                                                                </c:forEach>
                                                                             </select>
                                                                         </div>
                                                                     </div>
@@ -149,7 +172,7 @@
                                                                     data-bs-dismiss="modal">
                                                                 <fmt:message key="admin.page.button.close"/>
                                                             </button>
-                                                            <button type="button" class="btn btn-primary">
+                                                            <button type="submit" class="btn btn-primary">
                                                                 <fmt:message key="admin.page.button.save"/>
                                                             </button>
                                                         </div>
@@ -163,7 +186,6 @@
                                                 <button type="submit" class="btn btn-danger text-white">
                                                     <fmt:message key="admin.page.button.delete"/>
                                                 </button>
-                                                <show:request_result/>
                                             </form>
                                         </td>
                                     </tr>
@@ -175,19 +197,20 @@
                                     <ul class="pagination">
                                         <show:pagination_prev_button pageNum="${pageNumber}"
                                                                      commandName="admin_list_users"
+                                                                     paramsOtherPaginations="&order_by=${requestScope.order_by}&desc=${!requestScope.desc}"
                                                                      paramName="pageNumber"/>
 
                                         <c:forEach var="i" begin="1" end="${totalPages}">
                                             <c:if test="${i==pageNumber}">
                                                 <li class="page-item active">
                                                     <a class="page-link"
-                                                       href="controller?command=admin_list_users&pageNumber=${i}">${i}</a>
+                                                       href="controller?command=admin_list_users&order_by=${requestScope.order_by}&desc=${!requestScope.desc}&pageNumber=${i}">${i}</a>
                                                 </li>
                                             </c:if>
                                             <c:if test="${i!=pageNumber}">
                                                 <li class="page-item">
                                                     <a class="page-link"
-                                                       href="controller?command=admin_list_users&pageNumber=${i}">${i}</a>
+                                                       href="controller?command=admin_list_users&order_by=${requestScope.order_by}&desc=${!requestScope.desc}&pageNumber=${i}">${i}</a>
                                                 </li>
                                             </c:if>
                                         </c:forEach>
@@ -195,6 +218,7 @@
                                         <show:pagination_next_button pageNum="${pageNumber}"
                                                                      paramName="pageNumber"
                                                                      commandName="admin_list_users"
+                                                                     paramsOtherPaginations="&order_by=${requestScope.order_by}&desc=${!requestScope.desc}"
                                                                      totalPages="${totalPages}"/>
                                     </ul>
                                 </nav>
@@ -207,10 +231,35 @@
         <%@ include file="/WEB-INF/fragments/footer.jspf" %>
     </div>
 </div>
+<show:submit_result/>
 <!-- ============================================================== -->
 <!-- All Jquery -->
 <!-- ============================================================== -->
 <%@ include file="/WEB-INF/fragments/scripts.jspf" %>
+<script>
+    function editUserFormValidation(e, formName) {
+        e.preventDefault();
+        let login = document.querySelector('form[name="' + formName + '"]').login.value;
+        let email = document.querySelector('form[name="' + formName + '"]').email.value;
+        let regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g;  // Javascript reGex for Email Validation.
+        let regLogin = /^[\p{L}][\p{L}0-9]{4,29}$/gu;          // Javascript reGex for Login validation
+
+        if (login === "" || !regLogin.test(login)) {
+            window.alert(`<fmt:message key = "index_jsp.form.register.validate_login"/>`);
+            return false;
+        }
+
+        if (email === "" || !regEmail.test(email)) {
+            window.alert(`<fmt:message key = "index_jsp.form.register.validate_email"/>`);
+            return false;
+        }
+
+        document.querySelector('form[name="' + formName + '"]').submit();
+        return true;
+    }
+</script>
 </body>
 </html>
+
+
 
