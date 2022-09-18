@@ -68,9 +68,21 @@
                                 <table id="zero_config" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
-                                        <th><fmt:message key="admin.page.requests.table.header.user"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.activity"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.type"/></th>
+                                        <th>
+                                            <a href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${pageNumTableRequests}&archiveOrder_by=${requestScope.archiveOrder_by}&order_by=login&desc=${requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}">
+                                                <fmt:message key="admin.page.requests.table.header.user"/>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${pageNumTableRequests}&archiveOrder_by=${requestScope.archiveOrder_by}&order_by=${language == 'en' ? 'a.name_en' : 'a.name_uk'}&desc=${requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}">
+                                                <fmt:message key="admin.page.requests.table.header.activity"/>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${pageNumTableRequests}&archiveOrder_by=${requestScope.archiveOrder_by}&order_by=${language == 'en' ? 't.name_en' : 't.name_uk'}&desc=${requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}">
+                                                <fmt:message key="admin.page.requests.table.header.type"/>
+                                            </a>
+                                        </th>
                                         <th><fmt:message key="admin.page.requests.table.header.status"/></th>
                                         <th><fmt:message key="admin.page.requests.table.header.actions"/></th>
                                     </tr>
@@ -98,7 +110,7 @@
                                                             data-bs-original-title="Update">
                                                         <em class="mdi mdi-check"></em>
                                                     </button>
-                                                    <show:request_result/>
+                                                    <show:submit_result/>
                                                 </form>
                                                 <form action="controller" method="POST" class="p-0 m-0 d-inline">
                                                     <input type="hidden" name="command" value="admin_deny_request">
@@ -110,7 +122,7 @@
                                                         <em class="mdi mdi-close"></em>
                                                     </button>
                                                 </form>
-                                                <show:request_result/>
+                                                <show:submit_result/>
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -124,19 +136,19 @@
                                         <show:pagination_prev_button pageNum="${pageNumTableRequests}"
                                                                      commandName="admin_dashboard"
                                                                      paramName="pageNumTableRequests"
-                                                                     paramsOtherPaginations="&pageNumTableArchive=${pageNumTableArchive}"/>
+                                                                     paramsOtherPaginations="&pageNumTableArchive=${pageNumTableArchive}&archiveOrder_by=${requestScope.archiveOrder_by}&order_by=${requestScope.order_by}&desc=${!requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}"/>
 
                                         <c:forEach var="i" begin="1" end="${totalPagesForTableRequests}">
                                             <c:if test="${i==pageNumTableRequests}">
                                                 <li class="page-item active">
                                                     <a class="page-link"
-                                                       href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${i}">${i}</a>
+                                                       href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${i}&archiveOrder_by=${requestScope.archiveOrder_by}&order_by=${requestScope.order_by}&desc=${!requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}">${i}</a>
                                                 </li>
                                             </c:if>
                                             <c:if test="${i!=pageNumTableRequests}">
                                                 <li class="page-item">
                                                     <a class="page-link"
-                                                       href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${i}">${i}</a>
+                                                       href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${i}&archiveOrder_by=${requestScope.archiveOrder_by}&order_by=${requestScope.order_by}&desc=${!requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}">${i}</a>
                                                 </li>
                                             </c:if>
                                         </c:forEach>
@@ -145,7 +157,7 @@
                                                                      commandName="admin_dashboard"
                                                                      paramName="pageNumTableRequests"
                                                                      totalPages="${totalPagesForTableRequests}"
-                                                                     paramsOtherPaginations="&pageNumTableArchive=${pageNumTableArchive}"/>
+                                                                     paramsOtherPaginations="&pageNumTableArchive=${pageNumTableArchive}&archiveOrder_by=${requestScope.archiveOrder_by}&order_by=${requestScope.order_by}&desc=${!requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}"/>
                                     </ul>
                                 </nav>
                             </div>
@@ -163,9 +175,21 @@
                                 <table id="zero_config_archive" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
-                                        <th><fmt:message key="admin.page.requests.table.header.user"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.activity"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.type"/></th>
+                                        <th>
+                                            <a href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${pageNumTableRequests}&order_by=${requestScope.order_by}&archiveOrder_by=login&desc=${!requestScope.desc}&archiveDesc=${requestScope.archiveDesc}">
+                                                <fmt:message key="admin.page.requests.table.header.user"/>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${pageNumTableRequests}&order_by=${requestScope.order_by}&archiveOrder_by=${language == 'en' ? 'a.name_en' : 'a.name_uk'}&desc=${!requestScope.desc}&archiveDesc=${requestScope.archiveDesc}">
+                                                <fmt:message key="admin.page.requests.table.header.activity"/>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="controller?command=admin_dashboard&pageNumTableArchive=${pageNumTableArchive}&pageNumTableRequests=${pageNumTableRequests}&order_by=${requestScope.order_by}&archiveOrder_by=${language == 'en' ? 't.name_en' : 't.name_uk'}&desc=${!requestScope.desc}&archiveDesc=${requestScope.archiveDesc}">
+                                                <fmt:message key="admin.page.requests.table.header.type"/>
+                                            </a>
+                                        </th>
                                         <th><fmt:message key="admin.page.requests.table.header.status"/></th>
                                     </tr>
                                     </thead>
@@ -190,19 +214,19 @@
                                         <show:pagination_prev_button pageNum="${pageNumTableArchive}"
                                                                      commandName="admin_dashboard"
                                                                      paramName="pageNumTableArchive"
-                                                                     paramsOtherPaginations="&pageNumTableRequests=${pageNumTableRequests}"/>
+                                                                     paramsOtherPaginations="&pageNumTableRequests=${pageNumTableRequests}&order_by=${requestScope.order_by}&archiveOrder_by=${requestScope.archiveOrder_by}&desc=${!requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}"/>
 
                                         <c:forEach var="j" begin="1" end="${totalPagesForTableArchive}">
                                             <c:if test="${j==pageNumTableArchive}">
                                                 <li class="page-item active">
                                                     <a class="page-link"
-                                                       href="controller?command=admin_dashboard&pageNumTableRequests=${pageNumTableRequests}&pageNumTableArchive=${j}">${j}</a>
+                                                       href="controller?command=admin_dashboard&pageNumTableRequests=${pageNumTableRequests}&pageNumTableArchive=${j}&order_by=${requestScope.order_by}&archiveOrder_by=${requestScope.archiveOrder_by}&desc=${!requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}">${j}</a>
                                                 </li>
                                             </c:if>
                                             <c:if test="${j!=pageNumTableArchive}">
                                                 <li class="page-item">
                                                     <a class="page-link"
-                                                       href="controller?command=admin_dashboard&pageNumTableRequests=${pageNumTableRequests}&pageNumTableArchive=${j}">${j}</a>
+                                                       href="controller?command=admin_dashboard&pageNumTableRequests=${pageNumTableRequests}&pageNumTableArchive=${j}&order_by=${requestScope.order_by}&archiveOrder_by=${requestScope.archiveOrder_by}&desc=${!requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}">${j}</a>
                                                 </li>
                                             </c:if>
                                         </c:forEach>
@@ -211,7 +235,7 @@
                                                                      commandName="admin_dashboard"
                                                                      paramName="pageNumTableArchive"
                                                                      totalPages="${totalPagesForTableArchive}"
-                                                                     paramsOtherPaginations="&pageNumTableRequests=${pageNumTableRequests}"/>
+                                                                     paramsOtherPaginations="&pageNumTableRequests=${pageNumTableRequests}&order_by=${requestScope.order_by}&archiveOrder_by=${requestScope.archiveOrder_by}&desc=${!requestScope.desc}&archiveDesc=${!requestScope.archiveDesc}"/>
                                     </ul>
                                 </nav>
                             </div>
