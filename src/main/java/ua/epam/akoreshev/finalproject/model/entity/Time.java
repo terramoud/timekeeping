@@ -1,8 +1,11 @@
 package ua.epam.akoreshev.finalproject.model.entity;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Time {
+public class Time implements Serializable, Comparable<Time> {
+    private static final int SECONDS_PER_HOUR = 3600;
+    private static final int SECONDS_PER_MINUTE = 60;
     private long hours;
     private long minutes;
     private long seconds;
@@ -11,6 +14,13 @@ public class Time {
         this.hours = hours;
         this.minutes = minutes;
         this.seconds = seconds;
+    }
+
+    public Time(long seconds) {
+        this.hours = seconds / SECONDS_PER_HOUR;
+        long remainderSeconds = seconds % SECONDS_PER_HOUR;
+        this.minutes = remainderSeconds / SECONDS_PER_MINUTE;
+        this.seconds = remainderSeconds % SECONDS_PER_MINUTE;
     }
 
     public long getHours() {
@@ -35,6 +45,17 @@ public class Time {
 
     public void setSeconds(long seconds) {
         this.seconds = seconds;
+    }
+
+    @Override
+    public int compareTo(Time t) {
+        Long thisTotal = (getHours() * 3600) + (getMinutes() * 60) + getSeconds();
+        Long tTotal = (t.getHours() * 3600) + (t.getMinutes() * 60) + t.getSeconds();
+        if ((thisTotal - tTotal) > 0)
+            return 1;
+        if ((thisTotal - tTotal) < 0)
+            return -1;
+        return 0;
     }
 
     @Override
