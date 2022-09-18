@@ -183,25 +183,6 @@
                                     <button type="submit" class="btn btn-block btn-lg btn-info">
                                         <fmt:message key="index_jsp.button.register"/>
                                     </button>
-
-                                    <%--register result modal window--%>
-                                    <button id="registerResult" type="button" class="d-none" data-bs-toggle="modal"
-                                            data-bs-target="#regResultModal"></button>
-                                    <div class="modal fade" id="regResultModal" tabindex="-1"
-                                         aria-labelledby="regResultModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body text-success font-20 font-bold">
-                                                    <fmt:message key="index_jsp.modal.register.result"/>
-                                                </div>
-                                                <div class="modal-footer"></div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -214,7 +195,7 @@
         </footer>
     </div>
 </div>
-
+<show:submit_result/>
 <!-- ============================================================== -->
 <!-- All Required js -->
 <!-- ============================================================== -->
@@ -253,7 +234,6 @@
         }
 
         if (!patternPass.test(pass)) {
-            console.log(pass)
             alert(`<fmt:message key = "index_jsp.form.register.validate_password"/>`);
             return false;
         }
@@ -264,8 +244,8 @@
         }
         setTimeout(()=>{
             document.forms.RegForm.submit();
-        }, 2000)
-        document.querySelector("#registerResult").click();
+        }, 500)
+        return true;
     }
 
     function validateLoginForm(e) {
@@ -286,8 +266,9 @@
         }
         setTimeout(()=>{
             document.forms.formLogin.submit();
-        }, 1000)
+        }, 500)
         document.querySelector("#loginResult").click();
+        return true;
     }
 </script>
 </body>
