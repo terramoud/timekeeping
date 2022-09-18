@@ -20,6 +20,11 @@ public class Category extends Entity {
         this.nameUk = nameUk;
     }
 
+    public Category(String nameEn, String nameUk) {
+        this.nameEn = nameEn;
+        this.nameUk = nameUk;
+    }
+
     public String getNameEn() {
         return nameEn;
     }
@@ -44,6 +49,13 @@ public class Category extends Entity {
         return id == category.id &&
                 nameEn.equals(category.nameEn) &&
                 nameUk.equals(category.nameUk);
+    }
+
+    public boolean equalsByLocalizedNames(Object o) {
+        if (o == null || this.getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return this.nameEn.equals(category.nameEn) ||
+                this.nameUk.equals(category.nameUk);
     }
 
     @Override
