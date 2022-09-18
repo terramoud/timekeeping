@@ -30,9 +30,9 @@ public class ChangeUserCommand extends Command {
         int roleId = validator.getInt("role_id");
         User user = new User(userId, login, email, null, roleId);
         try {
-            putToSession(req, "user.edit.failed", true, LOG);
-            if (userService.editUser(user))
-                putToSession(req, "user.edit.success", false, LOG);
+            boolean isError = !userService.editUser(user);
+            String message = (isError) ? "user.edit.failed" : "user.edit.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error("Cannot edit user: {}", user);
             throw new CommandException("Cannot edit user", e);
