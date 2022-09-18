@@ -12,7 +12,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class UserDaoImpl implements UserDao {
-    private static final String SQL_FIND_ALL_USERS = "SELECT * FROM users WHERE role_id != 1";
+    private static final String SQL_FIND_ALL_USERS_WITHOUT_ADMINS = "SELECT * FROM users WHERE role_id != ?";
+
+    private static final String SQL_FIND_ALL_USERS = "SELECT * FROM users";
 
     private static final String SQL_CREATE_USER = "INSERT INTO users VALUES (DEFAULT, ?, ?, ?, ?)";
 
@@ -25,20 +27,8 @@ public class UserDaoImpl implements UserDao {
 
     private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?";
 
-    private static final String SQL_FIND_ALL_USERS_BY_ACTIVITY_ID =
-            "SELECT * FROM users INNER JOIN users_activities ON users.id = user_id WHERE activity_id = ?";
-
-    private static final String SQL_FIND_ALL_USERS_BY_ACTIVITY_NAME = "SELECT * FROM users " +
-            "INNER JOIN users_activities ON users.id = user_id " +
-            "INNER JOIN activities ON users_activities.activity_id = activities.id " +
-            "WHERE activities.name_en = ? OR activities.name_uk = ?";
-
-    private static final String SQL_GET_NUMBER_USERS = "SELECT COUNT(*) AS numRows FROM users";
-
-    private static final String SQL_FIND_ALL_USERS_ACTIVITIES =
-            "SELECT * FROM users " +
-                    "INNER JOIN users_activities ua ON users.id = ua.user_id " +
-                    "INNER JOIN activities a ON ua.activity_id = a.id";
+    private static final String SQL_GET_NUMBER_USERS_WITHOUT_ADMINS =
+            "SELECT COUNT(*) AS numRows FROM users WHERE role_id != ?";
 
     private final Mapper<User, PreparedStatement> mapRowToDB = (User user, PreparedStatement preparedStatement) -> {
         preparedStatement.setString(1, user.getLogin());
@@ -76,60 +66,8 @@ public class UserDaoImpl implements UserDao {
             }
             LOG.debug("The {} users has been found by query to database", usersList.size());
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to find all users from findAll() method, because {}", e.getMessage());
-            throw new DaoException("Cannot find users. " + e.getMessage(), e);
-        }
-        if (usersList.isEmpty()) {
-            LOG.warn("Empty list users has been returned by findAll() method");
-        }
-        return usersList;
-    }
-
-    @Override
-    public List<User> findAllUsersByActivity(long activityId) throws DaoException {
-        LOG.debug("Obtained user's 'activity id' to find it at database is: {}", activityId);
-        List<User> usersList = new LinkedList<>();
-        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_USERS_BY_ACTIVITY_ID)) {
-            pst.setLong(1, activityId);
-            ResultSet rs = pst.executeQuery();
-            LOG.trace("SQL query to database has already been completed successfully");
-            while (rs.next()) {
-                User user = new User();
-                mapRowFromDB.map(rs, user);
-                usersList.add(user);
-            }
-            LOG.debug("The {} users has been found by query to database", usersList.size());
-        } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to find all users by activity id, because {}", e.getMessage());
-            throw new DaoException("Cannot find users by activity id. " + e.getMessage(), e);
-        }
-        if (usersList.isEmpty()) {
-            LOG.warn("Empty list users has been returned by find all users by activity id");
-        }
-        return usersList;
-    }
-
-    @Override
-    public List<User> findAllUsersByActivity(String activityName) throws DaoException {
-        LOG.debug("Obtained user's 'activity name' to find it at database is: {}", activityName);
-        List<User> usersList = new LinkedList<>();
-        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_USERS_BY_ACTIVITY_NAME)) {
-            pst.setString(1, activityName);
-            pst.setString(2, activityName);
-            ResultSet rs = pst.executeQuery();
-            LOG.trace("SQL query to database has already been completed successfully");
-            while (rs.next()) {
-                User user = new User();
-                mapRowFromDB.map(rs, user);
-                usersList.add(user);
-            }
-            LOG.debug("The {} users has been found by query to database", usersList.size());
-        } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to find all users by activity name, because {}", e.getMessage());
-            throw new DaoException("Cannot find users by activity name. " + e.getMessage(), e);
-        }
-        if (usersList.isEmpty()) {
-            LOG.warn("Empty list users has been returned by find all users by activity name");
+            LOG.error(e);
+            throw new DaoException("Cannot find users", e, e.getErrorCode());
         }
         return usersList;
     }
@@ -153,8 +91,8 @@ public class UserDaoImpl implements UserDao {
             }
             LOG.debug("The {} rows has been added to database to create user", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to database to create user, because {}", e.getMessage());
-            throw new DaoException("Cannot create user at database. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot create user at database", e, e.getErrorCode());
         }
         return result;
     }
@@ -167,12 +105,12 @@ public class UserDaoImpl implements UserDao {
             pst.setLong(1, userId);
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query to read an user from database has already been completed successfully");
-            if (!rs.next()) throw new SQLException("There is not id: '" + userId + "' in db table");
+            if (!rs.next()) return null;
             mapRowFromDB.map(rs, user);
             LOG.debug("The user: {} has been found by query to database", user);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to get user by id, because {}", e.getMessage());
-            throw new DaoException("Cannot read user by id. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot read user by id", e, e.getErrorCode());
         }
         return user;
     }
@@ -185,12 +123,12 @@ public class UserDaoImpl implements UserDao {
             pst.setString(1, login);
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query to read an user from database has already been completed successfully");
-            if (!rs.next()) throw new SQLException("There is not login: '" + login + "' in db table");
+            if (!rs.next()) return null;
             mapRowFromDB.map(rs, user);
             LOG.debug("The user: {} has been found by query to database", user);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to get user by login, because {} ", e.getMessage());
-            throw new DaoException("Cannot read user by login. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot read user by login", e, e.getErrorCode());
         }
         return user;
     }
@@ -198,25 +136,31 @@ public class UserDaoImpl implements UserDao {
     @Override
     public long getNumberUsers() throws DaoException {
         long result = 0;
-        try (Statement st = connection.createStatement()) {
-            ResultSet rs = st.executeQuery(SQL_GET_NUMBER_USERS);
+        try (PreparedStatement pst = connection.prepareStatement(SQL_GET_NUMBER_USERS_WITHOUT_ADMINS)) {
+            pst.setInt(1, Role.getRoleId(Role.ADMIN));
+            ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query find all 'users' to database has already been completed successfully");
             if (rs.next()) {
                 result = rs.getLong("numRows");
             }
             LOG.debug("The {} rows has been found by query to database", result);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to find all 'users', because {}", e.getMessage());
-            throw new DaoException("Cannot find 'users'. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot find 'users'", e, e.getErrorCode());
         }
         return result;
     }
 
     @Override
-    public List<User> findAllUsers(int limit, int offset) throws DaoException {
+    public List<User> findAllUsers(int limit, int offset, String columnName, String sortOrder) throws DaoException {
         List<User> usersList = new LinkedList<>();
-        String sqlParameters = " LIMIT " + limit + " OFFSET " + offset;
-        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_USERS + sqlParameters)) {
+        String sqlParameters = " ORDER BY " + columnName
+                .concat(" " + sortOrder)
+                .concat(" LIMIT " + limit)
+                .concat(" OFFSET " + offset);
+        LOG.debug("SQL parameters are: {}", sqlParameters);
+        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_USERS_WITHOUT_ADMINS + sqlParameters)) {
+            pst.setInt(1, Role.getRoleId(Role.ADMIN));
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query find all users to database has already been completed successfully");
             while (rs.next()) {
@@ -226,11 +170,8 @@ public class UserDaoImpl implements UserDao {
             }
             LOG.debug("The {} users has been found by query to database", usersList.size());
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to find all users from findAllUsers() method, because {}", e.getMessage());
-            throw new DaoException("Cannot find users. " + e.getMessage(), e);
-        }
-        if (usersList.isEmpty()) {
-            LOG.warn("Empty list users has been returned by findAllUsers() method");
+            LOG.error("Cannot find users sorted by: {}", sqlParameters);
+            throw new DaoException("Cannot find any users", e, e.getErrorCode());
         }
         return usersList;
     }
@@ -250,8 +191,8 @@ public class UserDaoImpl implements UserDao {
             }
             LOG.debug("The {} rows has been changed to update user", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to update user, because {}", e.getMessage());
-            throw new DaoException("Cannot update user at database. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot update user at database", e, e.getErrorCode());
         }
         return result;
     }
@@ -270,8 +211,8 @@ public class UserDaoImpl implements UserDao {
             }
             LOG.debug("The {} rows has been removed to delete user", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to remove user by id, because {}", e.getMessage());
-            throw new DaoException("Cannot delete user from database. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot delete user from database", e, e.getErrorCode());
         }
         return result;
     }
