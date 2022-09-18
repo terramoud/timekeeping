@@ -17,7 +17,7 @@ public class ChangeLocaleCommand extends Command {
         LOG.debug("Set locale to: {}", locale);
         HttpSession session = req.getSession();
         session.setAttribute("language", locale);
-        LOG.debug("Sesion.setAttribute language is: {}", locale);
+        LOG.debug("Session.setAttribute language is: {}", locale);
         resp.addCookie(new Cookie("defaultLocale", locale));
         LOG.debug("Cookie.setAttribute language is: {}", locale);
         return req.getHeader("referer");
