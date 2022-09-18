@@ -24,7 +24,6 @@ public class UserPageCommand extends Command {
     private final IntervalService intervalService;
 
     public UserPageCommand(ActivityService activityService, IntervalService intervalService) {
-
         this.activityService = activityService;
         this.intervalService = intervalService;
     }
@@ -44,7 +43,7 @@ public class UserPageCommand extends Command {
             req.setAttribute("activityIntervalMap", activityIntervalMap);
         } catch (ServiceException e) {
             LOG.error(e);
-            throw new CommandException(e.getMessage());
+            throw new CommandException(e.getMessage(), e);
         }
         LOG.trace("Command has finished");
         return Path.USER_PAGE;
