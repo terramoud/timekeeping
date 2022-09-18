@@ -23,8 +23,12 @@
                 <a class="navbar-brand" href="controller?command=user_page">
                     <span class="logo-text ms-2"><fmt:message key="project.name"/></span>
                 </a>
+                <div class="d-flex d-md-none align-items-center">
+                    <%@ include file="/WEB-INF/fragments/profile_dropdown.jspf" %>
+                    <%@ include file="/WEB-INF/fragments/language_switcher.jspf" %>
+                </div>
             </div>
-            <div class="navbar-collapse collapse d-flex justify-content-end" data-navbarbg="skin5">
+            <div class="navbar-collapse collapse d-flex justify-content-end d-none d-md-block" data-navbarbg="skin5">
                 <ul class="navbar-nav float-end">
                     <!-- ============================================================== -->
                     <!-- Language switcher -->
@@ -118,7 +122,6 @@
                                                         <fmt:message key="user.page.button.is_started.activity"/>
                                                     </c:if>
                                                 </button>
-                                                <show:request_result/>
                                             </form>
 
                                             <form action="controller" method="POST" class="btn p-0">
@@ -128,7 +131,6 @@
                                                         class="btn btn-danger btn-md text-white font-bold">
                                                     <fmt:message key="user.page.button.stop.activity"/>
                                                 </button>
-                                                <show:request_result/>
                                             </form>
 
                                             <form action="controller" method="POST" class="btn p-0">
@@ -139,8 +141,6 @@
                                                 <button type="submit" class="btn btn-dark btn-md text-white font-bold">
                                                     <fmt:message key="user.page.button.remove.activity"/>
                                                 </button>
-                                                    <%--Show result of submitted form--%>
-                                                <show:request_result/>
                                             </form>
                                         </div>
                                     </div>
@@ -171,7 +171,7 @@
                                             <optgroup label="<c:out value="${language == 'en' ? category.nameEn : category.nameUk}"/>">
                                                 <c:forEach var="activity" items="${entry.value}">
                                                     <c:out value="activity.id ${activity.id}"/>
-                                                    <c:if test="${status.first}">
+                                                        <c:if test="${status.first}">
                                                             <option selected value="${activity.id}">
                                                                 <c:out value="${language == 'en' ? activity.nameEn : activity.nameUk}"/>
                                                             </option>
@@ -193,8 +193,6 @@
                                 <button type="submit" class="btn btn-primary">
                                     <fmt:message key="user.page.button.add.new.activity"/>
                                 </button>
-                                <%--Show result of submitted form--%>
-                                <show:request_result/>
                             </div>
                         </div>
                     </form>
@@ -213,6 +211,7 @@
         <div class="lds-pos"></div>
     </div>
 </div>
+<show:submit_result/>
 <!-- ============================================================== -->
 <!-- All Jquery -->
 <!-- ============================================================== -->
