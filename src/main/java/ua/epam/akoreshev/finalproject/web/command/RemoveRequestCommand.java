@@ -3,10 +3,12 @@ package ua.epam.akoreshev.finalproject.web.command;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.CommandException;
+import ua.epam.akoreshev.finalproject.exceptions.RequestException;
 import ua.epam.akoreshev.finalproject.exceptions.ServiceException;
 import ua.epam.akoreshev.finalproject.model.entity.Request;
 import ua.epam.akoreshev.finalproject.model.entity.User;
 import ua.epam.akoreshev.finalproject.web.service.RequestService;
+import ua.epam.akoreshev.finalproject.web.utils.RequestParameterValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,23 +25,23 @@ public class RemoveRequestCommand extends Command {
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
         LOG.trace("Command starts");
         User user = (User) req.getSession().getAttribute("user");
-        long activityId = Long.parseLong(req.getParameter("activity_id"));
-        long typeId = Long.parseLong(req.getParameter("type_id"));
-        long statusId = Long.parseLong(req.getParameter("status_id"));
+        RequestParameterValidator validator = new RequestParameterValidator(req);
         Request request = new Request();
         request.setUserId(user.getId());
-        request.setActivityId(activityId);
-        request.setTypeId(typeId);
-        request.setStatusId(statusId);
+        request.setActivityId(validator.getLong("activity_id"));
+        request.setTypeId(validator.getLong("type_id"));
+        request.setStatusId(validator.getLong("status_id"));
         LOG.debug("Request entity is {}", request);
         try {
-            req.getSession().setAttribute("request_status", "failed");
+            putToSession(req, "add.request.to_remove_activity.failed.message", true, LOG);
             if (requestService.createRequest(request)) {
-                req.getSession().setAttribute("request_status", "success");
+                putToSession(req, "add.request.to_remove_activity.success.message", false, LOG);
             }
+        } catch (RequestException e) {
+            putToSession(req, e.getMessage(), true, LOG);
         } catch (ServiceException e) {
-            LOG.error(e);
-            throw new CommandException("User cannot create request for activity, because " + e.getMessage());
+            LOG.error("User cannot create request: {}", request);
+            throw new CommandException("User cannot create request for activity", e);
         }
         LOG.trace("Command finished");
         return req.getHeader("referer");
