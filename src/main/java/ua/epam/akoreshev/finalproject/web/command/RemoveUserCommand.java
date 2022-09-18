@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.CommandException;
 import ua.epam.akoreshev.finalproject.exceptions.ServiceException;
 import ua.epam.akoreshev.finalproject.web.service.UserService;
-import ua.epam.akoreshev.finalproject.web.service.impl.UserServiceImpl;
+import ua.epam.akoreshev.finalproject.web.utils.RequestParameterValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,15 +19,16 @@ public class RemoveUserCommand extends Command {
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
-        long userId = Long.parseLong(req.getParameter("user_id"));
-
+        RequestParameterValidator validator = new RequestParameterValidator(req);
+        long userId = validator.getLong("user_id");
         try {
-            req.getSession().setAttribute("request_status", "failed");
+            putToSession(req, "remove.user.failed", false, LOG);
             if (userService.removeUser(userId)) {
-                req.getSession().setAttribute("request_status", "success");
+                putToSession(req, "remove.user.success", false, LOG);
             }
         } catch (ServiceException e) {
-            req.getSession().setAttribute("request_status", "failed");
+            LOG.error(e);
+            throw new CommandException(e.getMessage(), e);
         }
         LOG.trace("Command finished");
         return req.getHeader("referer");
