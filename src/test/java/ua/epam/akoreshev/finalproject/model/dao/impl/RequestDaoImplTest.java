@@ -5,10 +5,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import ua.epam.akoreshev.finalproject.model.dao.ActivityDao;
 import ua.epam.akoreshev.finalproject.model.dao.DBUtil;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
 import ua.epam.akoreshev.finalproject.model.dao.RequestDao;
+import ua.epam.akoreshev.finalproject.model.dao.UserDao;
+import ua.epam.akoreshev.finalproject.model.entity.Activity;
 import ua.epam.akoreshev.finalproject.model.entity.Request;
+import ua.epam.akoreshev.finalproject.model.entity.User;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -16,16 +20,19 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class RequestDaoImplTest {
     private static RequestDao requestDao;
     private static Connection connection;
+    private static ActivityDao activityDao;
+    private static UserDao userDao;
 
     @BeforeAll
     static void setUpBeforeAll() throws DaoException {
         connection = DBUtil.getConnection();
         requestDao = new RequestDaoImpl(connection);
+        activityDao = new ActivityDaoImpl(connection);
+        userDao = new UserDaoImpl(connection);
     }
 
     @BeforeEach
@@ -35,6 +42,7 @@ class RequestDaoImplTest {
 
     @AfterEach
     void tearDown() throws SQLException {
+        System.out.println("teardown");
         connection.rollback();
         connection.setAutoCommit(true);
     }
@@ -101,19 +109,37 @@ class RequestDaoImplTest {
     /**
      * @see RequestDaoImpl#update(Request)
      */
-    @ParameterizedTest
-    @MethodSource("testCasesWhenRequestIsChanged")
-    void testUpdateRequest(Request changedRequest) throws DaoException {
-        Request sourceRequest = new Request(0, 1, 1, 1, 1);
-        requestDao.create(sourceRequest);
-        sourceRequest.setUserId(changedRequest.getUserId());
-        sourceRequest.setActivityId(changedRequest.getActivityId());
-        sourceRequest.setTypeId(changedRequest.getTypeId());
-        sourceRequest.setStatusId(changedRequest.getStatusId());
+    @Test
+    void testUpdateRequest() throws DaoException {
+        Activity activity1 = new Activity("TestActivity1", "Тестова діяльність1", 1);
+        Activity activity2 = new Activity("TestActivity2", "Тестова діяльність2", 1);
+        activityDao.create(activity1);
+        activityDao.create(activity2);
+        User user1 = new User(0, "testUser1!", "test@mail.com1!", "*", 2);
+        User user2 = new User(0, "testUser2!", "test@mail.com2!", "*", 2);
+        userDao.create(user1);
+        userDao.create(user2);
 
-        requestDao.update(sourceRequest);
-        Request actualRequest = requestDao.read(sourceRequest.getId());
-        assertEquals(sourceRequest, actualRequest);
+        List<Request> requestList = new LinkedList<>();
+        requestList.add(new Request(0, user1.getId(), activity1.getId(), 1, 1));
+        requestList.add(new Request(0, user2.getId(), activity1.getId(), 1, 1));
+        requestList.add(new Request(0, user1.getId(), activity2.getId(), 1, 1));
+        requestList.add(new Request(0, user1.getId(), activity1.getId(), 2, 1));
+        requestList.add(new Request(0, user1.getId(), activity1.getId(), 1, 2));
+        requestList.add(new Request(0, user2.getId(), activity2.getId(), 2, 2));
+
+        Request sourceRequest = new Request(0, user1.getId(), activity1.getId(), 1, 1);
+        requestDao.create(sourceRequest);
+        for (Request changedRequest : requestList) {
+            sourceRequest.setUserId(changedRequest.getUserId());
+            sourceRequest.setActivityId(changedRequest.getActivityId());
+            sourceRequest.setTypeId(changedRequest.getTypeId());
+            sourceRequest.setStatusId(changedRequest.getStatusId());
+
+            assertTrue(requestDao.update(sourceRequest));
+            Request actualRequest = requestDao.read(sourceRequest.getId());
+            assertEquals(sourceRequest, actualRequest);
+        }
     }
 
     /**
@@ -145,28 +171,6 @@ class RequestDaoImplTest {
     }
 
     /**
-     * @see RequestDaoImpl#updateRequestStatus(long, String)
-     */
-    @Test
-    void testUpdateRequestStatusName() throws DaoException, SQLException {
-        Request sourceRequest = new Request(0, 1, 1, 1, 1);
-        requestDao.create(sourceRequest);
-        sourceRequest.setStatusId(2); // expected updated status
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(
-                "SELECT statuses.name_en FROM requests " +
-                        "INNER JOIN statuses ON requests.status_id = statuses.id " +
-                        "WHERE status_id = 2");
-        if (!resultSet.next()) {
-            throw new SQLException("Fatal: Cannot read status name from db. The test is crashed");
-        }
-        String newStatusName = resultSet.getString("name_en");
-        requestDao.updateRequestStatus(sourceRequest.getId(), newStatusName);
-        Request actualRequest = requestDao.read(sourceRequest.getId());
-        assertEquals(sourceRequest, actualRequest);
-    }
-
-    /**
      * @see RequestDaoImpl#updateRequestStatus(long, long)
      */
     @ParameterizedTest
@@ -175,16 +179,6 @@ class RequestDaoImplTest {
         Request sourceRequest = new Request(0, 1, 1, 1, 1);
         requestDao.create(sourceRequest);
         assertThrows(DaoException.class, () -> requestDao.updateRequestStatus(sourceRequest.getId(), wrongId));
-    }
-
-    /**
-     * @see RequestDaoImpl#updateRequestStatus(long, String)
-     */
-    @Test
-    void updateRequestStatusShouldThrowExceptionWhenStatusIsNull() throws DaoException {
-        Request sourceRequest = new Request(0, 1, 1, 1, 1);
-        requestDao.create(sourceRequest);
-        assertThrows(DaoException.class, () -> requestDao.updateRequestStatus(sourceRequest.getId(), null));
     }
 
     /**
@@ -238,63 +232,6 @@ class RequestDaoImplTest {
         differences.removeAll(requestsListBeforeAddedRequest);
         assertEquals(1, differences.size());
         assertEquals(expectedRequest, differences.get(0));
-    }
-
-    /**
-     * @see RequestDaoImpl#findAllRequestsByStatus(long)
-     */
-    @Test
-    void testFindAllRequestsByStatusId() throws DaoException, SQLException {
-        Request expectedRequest = new Request(0, 1, 1, 1, 1);
-        requestDao.create(expectedRequest);
-
-        List<Request> requestsListByStatusId = requestDao.findAllRequestsByStatus(1);
-        assertTrue(requestsListByStatusId.contains(expectedRequest));
-
-        Statement st = connection.createStatement();
-        st.executeUpdate("DELETE FROM requests WHERE status_id = 1 ORDER BY id DESC LIMIT 1");
-
-        List<Request> requestsListByStatusIdAfterDelete = requestDao.findAllRequestsByStatus(1);
-        assertFalse(requestsListByStatusIdAfterDelete.contains(expectedRequest));
-        assertEquals(requestsListByStatusId.size() - 1, requestsListByStatusIdAfterDelete.size());
-    }
-
-    /**
-     * @see RequestDaoImpl#findAllRequestsByStatus(String)
-     */
-    @Test
-    void testFindAllRequestsByStatusName() throws DaoException, SQLException {
-        Request expectedRequest = new Request(0, 1, 1, 1, 1);
-        requestDao.create(expectedRequest);
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(
-                "SELECT statuses.name_en FROM requests " +
-                        "INNER JOIN statuses ON requests.status_id = statuses.id " +
-                        "WHERE status_id = 1");
-        if (!resultSet.next()) {
-            throw new SQLException("Fatal: Cannot read status name from db. The test is crashed");
-        }
-        String statusName = resultSet.getString("name_en");
-        List<Request> requestsListByStatusName = requestDao.findAllRequestsByStatus(statusName);
-        assertTrue(requestsListByStatusName.contains(expectedRequest));
-
-        Statement st = connection.createStatement();
-        st.executeUpdate("DELETE FROM requests WHERE status_id = 1 ORDER BY id DESC LIMIT 1");
-
-        List<Request> requestsListByStatusNameAfterDelete = requestDao.findAllRequestsByStatus(1);
-        assertFalse(requestsListByStatusNameAfterDelete.contains(expectedRequest));
-        assertEquals(requestsListByStatusName.size() - 1, requestsListByStatusNameAfterDelete.size());
-    }
-
-    static Stream<Arguments> testCasesWhenRequestIsChanged() {
-        return Stream.of(
-                Arguments.of(new Request(0, 1, 1, 1, 1)), // update cloned request
-                Arguments.of(new Request(0, 2, 1, 1, 1)),
-                Arguments.of(new Request(0, 1, 2, 1, 1)),
-                Arguments.of(new Request(0, 1, 1, 2, 1)),
-                Arguments.of(new Request(0, 1, 1, 1, 2)),
-                Arguments.of(new Request(0, 2, 2, 2, 2))
-        );
     }
 
     static Stream<Arguments> testCasesWhenRequestHasNegativeOrZeroField() {
