@@ -89,11 +89,11 @@ public class UserActivityDaoImplTest {
      * @see UserActivityDaoImpl#delete(long, long)
      */
     @Test
-    void testDeleteUserActivityShouldThrownExceptionWhenRowIsZeroOrNegative() {
-        assertThrows(DaoException.class, () -> userActivityDao.delete(0L, 0L));
-        assertThrows(DaoException.class, () -> userActivityDao.delete(-1L, -1L));
-        assertThrows(DaoException.class, () -> userActivityDao.delete(0L, -1L));
-        assertThrows(DaoException.class, () -> userActivityDao.delete(-1L, 0L));
+    void testDeleteUserActivityShouldReturnNullWhenRowIsZeroOrNegative() throws DaoException {
+        assertFalse(userActivityDao.delete(0L, 0L));
+        assertFalse(userActivityDao.delete(-1L, -1L));
+        assertFalse(userActivityDao.delete(0L, -1L));
+        assertFalse(userActivityDao.delete(-1L, 0L));
     }
 
     /**
@@ -163,45 +163,6 @@ public class UserActivityDaoImplTest {
         differences.removeAll(activityListBeforeAddedNewRow);
         assertEquals(1, differences.size());
         assertEquals(expectedUserActivity, differences.getLast());
-    }
-
-    /**
-     * @see UserActivityDaoImpl#findAllUsersActivitiesByUser(long)
-     */
-    @Test
-    void testFindAllUsersActivitiesByUserId() throws DaoException, SQLException {
-        long[] generatedIds = createTestData();
-        List<UserActivity> activityListBeforeAddedNewRow = userActivityDao.findAllUsersActivitiesByUser(generatedIds[0]);
-        PreparedStatement pst = connection.prepareStatement("INSERT INTO users_activities VALUES (?, ?, false)");
-        pst.setLong(1, generatedIds[0]);
-        pst.setLong(2, generatedIds[1]);
-        pst.executeUpdate();
-        UserActivity expectedUserActivity = new UserActivity(generatedIds[0], generatedIds[1]);
-
-        List<UserActivity> activityListAfterAddedNewRow = userActivityDao.findAllUsersActivitiesByUser(generatedIds[0]);
-        LinkedList<UserActivity> differences = new LinkedList<>(activityListAfterAddedNewRow);
-        differences.removeAll(activityListBeforeAddedNewRow);
-        assertEquals(1, differences.size());
-        assertEquals(expectedUserActivity, differences.getLast());
-    }
-
-    /**
-     * @see UserActivityDaoImpl#removeAllUsersActivitiesByUser(long)
-     */
-    @Test
-    void testRemoveAllUsersActivitiesByUserId() throws DaoException, SQLException {
-        long[] generatedIds = createTestData();
-        PreparedStatement pst = connection.prepareStatement("INSERT INTO users_activities VALUES (?, ?, false)");
-        pst.setLong(1, generatedIds[0]);
-        pst.setLong(2, generatedIds[1]);
-        pst.executeUpdate();
-
-        long rowsBeforeDelete = getCountRowsFromTable();
-        assertTrue(userActivityDao.removeAllUsersActivitiesByUser(generatedIds[0]));
-        long rowsAfterDelete = getCountRowsFromTable();
-        assertTrue(rowsBeforeDelete > rowsAfterDelete);
-        assertThrows(DaoException.class, () -> userActivityDao.read(generatedIds[0], generatedIds[1]));
-        assertTrue(userActivityDao.findAllUsersActivitiesByUser(generatedIds[0]).isEmpty());
     }
 
     private long[] createTestData() throws SQLException {
