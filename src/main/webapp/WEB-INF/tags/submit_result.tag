@@ -5,7 +5,7 @@
        scope="session"/>
 <fmt:setLocale value="${language}"/>
 
-<c:if test="${sessionScope.request_status == 'success'}">
+<c:if test="${not sessionScope.isErrorMessage && sessionScope.message != null}">
     <script>
         window.onload = function () {
             document.querySelector('button[data-selector="requestResult"]').click()
@@ -22,16 +22,13 @@
                             aria-label="Close"></button>
                 </div>
                 <div class="modal-body font-20 font-bold d-flex justify-content-center">
-                    <fmt:message key="custom.tag.request.message"/>
+                    <c:out value="${sessionScope.message}"/>
                 </div>
             </div>
-<%--    <div class="alert alert-success" role="alert">--%>
-<%--        A simple success alert—check it out!--%>
-<%--    </div>--%>
         </div>
     </div>
 </c:if>
-<c:if test="${sessionScope.request_status == 'failed'}">
+<c:if test="${sessionScope.isErrorMessage && sessionScope.message != null}">
     <script>
         window.onload = function () {
             document.querySelector('button[data-selector="requestResult"]').click()
@@ -49,10 +46,11 @@
                     </button>
                 </div>
                 <div class="modal-body text-danger font-20 font-bold d-flex justify-content-center">
-                    <fmt:message key="custom.tag.request.failed.message"/>
+                    <c:out value="${sessionScope.message}"/>
                 </div>
             </div>
         </div>
     </div>
 </c:if>
-<c:remove var="request_status" scope="session"/>
+<c:remove var="message" scope="session"/>
+<c:remove var="isError" scope="session"/>
