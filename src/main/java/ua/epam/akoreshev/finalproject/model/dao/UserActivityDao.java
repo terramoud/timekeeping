@@ -7,9 +7,8 @@ import ua.epam.akoreshev.finalproject.model.entity.UserActivityBean;
 import java.util.List;
 
 public interface UserActivityDao extends BaseDao<UserActivity, Long> {
-    boolean removeAllUsersActivitiesByUser(long userId) throws DaoException;
-    List<UserActivity> findAllUsersActivitiesByUser(long userId) throws DaoException;
     boolean delete(long userId, long activityId) throws DaoException;
+
     UserActivity read(long userId, long activityId) throws DaoException;
 
     @Override
@@ -22,6 +21,6 @@ public interface UserActivityDao extends BaseDao<UserActivity, Long> {
         throw new UnsupportedOperationException();
     }
 
-    List<UserActivityBean> findAll(int limit, int offset) throws DaoException;
+    List<UserActivityBean> findAll(int limit, int offset, String columnName, String sortOrder) throws DaoException;
 }
 
