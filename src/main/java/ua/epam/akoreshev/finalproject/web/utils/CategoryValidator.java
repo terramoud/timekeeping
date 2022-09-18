@@ -5,7 +5,7 @@ import ua.epam.akoreshev.finalproject.model.entity.Category;
 import java.util.Arrays;
 
 public class CategoryValidator extends EntityValidator {
-    
+
     public boolean validateId(long categoryId) {
         return categoryId >= 0 && categoryId <= Integer.MAX_VALUE;
     }
