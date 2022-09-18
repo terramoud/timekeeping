@@ -11,12 +11,11 @@ import ua.epam.akoreshev.finalproject.model.entity.UserActivity;
 import ua.epam.akoreshev.finalproject.model.entity.UserActivityBean;
 
 import java.sql.*;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserActivityDaoImpl implements UserActivityDao {
+
     private static final String SQL_CREATE_USERS_ACTIVITIES = "INSERT INTO users_activities VALUES (?, ?, ?)";
 
     private static final String SQL_GET_USER_ACTIVITY_BY_USER_ID_AND_ACTIVITY_ID =
@@ -34,13 +33,8 @@ public class UserActivityDaoImpl implements UserActivityDao {
                     "INNER JOIN users u on users_activities.user_id = u.id " +
                     "INNER JOIN activities a on users_activities.activity_id = a.id";
 
-    private static final String SQL_DELETE_ALL_USERS_ACTIVITIES_BY_USER_ID =
-            "DELETE FROM users_activities WHERE user_id = ?";
-
-    private static final String SQL_FIND_ALL_USERS_ACTIVITIES_BY_USER_ID =
-            "SELECT * FROM users_activities WHERE user_id = ?";
-
-    private final Mapper<UserActivity, PreparedStatement> mapRowToDB = (UserActivity userActivity, PreparedStatement preparedStatement) -> {
+    private final Mapper<UserActivity, PreparedStatement> mapRowToDB = (UserActivity userActivity,
+                                                                        PreparedStatement preparedStatement) -> {
         preparedStatement.setLong(1, userActivity.getUserId());
         preparedStatement.setLong(2, userActivity.getActivityId());
         preparedStatement.setBoolean(3, userActivity.isActive());
@@ -61,50 +55,6 @@ public class UserActivityDaoImpl implements UserActivityDao {
     }
 
     @Override
-    public boolean removeAllUsersActivitiesByUser(long userId) throws DaoException {
-        LOG.debug("Obtained 'user id' to delete it from database is: {}", userId);
-        boolean result = true;
-        try (PreparedStatement pst = connection.prepareStatement(SQL_DELETE_ALL_USERS_ACTIVITIES_BY_USER_ID)) {
-            pst.setLong(1, userId);
-            int rowCount = pst.executeUpdate();
-            LOG.trace("SQL query to delete an 'user_activity' from database has already been completed successfully");
-            if (rowCount == 0) {
-                result = false;
-                LOG.warn("The 'user_activities' were not deleted by query to database");
-            }
-            LOG.debug("The {} rows has been removed to delete those 'user_activities'", rowCount);
-        } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to remove 'user_activities', because {}", e.getMessage());
-            throw new DaoException("Cannot delete 'user_activities' from database. " + e.getMessage(), e);
-        }
-        return result;
-    }
-
-    @Override
-    public List<UserActivity> findAllUsersActivitiesByUser(long userId) throws DaoException {
-        LOG.debug("Obtained 'user id' to find 'user_activity' is: {}", userId);
-        List<UserActivity> userActivities = new LinkedList<>();
-        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_USERS_ACTIVITIES_BY_USER_ID)) {
-            pst.setLong(1, userId);
-            ResultSet rs = pst.executeQuery();
-            LOG.trace("SQL query to database has already been completed successfully");
-            while (rs.next()) {
-                UserActivity userActivity = new UserActivity();
-                mapRowFromDB.map(rs, userActivity);
-                userActivities.add(userActivity);
-            }
-            LOG.debug("The {} 'user_activities' has been found by query to database", userActivities.size());
-        } catch (SQLException | DaoException e) {
-            LOG.error("DAO exception has been thrown to find all 'user_activities' by user id, because {}", e.getMessage());
-            throw new DaoException("Cannot find 'user_activities' by user id. " + e.getMessage(), e);
-        }
-        if (userActivities.isEmpty()) {
-            LOG.warn("Empty list 'user_activities' has been returned by 'find all user_activities by user id'");
-        }
-        return userActivities;
-    }
-
-    @Override
     public List<UserActivity> findAll() throws DaoException {
         List<UserActivity> userActivities = new LinkedList<>();
         try (Statement st = connection.createStatement()) {
@@ -117,22 +67,20 @@ public class UserActivityDaoImpl implements UserActivityDao {
             }
             LOG.debug("The {} 'user_activities' has been found by query to database", userActivities.size());
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to find all 'user_activities', because {}", e.getMessage());
-            throw new DaoException("Cannot find activities. " + e.getMessage(), e);
-        }
-        if (userActivities.isEmpty()) {
-            LOG.warn("Empty list 'user_activities' has been returned by findAll() method");
+            LOG.error(e);
+            throw new DaoException("Cannot find activities", e, e.getErrorCode());
         }
         return userActivities;
     }
 
     @Override
-    public List<UserActivityBean> findAll(int limit, int offset) throws DaoException {
+    public List<UserActivityBean> findAll(int limit, int offset, String columnName, String sortOrder) throws DaoException {
         List<UserActivityBean> userActivities = new LinkedList<>();
-        String sortParam = " ORDER BY user_id DESC";
-        String sqlParameters = " LIMIT " + limit + " OFFSET " + offset;
-        try (PreparedStatement pst = connection.prepareStatement(
-                SQL_FIND_ALL_USERS_ACTIVITIES + sortParam + sqlParameters)) {
+        String sqlParameters = " ORDER BY " + columnName
+                .concat(" " + sortOrder)
+                .concat(" LIMIT " + limit)
+                .concat(" OFFSET " + offset);
+        try (PreparedStatement pst = connection.prepareStatement(SQL_FIND_ALL_USERS_ACTIVITIES + sqlParameters)) {
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query find all 'user_activities' has already been completed successfully");
             while (rs.next()) {
@@ -154,7 +102,7 @@ public class UserActivityDaoImpl implements UserActivityDao {
             }
             LOG.debug("The {} 'user_activities' has been found by query to database", userActivities.size());
         } catch (SQLException e) {
-            LOG.error("Cannot find all with offset and limit 'user_activities', because {}", e.getMessage());
+            LOG.error("Cannot find all 'user_activities' sorted by: {}", sqlParameters);
             throw new DaoException("Cannot find activities with offset and limit. " + e.getMessage(), e);
         }
         return userActivities;
@@ -174,15 +122,16 @@ public class UserActivityDaoImpl implements UserActivityDao {
             }
             LOG.debug("The {} rows has been added to database to create 'user_activity'", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to create 'user_activity', because {}", e.getMessage());
-            throw new DaoException("Cannot create 'user_activity' database. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot create 'user_activity' at database", e, e.getErrorCode());
         }
         return result;
     }
 
     @Override
     public UserActivity read(long userId, long activityId) throws DaoException {
-        LOG.debug("Obtained 'user id' and 'activity id' to read 'user_activity' from database are: {}, {}", userId, activityId);
+        LOG.debug("Obtained 'user id' and 'activity id' to read 'user_activity' from database are: {}, {}",
+                userId, activityId);
         UserActivity userActivity = new UserActivity();
         try (PreparedStatement pst = connection.prepareStatement(SQL_GET_USER_ACTIVITY_BY_USER_ID_AND_ACTIVITY_ID)) {
             pst.setLong(1, userId);
@@ -193,8 +142,8 @@ public class UserActivityDaoImpl implements UserActivityDao {
             mapRowFromDB.map(rs, userActivity);
             LOG.debug("The 'user_activity': {} has been found by query to database", userActivity);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to get 'user_activity', because {}", e.getMessage());
-            throw new DaoException("Cannot read 'user_activity' by 'user id' and 'activity id'. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot read 'user_activity' by 'user id' and 'activity id'", e, e.getErrorCode());
         }
         return userActivity;
     }
@@ -215,8 +164,8 @@ public class UserActivityDaoImpl implements UserActivityDao {
             }
             LOG.debug("The {} rows has been changed to update 'user_activity'", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to update 'user_activity', because {}", e.getMessage());
-            throw new DaoException("Cannot update 'user_activity' at database. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot update 'user_activity' at database", e, e.getErrorCode());
         }
         return result;
     }
@@ -224,9 +173,6 @@ public class UserActivityDaoImpl implements UserActivityDao {
     @Override
     public boolean delete(long userId, long activityId) throws DaoException {
         LOG.debug("Obtained 'user id' and 'activity id' to delete it from database are: {}, {}", userId, activityId);
-        if (userId < 1 && activityId < 1) {
-            throw new DaoException("Obtained 'user id' and 'activity id' parameters must be more than 0");
-        }
         boolean result = true;
         try (PreparedStatement pst = connection.prepareStatement(SQL_DELETE_USER_ACTIVITY)) {
             pst.setLong(1, userId);
@@ -239,8 +185,8 @@ public class UserActivityDaoImpl implements UserActivityDao {
             }
             LOG.debug("The {} rows has been removed to delete 'user_activity'", rowCount);
         } catch (SQLException e) {
-            LOG.error("DAO exception has been thrown to remove 'user_activity', because {}", e.getMessage());
-            throw new DaoException("Cannot delete 'user_activity' from database. " + e.getMessage(), e);
+            LOG.error(e);
+            throw new DaoException("Cannot delete 'user_activity' from database", e, e.getErrorCode());
         }
         return result;
     }
