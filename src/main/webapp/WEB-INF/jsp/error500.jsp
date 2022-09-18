@@ -28,6 +28,8 @@
             </h3>
             <p class="text-muted mt-4 mb-4">
                 <c:set var="message" value="${requestScope['javax.servlet.error.message']}"/>
+                <c:set var="code" value="${requestScope['javax.servlet.error.status_code']}"/>
+                <c:set var="servlet_name" value="${requestScope['javax.servlet.error.servlet_name']}"/>
                 <c:set var="exception" value="${requestScope['javax.servlet.error.exception']}"/>
                 <c:if test="${not empty message}">
             <h4><fmt:message key="error_jsp.error.message"/> ${message}</h4>
