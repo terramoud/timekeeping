@@ -4,10 +4,8 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import ua.epam.akoreshev.finalproject.exceptions.CommandException;
 import ua.epam.akoreshev.finalproject.exceptions.EditUserException;
-import ua.epam.akoreshev.finalproject.exceptions.RequestException;
 import ua.epam.akoreshev.finalproject.exceptions.ServiceException;
 import ua.epam.akoreshev.finalproject.model.entity.User;
-import ua.epam.akoreshev.finalproject.web.service.RequestService;
 import ua.epam.akoreshev.finalproject.web.service.UserService;
 
 import javax.servlet.ServletContext;
