@@ -59,7 +59,8 @@ class AddRequestCommandTest {
      * @see AddRequestCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldReturnUrlAndPutToSessionSuccessMessage() throws ServiceException, RequestException, CommandException {
+    void testExecuteShouldReturnUrlAndPutToSessionSuccessMessage()
+            throws ServiceException, RequestException, CommandException {
         when(requestService.createRequest(any())).thenReturn(true);
         assertEquals(req.getHeader("referer"), command.execute(req, resp));
         verify(session).setAttribute("isErrorMessage", false);
@@ -70,7 +71,8 @@ class AddRequestCommandTest {
      * @see AddRequestCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldReturnUrlAndPutToSessionErrorMessage() throws ServiceException, RequestException, CommandException {
+    void testExecuteShouldReturnUrlAndPutToSessionErrorMessage()
+            throws ServiceException, RequestException, CommandException {
         when(requestService.createRequest(any())).thenReturn(false);
         assertEquals(req.getHeader("referer"), command.execute(req, resp));
         verify(session).setAttribute("isErrorMessage", true);
@@ -81,7 +83,8 @@ class AddRequestCommandTest {
      * @see AddRequestCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowRequestException() throws ServiceException, RequestException, CommandException {
+    void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowRequestException()
+            throws ServiceException, RequestException, CommandException {
         when(requestService.createRequest(any())).thenThrow(new RequestException("Cannot add request"));
         assertEquals(req.getHeader("referer"), command.execute(req, resp));
         verify(session).setAttribute("isErrorMessage", true);
@@ -92,7 +95,8 @@ class AddRequestCommandTest {
      * @see AddRequestCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldThrowExceptionWhenServiceThrowException() throws ServiceException, RequestException {
+    void testExecuteShouldThrowExceptionWhenServiceThrowException()
+            throws ServiceException, RequestException {
         when(requestService.createRequest(any())).thenThrow(ServiceException.class);
         assertThrows(CommandException.class, () -> command.execute(req, resp));
     }
@@ -101,7 +105,8 @@ class AddRequestCommandTest {
      * @see AddRequestCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldThrowExceptionWhenSessionOrUserIsNotExists() throws ServiceException, RequestException {
+    void testExecuteShouldThrowExceptionWhenSessionOrUserIsNotExists()
+            throws ServiceException, RequestException {
         Mockito.reset(session);
         when(requestService.createRequest(any())).thenReturn(true);
         assertThrows(NullPointerException.class, () -> command.execute(req, resp));
