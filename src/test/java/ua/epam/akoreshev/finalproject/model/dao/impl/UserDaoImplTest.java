@@ -82,11 +82,19 @@ public class UserDaoImplTest {
      * @see UserDaoImpl#read(String)
      */
     @Test
-    void testReadUserShouldThrownExceptionWhenUserIsMissing() {
-        assertThrows(DaoException.class, () -> userDao.read((String) null));
-        assertThrows(DaoException.class, () -> userDao.read(""));
-        assertThrows(DaoException.class, () -> userDao.read(0L));
-        assertThrows(DaoException.class, () -> userDao.read(-1L));
+    void testReadUserShouldReturnNullWhenUserIsWrong() throws DaoException {
+        assertNull(userDao.read(-1L));
+        assertNull(userDao.read(Long.MAX_VALUE));
+    }
+
+    /**
+     * @see UserDaoImpl#read(String)
+     */
+    @Test
+    void testReadUserShouldReturnNullWhenUserIsMissing() throws DaoException {
+        assertNull(userDao.read((String) null));
+        assertNull(userDao.read(""));
+        assertNull(userDao.read(0L));
     }
 
     /**
@@ -222,7 +230,7 @@ public class UserDaoImplTest {
         long rowsBeforeDelete = getCountRowsFromTable();
         userDao.delete(rs.getLong(1));
         long rowsAfterDelete = getCountRowsFromTable();
-        assertThrows(DaoException.class, () -> userDao.read(rs.getLong(1)));
+        assertNull(userDao.read(rs.getLong(1)));
         assertEquals(rowsBeforeDelete - 1, rowsAfterDelete);
     }
 
@@ -256,66 +264,6 @@ public class UserDaoImplTest {
         differences.removeAll(userListBeforeAddedUser);
         assertEquals(1, differences.size());
         assertEquals(expectedUser, differences.get(0));
-    }
-
-    /**
-     * @see UserDaoImpl#findAllUsersByActivity(long)
-     */
-    @Test
-    void testFindAllUsersByActivityId() throws DaoException, SQLException {
-        User expectedUser = new User(0, "User1", "test1@test.com", "passtest", 2);
-        userDao.create(expectedUser);
-
-        PreparedStatement pst = connection.prepareStatement(
-                "INSERT INTO users_activities (user_id, activity_id) VALUES (?, ?)");
-        pst.setLong(1, expectedUser.getId());
-        pst.setLong(2, 1);
-        pst.executeUpdate();
-
-        List<User> userListByActivityId = userDao.findAllUsersByActivity(1);
-        assertTrue(userListByActivityId.contains(expectedUser));
-
-        pst = connection.prepareStatement("DELETE FROM users_activities WHERE user_id = ? AND activity_id = ?");
-        pst.setLong(1, expectedUser.getId());
-        pst.setLong(2, 1);
-        pst.executeUpdate();
-
-        List<User> userListByActivityIdAfterDelete = userDao.findAllUsersByActivity(1);
-        assertFalse(userListByActivityIdAfterDelete.contains(expectedUser));
-        assertEquals(userListByActivityId.size() - 1, userListByActivityIdAfterDelete.size());
-    }
-
-    /**
-     * @see UserDaoImpl#findAllUsersByActivity(String)
-     */
-    @Test
-    void testFindAllUsersByActivityName() throws DaoException, SQLException {
-        User expectedUser = new User(0, "User1", "test1@test.com", "passtest", 2);
-        userDao.create(expectedUser);
-
-        Statement st = connection.createStatement();
-        ResultSet rs = st.executeQuery("SELECT name_en FROM activities WHERE id = 1");
-        String activityName = null;
-        if (rs.next()) {
-            activityName = rs.getString("name_en");
-        }
-
-        PreparedStatement pst = connection.prepareStatement("INSERT INTO users_activities VALUES (?, ?, false)");
-        pst.setLong(1, expectedUser.getId());
-        pst.setLong(2, 1);
-        pst.executeUpdate();
-
-        List<User> userListByActivityName = userDao.findAllUsersByActivity(activityName);
-        assertTrue(userListByActivityName.contains(expectedUser));
-
-        pst = connection.prepareStatement("DELETE FROM users_activities WHERE user_id = ? AND activity_id = ?");
-        pst.setLong(1, expectedUser.getId());
-        pst.setLong(2, 1);
-        pst.executeUpdate();
-
-        List<User> userListByActivityNameAfterDelete = userDao.findAllUsersByActivity(activityName);
-        assertFalse(userListByActivityNameAfterDelete.contains(expectedUser));
-        assertEquals(userListByActivityName.size() - 1, userListByActivityNameAfterDelete.size());
     }
 
     private static Stream<Arguments> testCasesWhenUserIsNotUniqueRowInTable() {
