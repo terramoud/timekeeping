@@ -66,9 +66,18 @@ public class ActivityDaoImplTest {
      * @see ActivityDaoImpl#read(Long)
      */
     @Test
-    void testReadActivityShouldThrownExceptionWhenActivityIsMissing() {
-        assertThrows(DaoException.class, () -> activityDao.read(0L));
-        assertThrows(DaoException.class, () -> activityDao.read(-1L));
+    void testReadActivityShouldReturnNullWhenActivityIsWrong() throws DaoException {
+        assertNull(activityDao.read(-1L));
+        assertNull(activityDao.read(Long.MAX_VALUE));
+    }
+
+    /**
+     * @see ActivityDaoImpl#read(Long)
+     */
+    @Test
+    void testReadActivityShouldReturnNullWhenActivityIsMissing() throws DaoException {
+        assertNull(activityDao.read(0L));
+        assertNull(activityDao.read((long) Integer.MAX_VALUE));
     }
 
     /**
@@ -199,7 +208,7 @@ public class ActivityDaoImplTest {
         long rowsBeforeDelete = getCountRowsFromTable();
         assertTrue(activityDao.delete(rs.getLong(1)));
         long rowsAfterDelete = getCountRowsFromTable();
-        assertThrows(DaoException.class, () -> activityDao.read(rs.getLong(1)));
+        assertNull(activityDao.read(rs.getLong(1)));
         assertEquals(rowsBeforeDelete - 1, rowsAfterDelete);
     }
 
@@ -252,29 +261,6 @@ public class ActivityDaoImplTest {
     }
 
     /**
-     * @see ActivityDaoImpl#findAllActivitiesByCategory(String)
-     */
-    @Test
-    void testFindAllActivitiesByCategoryName() throws DaoException, SQLException {
-        Activity expectedActivity = new Activity("Activity1", "Активність1", 1);
-        assertTrue(activityDao.create(expectedActivity));
-
-        Statement st = connection.createStatement();
-        ResultSet rs = st.executeQuery("SELECT name_en FROM categories WHERE id = 1");
-        if (!rs.next()) {
-            throw new SQLException("Fatal: Cannot create the test for activityDao. The test is crashed");
-        }
-        String categoryName = rs.getString("name_en");
-
-        List<Activity> activityListByCategory = activityDao.findAllActivitiesByCategory(categoryName);
-        assertTrue(activityListByCategory.contains(expectedActivity));
-        assertTrue(activityDao.delete(expectedActivity.getId()));
-        List<Activity> activityListByCategoryAfterDelete = activityDao.findAllActivitiesByCategory(categoryName);
-        assertFalse(activityListByCategoryAfterDelete.contains(expectedActivity));
-        assertEquals(activityListByCategory.size() - 1, activityListByCategoryAfterDelete.size());
-    }
-
-    /**
      * @see ActivityDaoImpl#findAllActivitiesByUser(long)
      */
     @Test
@@ -293,34 +279,6 @@ public class ActivityDaoImplTest {
         List<Activity> activityListByUserAfterDelete = activityDao.findAllActivitiesByUser(1);
         assertFalse(activityListByUserAfterDelete.contains(expectedActivity));
         assertEquals(activityListByUser.size() - 1, activityListByUserAfterDelete.size());
-    }
-
-    /**
-     * @see ActivityDaoImpl#findAllActivitiesByUser(String)
-     */
-    @Test
-    void testFindAllActivitiesByUserName() throws DaoException, SQLException {
-        Activity expectedActivity = new Activity("Activity1", "Активність1", 1);
-        assertTrue(activityDao.create(expectedActivity));
-
-        PreparedStatement pst = connection.prepareStatement("INSERT INTO users_activities VALUES (?, ?, false)");
-        pst.setLong(1, 1);
-        pst.setLong(2, expectedActivity.getId());
-        pst.executeUpdate();
-
-        Statement st = connection.createStatement();
-        ResultSet rs = st.executeQuery("SELECT login FROM users WHERE id = 1");
-        if (!rs.next()) {
-            throw new SQLException("Fatal: Cannot create the test for activityDao. The test is crashed");
-        }
-        String login = rs.getString("login");
-
-        List<Activity> activityListByCategory = activityDao.findAllActivitiesByUser(login);
-        assertTrue(activityListByCategory.contains(expectedActivity));
-        assertTrue(activityDao.delete(expectedActivity.getId()));
-        List<Activity> activityListByCategoryAfterDelete = activityDao.findAllActivitiesByUser(login);
-        assertFalse(activityListByCategoryAfterDelete.contains(expectedActivity));
-        assertEquals(activityListByCategory.size() - 1, activityListByCategoryAfterDelete.size());
     }
 
     private static Stream<Arguments> testCasesWhenActivityIsNotUniqueRowInTable() {
