@@ -9,17 +9,16 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface BaseDao<T extends Entity, ID> {
-    // List<?> findByPage(T entity, Pagination pagination, int offset, int limit);
+public interface BaseDao<T extends Entity, L> {
     List<T> findAll() throws DaoException;
 
     boolean create(T t) throws DaoException;
 
-    T read(ID id) throws DaoException;
+    T read(L id) throws DaoException;
 
     boolean update(T t) throws DaoException;
 
-    boolean delete(ID id) throws DaoException;
+    boolean delete(L id) throws DaoException;
 
     default void setAutoCommit(Connection connection) throws DaoException {
         try {
