@@ -30,9 +30,9 @@ public class CreateActivityCommand extends Command {
         long categoryId = validator.getLong("category_id");
         Activity activity = new Activity(0, nameEn, nameUk, categoryId);
         try {
-            putToSession(req, "activity.create.failed", true, LOG);
-            if (activityService.createActivity(activity))
-                putToSession(req, "activity.create.success", false, LOG);
+            boolean isError = !activityService.createActivity(activity);
+            String message = (isError) ? "activity.create.failed" : "activity.create.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error(e);
             throw new CommandException(e.getMessage(), e);
