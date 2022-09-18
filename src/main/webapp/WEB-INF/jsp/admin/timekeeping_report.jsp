@@ -67,10 +67,26 @@
                                 <table id="zero_config" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
-                                        <th><fmt:message key="admin.page.requests.table.header.user"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.activity"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.summary_time"/></th>
-                                        <th><fmt:message key="admin.page.requests.table.header.attempts"/></th>
+                                        <th scope="col">
+                                            <a href="controller?command=admin_timekeeping_report&pageNumber=${requestScope.pageNumber}&order_by=login&desc=${requestScope.desc}">
+                                                <fmt:message key="admin.page.requests.table.header.user"/>
+                                            </a>
+                                        </th>
+                                        <th scope="col">
+                                            <a href="controller?command=admin_timekeeping_report&pageNumber=${requestScope.pageNumber}&order_by=${language == 'en' ? 'a.name_en' : 'a.name_uk'}&desc=${requestScope.desc}">
+                                                <fmt:message key="admin.page.requests.table.header.activity"/>
+                                            </a>
+                                        </th>
+                                        <th scope="col">
+                                            <a href="controller?command=admin_timekeeping_report&pageNumber=${requestScope.pageNumber}&order_by=summary&desc=${requestScope.desc}">
+                                                <fmt:message key="admin.page.requests.table.header.summary_time"/>
+                                            </a>
+                                        </th>
+                                        <th scope="col">
+                                            <a href="controller?command=admin_timekeeping_report&pageNumber=${requestScope.pageNumber}&order_by=attempts&desc=${requestScope.desc}">
+                                                <fmt:message key="admin.page.requests.table.header.attempts"/>
+                                            </a>
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -79,7 +95,7 @@
                                                 <td><c:out value="${spentTime.user.login}"/></td>
                                                 <td><c:out value="${language == 'en' ? spentTime.activity.nameEn : spentTime.activity.nameUk}"/></td>
                                                 <td><show:spent_time_formater time="${spentTime.total}"/></td>
-                                                <td class="text-warning"><c:out value="${spentTime.attempts}"/></td>
+                                                <td><c:out value="${spentTime.attempts}"/></td>
                                             </tr>
                                         </c:forEach>
                                     </tbody>
@@ -90,19 +106,20 @@
                                     <ul class="pagination">
                                         <show:pagination_prev_button pageNum="${pageNumber}"
                                                                      commandName="admin_timekeeping_report"
+                                                                     paramsOtherPaginations="&order_by=${requestScope.order_by}&desc=${!requestScope.desc}"
                                                                      paramName="pageNumber"/>
 
                                         <c:forEach var="i" begin="1" end="${totalPages}">
                                             <c:if test="${i==pageNumber}">
                                                 <li class="page-item active">
                                                     <a class="page-link"
-                                                       href="controller?command=admin_timekeeping_report&pageNumber=${i}">${i}</a>
+                                                       href="controller?command=admin_timekeeping_report&pageNumber=${i}&order_by=${requestScope.order_by}&desc=${!requestScope.desc}">${i}</a>
                                                 </li>
                                             </c:if>
                                             <c:if test="${i!=pageNumber}">
                                                 <li class="page-item">
                                                     <a class="page-link"
-                                                       href="controller?command=admin_timekeeping_report&pageNumber=${i}">${i}</a>
+                                                       href="controller?command=admin_timekeeping_report&pageNumber=${i}&order_by=${requestScope.order_by}&desc=${!requestScope.desc}">${i}</a>
                                                 </li>
                                             </c:if>
                                         </c:forEach>
@@ -110,6 +127,7 @@
                                         <show:pagination_next_button pageNum="${pageNumber}"
                                                                      paramName="pageNumber"
                                                                      commandName="admin_timekeeping_report"
+                                                                     paramsOtherPaginations="&order_by=${requestScope.order_by}&desc=${!requestScope.desc}"
                                                                      totalPages="${totalPages}"/>
                                     </ul>
                                 </nav>
@@ -122,6 +140,7 @@
         <%@ include file="/WEB-INF/fragments/footer.jspf" %>
     </div>
 </div>
+<show:submit_result/>
 <!-- ============================================================== -->
 <!-- All Jquery -->
 <!-- ============================================================== -->
