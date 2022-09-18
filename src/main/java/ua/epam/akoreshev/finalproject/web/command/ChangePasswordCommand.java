@@ -29,9 +29,9 @@ public class ChangePasswordCommand extends Command {
         String newPassword = validator.getString("new_password");
         String confirmNewPassword = validator.getString("confirm_new_password");
         try {
-            putToSession(req, "password.change.failed", true, LOG);
-            if (userService.changePassword(userId, oldPassword, newPassword, confirmNewPassword))
-                putToSession(req, "password.change.success", false, LOG);
+            boolean isError = !userService.changePassword(userId, oldPassword, newPassword, confirmNewPassword);
+            String message = (isError) ? "password.change.failed" : "password.change.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error(e);
             throw new CommandException(e.getMessage(), e);
