@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.CommandException;
 import ua.epam.akoreshev.finalproject.exceptions.ServiceException;
 import ua.epam.akoreshev.finalproject.web.service.ActivityService;
+import ua.epam.akoreshev.finalproject.web.utils.RequestParameterValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,15 +20,16 @@ public class RemoveActivityCommand extends Command {
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
-        long activityId = Long.parseLong(req.getParameter("activity_id"));
-
+        RequestParameterValidator validator = new RequestParameterValidator(req);
+        long activityId = validator.getLong("activity_id");
         try {
-            req.getSession().setAttribute("request_status", "failed");
+            putToSession(req, "activity.remove.failed", true, LOG);
             if (activityService.removeActivity(activityId)) {
-                req.getSession().setAttribute("request_status", "success");
+                putToSession(req, "activity.remove.success", false, LOG);
             }
         } catch (ServiceException e) {
-            req.getSession().setAttribute("request_status", "failed");
+            LOG.error("Cannot remove activity by id: {}", activityId);
+            throw new CommandException("Cannot remove activity by id", e);
         }
         LOG.trace("Command finished");
         return req.getHeader("referer");
