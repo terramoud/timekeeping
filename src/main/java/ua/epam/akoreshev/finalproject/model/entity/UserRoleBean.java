@@ -1,12 +1,14 @@
 package ua.epam.akoreshev.finalproject.model.entity;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class UserRoleBean {
+public class UserRoleBean implements Serializable {
+    private static final long serialVersionUID = -8708254124499350502L;
     private User user;
-    String role;
+    private Role role;
 
-    public UserRoleBean(User user, String role) {
+    public UserRoleBean(User user, Role role) {
         this.user = user;
         this.role = role;
     }
@@ -19,11 +21,11 @@ public class UserRoleBean {
         this.user = user;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -33,7 +35,7 @@ public class UserRoleBean {
         if (o == null || getClass() != o.getClass()) return false;
         UserRoleBean that = (UserRoleBean) o;
         return user.equals(that.user) &&
-                role.equals(that.role);
+                role == that.role;
     }
 
     @Override
@@ -41,5 +43,11 @@ public class UserRoleBean {
         return Objects.hash(user, role);
     }
 
-
+    @Override
+    public String toString() {
+        return "UserRoleBean{" +
+                "user=" + user +
+                ", role=" + role +
+                '}';
+    }
 }
