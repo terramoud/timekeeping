@@ -8,7 +8,7 @@ public class UserStatistic implements Serializable {
     private User user;
     private Activity activity;
     private Time total;
-    private int attempts;
+    private long attempts;
 
     public UserStatistic(User user, Activity activity, Time total, int attempts) {
         this.user = user;
@@ -44,11 +44,11 @@ public class UserStatistic implements Serializable {
         this.total = total;
     }
 
-    public int getAttempts() {
+    public long getAttempts() {
         return attempts;
     }
 
-    public void setAttempts(int attempts) {
+    public void setAttempts(long attempts) {
         this.attempts = attempts;
     }
 
