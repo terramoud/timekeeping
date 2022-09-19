@@ -85,7 +85,7 @@ class AddRequestCommandTest {
     @Test
     void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowRequestException()
             throws ServiceException, RequestException, CommandException {
-        when(requestService.createRequest(any())).thenThrow(new RequestException("Cannot add request"));
+        when(requestService.createRequest(any())).thenThrow(new RequestException("Some message"));
         assertEquals(req.getHeader("referer"), command.execute(req, resp));
         verify(session).setAttribute("isErrorMessage", true);
         verify(session).setAttribute(eq("message"), any());
