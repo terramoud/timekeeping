@@ -25,10 +25,9 @@ public class DenyRequestCommand extends Command {
         RequestParameterValidator validator = new RequestParameterValidator(req);
         long requestId = validator.getLong("request_id");
         try {
-            putToSession(req, "request.reject.failed", true, LOG);
-            if (requestService.rejectRequest(requestId)) {
-                putToSession(req, "request.reject.success", false, LOG);
-            }
+            boolean isError = !requestService.rejectRequest(requestId);
+            String message = (isError) ? "request.reject.failed" : "request.reject.success";
+            putToSession(req, message, isError, LOG);
         } catch (RequestException e) {
             putToSession(req, e.getMessage(), true, LOG);
         } catch (ServiceException e) {

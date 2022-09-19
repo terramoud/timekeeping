@@ -29,9 +29,9 @@ public class EditActivityCommand extends Command {
         long categoryId = validator.getLong("category_id");
         Activity activity = new Activity(activityId, nameEn, nameUk, categoryId);
         try {
-            putToSession(req, "activity.edit.failed", true, LOG);
-            if (activityService.editActivity(activity))
-                putToSession(req, "activity.edit.success", false, LOG);
+            boolean isError = !activityService.editActivity(activity);
+            String message = (isError) ? "activity.edit.failed" : "activity.edit.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error("Cannot edit activity: {}", activity);
             throw new CommandException("Cannot edit activity", e);

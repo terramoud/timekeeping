@@ -34,11 +34,9 @@ public class RegisterCommand extends Command {
         user.setRoleId(Role.getRoleId(Role.USER));
         String passwordConfirm = validator.getString("password_confirm");
         try {
-            putToSession(req, "registration.failed", true, LOG);
-            if (userService.addUser(user, passwordConfirm)) {
-                LOG.trace("Registration completed");
-                putToSession(req, "registration.success", false, LOG);
-            }
+            boolean isError = !userService.addUser(user, passwordConfirm);
+            String message = (isError) ? "registration.failed" : "registration.success";
+            putToSession(req, message, isError, LOG);
         } catch (UserException e) {
             LOG.warn(e);
             putToSession(req, e.getMessage(), true, LOG);

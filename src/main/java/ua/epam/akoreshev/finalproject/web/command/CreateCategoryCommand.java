@@ -29,9 +29,9 @@ public class CreateCategoryCommand extends Command {
         Category category = new Category(0, nameEn, nameUk);
 
         try {
-            putToSession(req, "category.create.failed", true, LOG);
-            if (categoryService.createCategory(category))
-                putToSession(req, "category.create.success", false, LOG);
+            boolean isError = !categoryService.createCategory(category);
+            String message = (isError) ? "category.create.failed" : "category.create.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error(e);
             throw new CommandException(e.getMessage(), e);

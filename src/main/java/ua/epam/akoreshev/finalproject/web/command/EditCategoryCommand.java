@@ -29,9 +29,9 @@ public class EditCategoryCommand extends Command {
         String nameUk = validator.getString("name_uk");
         Category category = new Category(categoryId, nameEn, nameUk);
         try {
-            putToSession(req, "category.edit.failed", true, LOG);
-            if (categoryService.editCategory(category))
-                putToSession(req, "category.edit.success", false, LOG);
+            boolean isError = !categoryService.editCategory(category);
+            String message = (isError) ? "category.edit.failed" : "category.edit.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error(e);
             throw new CommandException(e.getMessage(), e);
