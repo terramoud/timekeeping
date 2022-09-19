@@ -88,7 +88,7 @@ class CreateActivityCommandTest {
      * @see CreateActivityCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowRequestException()
+    void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowActivityException()
             throws ServiceException, CommandException, ActivityException {
         when(activityService.createActivity(any())).thenThrow(new ActivityException("Cannot create activity"));
         assertEquals(req.getHeader("referer"), command.execute(req, resp));

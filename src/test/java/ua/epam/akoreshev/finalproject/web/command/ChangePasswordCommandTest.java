@@ -84,7 +84,7 @@ class ChangePasswordCommandTest {
      * @see ChangePasswordCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowRequestException()
+    void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowEditUserException()
             throws ServiceException, CommandException, EditUserException {
         when(userService.changePassword(anyLong(), anyString(), anyString(), anyString()))
                 .thenThrow(new EditUserException("Cannot change password"));

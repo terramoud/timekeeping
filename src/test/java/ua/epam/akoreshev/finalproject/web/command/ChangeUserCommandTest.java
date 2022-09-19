@@ -86,7 +86,7 @@ class ChangeUserCommandTest {
      * @see ChangeUserCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowRequestException()
+    void testExecuteShouldReturnUrlAndPutToSessionErrorMessageWhenServiceThrowEditUserException()
             throws ServiceException, CommandException, EditUserException {
         when(userService.editUser(any())).thenThrow(new EditUserException("Cannot edit user"));
         assertEquals(req.getHeader("referer"), command.execute(req, resp));
@@ -98,7 +98,7 @@ class ChangeUserCommandTest {
      * @see ChangeUserCommand#execute(HttpServletRequest, HttpServletResponse)
      */
     @Test
-    void testExecuteShouldThrowExceptionWhenSessionOrUserIsNotExists()
+    void testExecuteShouldThrowExceptionWhenServiceThrowException()
             throws ServiceException, EditUserException {
         when(userService.editUser(any())).thenThrow(ServiceException.class);
         assertThrows(CommandException.class, () -> command.execute(req, resp));
