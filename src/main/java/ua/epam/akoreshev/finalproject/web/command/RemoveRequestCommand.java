@@ -33,10 +33,10 @@ public class RemoveRequestCommand extends Command {
         request.setStatusId(validator.getLong("status_id"));
         LOG.debug("Request entity is {}", request);
         try {
-            putToSession(req, "add.request.to_remove_activity.failed.message", true, LOG);
-            if (requestService.createRequest(request)) {
-                putToSession(req, "add.request.to_remove_activity.success.message", false, LOG);
-            }
+            boolean isError = !requestService.createRequest(request);
+            String message = (isError) ? "add.request.to_remove_activity.failed.message"
+                    : "add.request.to_remove_activity.success.message";
+            putToSession(req, message, isError, LOG);
         } catch (RequestException e) {
             putToSession(req, e.getMessage(), true, LOG);
         } catch (ServiceException e) {
