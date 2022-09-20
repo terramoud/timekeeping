@@ -24,9 +24,9 @@ public class RemoveAccountCommand extends Command {
         RequestParameterValidator validator = new RequestParameterValidator(req);
         long userId = validator.getLong("user_id");
         try {
-            putToSession(req, "remove.account.failed", false, LOG);
-            if (userService.removeUser(userId)) {
-                putToSession(req, "remove.account.success", false, LOG);
+            if (!userService.removeUser(userId)) {
+                putToSession(req, "remove.account.failed", true, LOG);
+                return req.getHeader("referer");
             }
         } catch (ServiceException e) {
             LOG.error("Cannot remove account by user id: {}", userId);
