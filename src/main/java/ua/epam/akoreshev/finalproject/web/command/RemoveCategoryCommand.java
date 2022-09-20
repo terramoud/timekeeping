@@ -24,10 +24,9 @@ public class RemoveCategoryCommand extends Command {
         RequestParameterValidator validator = new RequestParameterValidator(req);
         long categoryId = validator.getLong("category_id");
         try {
-            putToSession(req, "category.remove.failed", true, LOG);
-            if (categoryService.removeCategory(categoryId)) {
-                putToSession(req, "category.remove.success", false, LOG);
-            }
+            boolean isError = !categoryService.removeCategory(categoryId);
+            String message = (isError) ? "category.remove.failed" : "category.remove.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error("Cannot remove category by id: {}", categoryId);
             throw new CommandException("Cannot remove category by id", e);
