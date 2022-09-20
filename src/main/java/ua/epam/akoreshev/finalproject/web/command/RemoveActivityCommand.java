@@ -23,10 +23,9 @@ public class RemoveActivityCommand extends Command {
         RequestParameterValidator validator = new RequestParameterValidator(req);
         long activityId = validator.getLong("activity_id");
         try {
-            putToSession(req, "activity.remove.failed", true, LOG);
-            if (activityService.removeActivity(activityId)) {
-                putToSession(req, "activity.remove.success", false, LOG);
-            }
+            boolean isError = !activityService.removeActivity(activityId);
+            String message = (isError) ? "activity.remove.failed" : "activity.remove.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error("Cannot remove activity by id: {}", activityId);
             throw new CommandException("Cannot remove activity by id", e);
