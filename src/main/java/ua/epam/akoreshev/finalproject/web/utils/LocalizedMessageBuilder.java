@@ -50,7 +50,7 @@ public class LocalizedMessageBuilder {
             result = resourceBundle.getString(key);
         } catch (MissingResourceException | NullPointerException | IllegalArgumentException e) {
             result = "Warning! Cannot load message about result of action";
-            LOG.error("Cannot load message from bundle: '{}'", bundleName, e);
+            LOG.error("Cannot load message from bundle: '{}'. {}", bundleName, e.getMessage());
         }
         return result;
     }
