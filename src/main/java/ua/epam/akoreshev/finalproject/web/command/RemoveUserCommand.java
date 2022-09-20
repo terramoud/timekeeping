@@ -22,10 +22,9 @@ public class RemoveUserCommand extends Command {
         RequestParameterValidator validator = new RequestParameterValidator(req);
         long userId = validator.getLong("user_id");
         try {
-            putToSession(req, "remove.user.failed", false, LOG);
-            if (userService.removeUser(userId)) {
-                putToSession(req, "remove.user.success", false, LOG);
-            }
+            boolean isError = !userService.removeUser(userId);
+            String message = (isError) ? "remove.user.failed" : "remove.user.success";
+            putToSession(req, message, isError, LOG);
         } catch (ServiceException e) {
             LOG.error(e);
             throw new CommandException(e.getMessage(), e);
