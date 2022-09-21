@@ -9,10 +9,12 @@ import java.util.List;
 
 public interface ActivityDao extends BaseDao<Activity, Long> {
     List<Activity> findAllActivitiesByCategory(long categoryId) throws DaoException;
+
     List<Activity> findAllActivitiesByUser(long userId) throws DaoException;
+
     List<Category> findAllCategories() throws DaoException;
 
-    long getNumberActivities() throws DaoException;
+    int getNumberActivities() throws DaoException;
 
     List<ActivityCategoryBean> findAllActivities(int limit, int offset, String columnName, String sortOrder) throws DaoException;
 }

@@ -48,7 +48,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public long getNumberActivities() throws ServiceException {
+    public int getNumberActivities() throws ServiceException {
         try {
             return activityDao.getNumberActivities();
         } catch (DaoException e) {

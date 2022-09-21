@@ -132,13 +132,13 @@ public class ActivityDaoImpl implements ActivityDao {
     }
 
     @Override
-    public long getNumberActivities() throws DaoException {
-        long result = 0;
+    public int getNumberActivities() throws DaoException {
+        int result = 0;
         try (Statement st = connection.createStatement()) {
             ResultSet rs = st.executeQuery(SQL_GET_NUMBER_ACTIVITIES);
             LOG.trace("SQL query find all 'activities' to database has already been completed successfully");
             if (rs.next()) {
-                result = rs.getLong("numRows");
+                result = rs.getInt("numRows");
             }
             LOG.debug("The {} rows has been found by query to database", result);
         } catch (SQLException e) {

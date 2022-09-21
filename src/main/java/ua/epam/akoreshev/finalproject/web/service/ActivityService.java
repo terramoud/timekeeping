@@ -14,7 +14,7 @@ public interface ActivityService {
 
     List<Activity> findAllActivitiesByUser(User user) throws ServiceException;
 
-    long getNumberActivities() throws ServiceException;
+    int getNumberActivities() throws ServiceException;
 
     List<ActivityCategoryBean> getActivities(int limit, int offset, String columnName, String sortOrder) throws ServiceException;
 

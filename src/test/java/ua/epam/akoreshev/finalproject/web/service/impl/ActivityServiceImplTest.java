@@ -135,7 +135,7 @@ class ActivityServiceImplTest {
      */
     @Test
     void testGetNumberActivitiesShouldReturnNumber() throws DaoException, ServiceException {
-        long expected = 1L;
+        int expected = 1;
         Mockito.when(activityDao.getNumberActivities()).thenReturn(expected);
         assertEquals(expected, activityService.getNumberActivities());
     }
