@@ -49,13 +49,13 @@ public class CategoryDaoImpl implements CategoryDao {
     }
 
     @Override
-    public long getNumberCategories() throws DaoException {
-        long result = 0;
+    public int getNumberCategories() throws DaoException {
+        int result = 0;
         try (Statement st = connection.createStatement()) {
             ResultSet rs = st.executeQuery(SQL_GET_NUMBER_CATEGORIES_OF_ACTIVITIES);
             LOG.trace("SQL query find all 'categories' to database has already been completed successfully");
             if (rs.next()) {
-                result = rs.getLong("numRows");
+                result = rs.getInt("numRows");
             }
             LOG.debug("The {} rows has been found by query to database", result);
         } catch (SQLException e) {

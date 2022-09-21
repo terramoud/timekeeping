@@ -49,7 +49,7 @@ class CategoryServiceImplTest {
      */
     @Test
     void testGetNumberCategoriesShouldReturnNumber() throws DaoException, ServiceException {
-        long expected = 1L;
+        int expected = 1;
         Mockito.when(categoryDao.getNumberCategories()).thenReturn(expected);
         assertEquals(expected, categoryService.getNumberCategories());
     }

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CategoryService {
 
-    long getNumberCategories() throws ServiceException;
+    int getNumberCategories() throws ServiceException;
 
     List<Category> getCategories(int limit, int offset, String columnName, String sortOrder) throws ServiceException;
 

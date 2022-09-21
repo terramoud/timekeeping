@@ -24,7 +24,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public long getNumberCategories() throws ServiceException {
+    public int getNumberCategories() throws ServiceException {
         try {
             return categoryDao.getNumberCategories();
         } catch (DaoException e) {
