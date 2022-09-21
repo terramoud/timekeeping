@@ -207,13 +207,13 @@ public class IntervalDaoImpl implements IntervalDao {
     }
 
     @Override
-    public long getNumberIntervals() throws DaoException {
-        long result = 0;
+    public int getNumberIntervals() throws DaoException {
+        int result = 0;
         try (Statement st = connection.createStatement()) {
             ResultSet rs = st.executeQuery(SQL_GET_NUMBER_INTERVALS);
             LOG.trace("SQL query find all 'intervals' to database has already been completed successfully");
             if (rs.next()) {
-                result = rs.getLong("numRows");
+                result = rs.getInt("numRows");
             }
             LOG.debug("The {} rows has been found by query to database", result);
         } catch (SQLException e) {

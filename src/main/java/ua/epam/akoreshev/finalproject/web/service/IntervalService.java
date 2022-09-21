@@ -18,7 +18,7 @@ public interface IntervalService {
 
     boolean setFinishTimeForUserActivity(long userId, long activityId, LocalDateTime stopTime) throws ServiceException, IntervalException;
 
-    long getNumberUsersActivities() throws ServiceException;
+    int getNumberUsersActivities() throws ServiceException;
 
     List<UserStatistic> getStatisticsByUsers(int limit, int offset, String columnName, String sortOrder) throws ServiceException;
 }

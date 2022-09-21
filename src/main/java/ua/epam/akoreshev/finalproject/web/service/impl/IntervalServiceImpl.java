@@ -83,7 +83,7 @@ public class IntervalServiceImpl implements IntervalService {
     }
 
     @Override
-    public long getNumberUsersActivities() throws ServiceException {
+    public int getNumberUsersActivities() throws ServiceException {
         try {
             return intervalDao.getNumberIntervals();
         } catch (DaoException e) {

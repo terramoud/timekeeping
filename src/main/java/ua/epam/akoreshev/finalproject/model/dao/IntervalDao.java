@@ -14,7 +14,7 @@ public interface IntervalDao extends BaseDao<Interval, Long> {
 
     Interval readIntervalByUserActivity(long userId, long activityId) throws DaoException;
 
-    long getNumberIntervals() throws DaoException;
+    int getNumberIntervals() throws DaoException;
 
     List<UserStatistic> findUserStatistics(int limit, int offset, String columnName, String sortOrder) throws DaoException;
 }

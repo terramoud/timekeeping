@@ -271,7 +271,7 @@ class IntervalServiceImplTest {
      */
     @Test
     void testGetNumberUsersActivitiesShouldReturnNumber() throws ServiceException, DaoException {
-        long expected = 1L;
+        int expected = 1;
         Mockito.when(intervalDao.getNumberIntervals()).thenReturn(expected);
         assertEquals(expected, intervalService.getNumberUsersActivities());
     }
