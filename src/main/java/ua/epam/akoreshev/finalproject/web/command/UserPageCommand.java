@@ -32,6 +32,7 @@ public class UserPageCommand extends Command {
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
         LOG.trace("Command has started");
         User user = (User) req.getSession().getAttribute("user");
+        LOG.debug("User obtained from session is: '{}'", user);
         if (user == null)
             throw new CommandException("The user is not logged in yet");
         try {
