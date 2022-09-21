@@ -1,46 +1,39 @@
 package ua.epam.akoreshev.finalproject.web.utils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import javax.servlet.http.HttpServletRequest;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 public class RequestParameterValidator {
-    private static final Logger LOG = LogManager.getLogger(RequestParameterValidator.class);
-    public static final String REGEXP = "^[0-9a-zA-Z]([0-9a-zA-Z_\\-.]*[0-9a-zA-Z])?$";
     private final HttpServletRequest req;
 
     public RequestParameterValidator(HttpServletRequest request) {
         this.req = request;
     }
 
-    public long getLong(String number) {
-        long result;
+    public long getLong(String paramName) {
+        long number;
         try {
-            String temp = Long.parseUnsignedLong(req.getParameter(number)) + "";
-            result = Long.parseLong(temp);
+            String temp = Long.parseUnsignedLong(req.getParameter(paramName)) + "";
+            number = Long.parseLong(temp);
         } catch (NumberFormatException | NullPointerException e) {
-            result = 0;
+            number = 0;
         }
-        return result;
+        return number;
     }
 
-    public int getInt(String number) {
-        int result;
+    public int getInt(String paramName) {
+        int number;
         try {
-            String temp = Integer.parseUnsignedInt(req.getParameter(number)) + "";
-            result = Integer.parseInt(temp);
+            String temp = Integer.parseUnsignedInt(req.getParameter(paramName)) + "";
+            number = Integer.parseInt(temp);
         } catch (NumberFormatException | NullPointerException e) {
-            result = 0;
+            number = 0;
         }
-        return result;
+        return number;
     }
 
-    public String getString(String str) {
-        String param = req.getParameter(str);
-        return (param != null && validateParameter(param)) ? param : "";
+    public String getString(String paramName) {
+        String parameterValue = req.getParameter(paramName);
+        return (parameterValue == null) ? "" : parameterValue;
     }
 
     public int getPaginationPageNumber(String pageNumber) {
@@ -49,17 +42,5 @@ public class RequestParameterValidator {
 
     public boolean getBoolean(String desc) {
         return Boolean.parseBoolean(req.getParameter(desc));
-    }
-
-    private boolean validateParameter(String parameter) {
-        try {
-            return parameter != null && Pattern.matches(REGEXP, parameter);
-        } catch (NullPointerException e) {
-            LOG.warn("Request parameter isn't exists {}", e.getMessage());
-            return false;
-        } catch (PatternSyntaxException e) {
-            LOG.warn(e.getMessage(), e);
-            return false;
-        }
     }
 }
