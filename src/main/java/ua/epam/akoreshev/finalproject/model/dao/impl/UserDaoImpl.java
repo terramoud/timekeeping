@@ -134,14 +134,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public long getNumberUsers() throws DaoException {
-        long result = 0;
+    public int getNumberUsers() throws DaoException {
+        int result = 0;
         try (PreparedStatement pst = connection.prepareStatement(SQL_GET_NUMBER_USERS_WITHOUT_ADMINS)) {
             pst.setInt(1, Role.getRoleId(Role.ADMIN));
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query find all 'users' to database has already been completed successfully");
             if (rs.next()) {
-                result = rs.getLong("numRows");
+                result = rs.getInt("numRows");
             }
             LOG.debug("The {} rows has been found by query to database", result);
         } catch (SQLException e) {

@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public long getNumberUsers() throws ServiceException {
+    public int getNumberUsers() throws ServiceException {
         try {
             return userDao.getNumberUsers();
         } catch (DaoException e) {

@@ -190,9 +190,9 @@ class UserServiceImplTest {
      * @see UserServiceImpl#getNumberUsers()
      */
     @Test
-    void testGetNumberUsersShouldReturnLong() throws DaoException, ServiceException {
-        Mockito.when(userDao.getNumberUsers()).thenReturn(10L);
-        assertEquals(10L, userService.getNumberUsers());
+    void testGetNumberUsersShouldReturnInt() throws DaoException, ServiceException {
+        Mockito.when(userDao.getNumberUsers()).thenReturn(10);
+        assertEquals(10, userService.getNumberUsers());
     }
 
     /**

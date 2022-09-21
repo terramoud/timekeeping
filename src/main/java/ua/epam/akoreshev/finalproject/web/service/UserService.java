@@ -13,7 +13,7 @@ public interface UserService {
 
     User findUserByLoginAndPassword(String login, String password) throws ServiceException, UserException;
 
-    long getNumberUsers() throws ServiceException;
+    int getNumberUsers() throws ServiceException;
 
     List<User> getUsers(int limit, int offset, String columnName, String sortOrder) throws ServiceException;
 

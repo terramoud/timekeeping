@@ -8,7 +8,7 @@ import java.util.List;
 public interface UserDao extends BaseDao<User, Long> {
     User read(String login) throws DaoException;
 
-    long getNumberUsers() throws DaoException;
+    int getNumberUsers() throws DaoException;
 
     List<User> findAllUsers(int limit, int offset, String columnName, String sortOrder) throws DaoException;
 }
