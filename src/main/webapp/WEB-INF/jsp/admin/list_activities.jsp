@@ -316,8 +316,8 @@
         e.preventDefault();
         let nameEn = document.querySelector('form[name="' + formName + '"]').name_en.value;
         let nameUk = document.querySelector('form[name="' + formName + '"]').name_uk.value;
-        const regNameEn = /^[a-zA-Z][a-zA-Z \-]{0,30}[a-zA-Z]$/g; // Javascript reGex for activity name validation
-        const regNameUk = /^[\p{L}][\p{L} \-]{0,30}[\p{L}]$/gu; // Javascript reGex for activity name validation
+        const regNameEn = /^[a-zA-Z][a-zA-Z \-']{0,30}[a-zA-Z]$/g; // Javascript reGex for activity name validation
+        const regNameUk = /^[\p{L}][\p{L} \-']{0,30}[\p{L}]$/gu; // Javascript reGex for activity name validation
 
         if (!regNameEn.test(nameEn)) {
             window.alert(`<fmt:message key = "admin.page.activity.name_en.invalid"/>`);
