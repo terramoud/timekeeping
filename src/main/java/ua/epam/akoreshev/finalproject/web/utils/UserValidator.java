@@ -10,7 +10,7 @@ import java.util.regex.PatternSyntaxException;
 public class UserValidator {
     private static final Logger LOG = LogManager.getLogger(UserValidator.class);
     private static final String EMAIL_REGEXP = "^\\w+([.-]?\\w+){0,249}@\\w+([.-]?\\w+){0,249}(\\.\\w{2,3}){1,249}$";
-    private static final String LOGIN_REGEXP = "^[\\p{L}][\\p{L}0-9]{4,31}$";
+    private static final String LOGIN_REGEXP = "^[\\p{L}][\\p{L}0-9]{2,31}$";
     private static final String PASSWORD_REGEXP = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,31}$";
 
     public boolean validateId(long userId) {

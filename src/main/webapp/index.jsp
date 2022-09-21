@@ -220,7 +220,7 @@
         let pass = document.forms.RegForm.password.value;
         let pass_confirm = document.forms.RegForm.password_confirm.value;
         let regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g;  //Javascript reGex for Email Validation.
-        let regLogin = /^[\p{L}][\p{L}0-9]{4,29}$/gu;          // Javascript reGex for Login validation
+        let regLogin = /^[\p{L}][\p{L}0-9]{2,29}$/gu;          // Javascript reGex for Login validation
         let patternPass = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/g;
 
         if (login === "" || !regLogin.test(login)) {
@@ -252,7 +252,7 @@
         e.preventDefault();
         let login = document.forms.formLogin.login.value;
         let pass = document.forms.formLogin.password.value;
-        let regLogin = /^[\p{L}][\p{L}0-9]{4,29}$/gu;
+        let regLogin = /^[\p{L}][\p{L}0-9]{2,29}$/gu;
         let patternPassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/g;
 
         if (login === "" || !regLogin.test(login)) {

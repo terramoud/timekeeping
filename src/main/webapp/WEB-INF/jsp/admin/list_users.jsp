@@ -242,7 +242,7 @@
         let login = document.querySelector('form[name="' + formName + '"]').login.value;
         let email = document.querySelector('form[name="' + formName + '"]').email.value;
         let regEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/g;  // Javascript reGex for Email Validation.
-        let regLogin = /^[\p{L}][\p{L}0-9]{4,29}$/gu;          // Javascript reGex for Login validation
+        let regLogin = /^[\p{L}][\p{L}0-9]{2,29}$/gu;          // Javascript reGex for Login validation
 
         if (login === "" || !regLogin.test(login)) {
             window.alert(`<fmt:message key = "index_jsp.form.register.validate_login"/>`);
