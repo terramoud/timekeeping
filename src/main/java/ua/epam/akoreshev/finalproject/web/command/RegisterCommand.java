@@ -33,6 +33,7 @@ public class RegisterCommand extends Command {
         user.setPassword(validator.getString("password"));
         user.setRoleId(Role.getRoleId(Role.USER));
         String passwordConfirm = validator.getString("password_confirm");
+        LOG.debug("User obtained from register form is: '{}'", user);
         try {
             boolean isError = !userService.addUser(user, passwordConfirm);
             String message = (isError) ? "registration.failed" : "registration.success";
