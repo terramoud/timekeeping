@@ -95,7 +95,7 @@
                                                     value="${language == 'en' ? pendingRequest.activity.nameEn : pendingRequest.activity.nameUk}"/></td>
                                             <td><c:out
                                                     value="${language == 'en' ? pendingRequest.type.nameEn : pendingRequest.type.nameUk}"/></td>
-                                            <td class="text-warning"><c:out
+                                            <td><c:out
                                                     value="${language == 'en' ? pendingRequest.status.nameEn : pendingRequest.status.nameUk}"/></td>
                                             <td>
                                                 <form action="controller" method="POST" class="p-0 m-0 d-inline">
@@ -201,7 +201,7 @@
                                                         value="${language == 'en' ? completedRequest.activity.nameEn : completedRequest.activity.nameUk}"/></td>
                                                 <td><c:out
                                                         value="${language == 'en' ? completedRequest.type.nameEn : completedRequest.type.nameUk}"/></td>
-                                                <td class="text-warning"><c:out
+                                                <td><c:out
                                                         value="${language == 'en' ? completedRequest.status.nameEn : completedRequest.status.nameUk}"/></td>
                                             </tr>
                                         </c:forEach>
