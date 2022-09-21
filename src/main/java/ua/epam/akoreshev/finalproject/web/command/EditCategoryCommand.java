@@ -28,6 +28,7 @@ public class EditCategoryCommand extends Command {
         String nameEn = validator.getString("name_en");
         String nameUk = validator.getString("name_uk");
         Category category = new Category(categoryId, nameEn, nameUk);
+        LOG.debug("Obtained category entity from request parameters is '{}'", category);
         try {
             boolean isError = !categoryService.editCategory(category);
             String message = (isError) ? "category.edit.failed" : "category.edit.success";

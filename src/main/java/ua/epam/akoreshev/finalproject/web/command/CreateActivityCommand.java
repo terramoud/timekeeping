@@ -29,6 +29,7 @@ public class CreateActivityCommand extends Command {
         String nameUk = validator.getString("name_uk");
         long categoryId = validator.getLong("category_id");
         Activity activity = new Activity(0, nameEn, nameUk, categoryId);
+        LOG.debug("Obtained activity entity from request parameters is '{}'", activity);
         try {
             boolean isError = !activityService.createActivity(activity);
             String message = (isError) ? "activity.create.failed" : "activity.create.success";

@@ -28,6 +28,7 @@ public class EditActivityCommand extends Command {
         String nameUk = validator.getString("name_uk");
         long categoryId = validator.getLong("category_id");
         Activity activity = new Activity(activityId, nameEn, nameUk, categoryId);
+        LOG.debug("Obtained activity entity from request parameters is '{}'", activity);
         try {
             boolean isError = !activityService.editActivity(activity);
             String message = (isError) ? "activity.edit.failed" : "activity.edit.success";

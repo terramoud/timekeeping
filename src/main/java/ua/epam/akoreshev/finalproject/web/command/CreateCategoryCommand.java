@@ -27,7 +27,7 @@ public class CreateCategoryCommand extends Command {
         String nameEn = validator.getString("name_en");
         String nameUk = validator.getString("name_uk");
         Category category = new Category(0, nameEn, nameUk);
-
+        LOG.debug("Obtained category entity from request parameters is '{}'", category);
         try {
             boolean isError = !categoryService.createCategory(category);
             String message = (isError) ? "category.create.failed" : "category.create.success";
