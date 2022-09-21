@@ -14,7 +14,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private static final Logger LOG = LogManager.getLogger(UserServiceImpl.class);
-    public static final String INVALID_USER_LOGIN = "Invalid user login: {}";
+    public static final String INVALID_USER_LOGIN = "Invalid user login: '{}'";
     public static final String USER_ERROR_INVALID_LOGIN = "user.error.invalid.login";
 
     private final UserDao userDao;
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
                 throw new UserException(USER_ERROR_INVALID_LOGIN);
             }
             if (!userValidator.validateEmail(user.getEmail())) {
-                LOG.warn("Invalid user email: {}", user.getEmail());
+                LOG.warn("Invalid user email: '{}'", user.getEmail());
                 throw new UserException("user.error.invalid.email");
             }
             if (!userValidator.validatePassword(user.getPassword()))
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         } catch (DaoException e) {
             if (e.getSqlErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY)
                 throw new UserException("user.error.duplicate_user");
-            LOG.error("Cannot add new user {}", user);
+            LOG.error("Cannot add new user '{}'", user);
             throw new ServiceException("Cannot add new user", e);
         }
     }
@@ -61,14 +61,14 @@ public class UserServiceImpl implements UserService {
             throw new UserException("user.error.invalid.new_password");
         try {
             User user = userDao.read(login);
-            LOG.debug("Obtained user from db by login is: {}", user);
+            LOG.debug("Obtained user from db by login is: '{}'", user);
             if (user == null)
                 throw new UserException("user.error.not_exists");
             if (!user.getPassword().equals(password))
                 throw new UserException("user.error.invalid.password");
             return user;
         } catch (DaoException e) {
-            LOG.error("Cannot find user by login: {} and password", login);
+            LOG.error("Cannot find user by login: '{}' and password", login);
             throw new ServiceException("Cannot find user by login and password", e);
         }
     }
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
         try {
             return userValidator.validateId(userId) && userDao.delete(userId);
         } catch (DaoException e) {
-            LOG.error("Cannot remove user by id: {}", userId);
+            LOG.error("Cannot remove user by id: '{}'", userId);
             throw new ServiceException("Cannot remove user", e);
         }
     }
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
     public boolean editUser(User user) throws ServiceException, EditUserException {
         try {
             User userToEdit = userDao.read(user.getId());
-            LOG.debug("User to edit is: {}", userToEdit);
+            LOG.debug("User to edit is: '{}'", userToEdit);
             if (userToEdit == null)
                 throw new EditUserException("user.error.not_exists");
             user.setPassword(userToEdit.getPassword());
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
                 throw new EditUserException(USER_ERROR_INVALID_LOGIN);
             }
             if (!userValidator.validateEmail(user.getEmail())) {
-                LOG.warn("Invalid user email: {}", user.getEmail());
+                LOG.warn("Invalid user email: '{}'", user.getEmail());
                 throw new EditUserException("user.error.invalid.email");
             }
             List<User> allUsers = userDao.findAll();
@@ -124,18 +124,18 @@ public class UserServiceImpl implements UserService {
             boolean isLoginNotUnique = allUsers.stream()
                     .anyMatch(u -> u.getLogin().equals(user.getLogin()));
             if (isLoginNotUnique) {
-                LOG.warn("User login is duplicated: {}", user.getLogin());
+                LOG.warn("User login is duplicated: '{}'", user.getLogin());
                 throw new EditUserException("user.error.duplicate.login");
             }
             boolean isEmailNotUnique = allUsers.stream()
                     .anyMatch(u -> u.getEmail().equals(user.getEmail()));
             if (isEmailNotUnique) {
-                LOG.warn("User email is duplicated: {}", user.getEmail());
+                LOG.warn("User email is duplicated: '{}'", user.getEmail());
                 throw new EditUserException("user.error.duplicate.email");
             }
             return userDao.update(user);
         } catch (DaoException e) {
-            LOG.error("Cannot edit user with id: {}", user.getId());
+            LOG.error("Cannot edit user with id: '{}'", user.getId());
             throw new ServiceException("Cannot edit user", e);
         }
     }
@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
             user.setPassword(newPassword);
             return userDao.update(user);
         } catch (DaoException e) {
-            LOG.error("Cannot change password for user with id: {}", userId);
+            LOG.error("Cannot change password for user with id: '{}'", userId);
             throw new ServiceException("Cannot change password for user", e);
         }
     }
