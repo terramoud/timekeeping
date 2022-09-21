@@ -25,13 +25,14 @@ public class AddRequestCommand extends Command {
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
         LOG.trace("Command starts");
         User user = (User) req.getSession().getAttribute("user");
+        LOG.debug("User obtained from session is: '{}'", user);
         RequestParameterValidator validator = new RequestParameterValidator(req);
         Request request = new Request();
         request.setUserId(user.getId());
         request.setActivityId(validator.getLong("activity_id"));
         request.setTypeId(validator.getLong("type_id"));
         request.setStatusId(validator.getLong("status_id"));
-        LOG.debug("Request entity is {}", request);
+        LOG.debug("Obtained request entity from request parameters is '{}'", request);
         try {
             boolean isError = !requestService.createRequest(request);
             String message = (isError) ? "add.request.failed.message" : "add.request.success.message";
