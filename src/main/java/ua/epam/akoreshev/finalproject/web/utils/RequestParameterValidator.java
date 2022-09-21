@@ -9,7 +9,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class RequestParameterValidator {
     private static final Logger LOG = LogManager.getLogger(RequestParameterValidator.class);
-    public static final String REGEXP = "^[0-9a-zA-Z]([0-9a-zA-Z_\\-]*[0-9a-zA-Z])?$";
+    public static final String REGEXP = "^[0-9a-zA-Z]([0-9a-zA-Z_\\-.]*[0-9a-zA-Z])?$";
     private final HttpServletRequest req;
 
     public RequestParameterValidator(HttpServletRequest request) {
@@ -55,9 +55,10 @@ public class RequestParameterValidator {
         try {
             return parameter != null && Pattern.matches(REGEXP, parameter);
         } catch (NullPointerException e) {
+            LOG.warn("Request parameter isn't exists {}", e.getMessage());
             return false;
         } catch (PatternSyntaxException e) {
-            LOG.error(e.getMessage(), e);
+            LOG.warn(e.getMessage(), e);
             return false;
         }
     }
