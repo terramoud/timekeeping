@@ -32,6 +32,8 @@ public class UserPageCommand extends Command {
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws CommandException {
         LOG.trace("Command has started");
         User user = (User) req.getSession().getAttribute("user");
+        if (user == null)
+            throw new CommandException("The user is not logged in yet");
         try {
             Map<Category, List<Activity>> allActivitiesByCategories = activityService.findAllActivitiesByCategories();
             LOG.debug("Request.setAttribute allActivitiesByCategories is: {}", allActivitiesByCategories);
