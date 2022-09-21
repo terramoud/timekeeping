@@ -29,6 +29,7 @@ public class ChangeUserCommand extends Command {
         String email = validator.getString("email");
         int roleId = validator.getInt("role_id");
         User user = new User(userId, login, email, null, roleId);
+        LOG.debug("User obtained from request parameters is: '{}'", user);
         try {
             boolean isError = !userService.editUser(user);
             String message = (isError) ? "user.edit.failed" : "user.edit.success";
