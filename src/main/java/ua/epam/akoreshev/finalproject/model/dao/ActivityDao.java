@@ -59,20 +59,23 @@ public interface ActivityDao extends BaseDao<Activity, Long> {
 
     /**
      * Finds all rows in the 'activities' and the 'categories' tables
-     * Creates the list of java bean that contains pairs
+     * Creates the list of {@link ActivityCategoryBean} beans that contains pairs
      * {@link Activity} entity and corresponding {@link Category} entity
      * and returns those beans have been sorted them by table column
      * name and by sort order
      *
-     * @param limit number of records to find
-     * @param offset table row number which represents start point for limit
+     * @param limit      number of records to find
+     * @param offset     table row number which represents start point for limit
      * @param columnName table column name
-     * @param sortOrder descending or ascending order switcher
+     * @param sortOrder  descending or ascending order switcher
      * @return the sorted and truncated by limit list of
      *         the {@link ActivityCategoryBean} beans
      * @throws DaoException with the {@link SQLException#getErrorCode()}
      *                      if the {@link SQLException} was thrown by method
      */
-    List<ActivityCategoryBean> findAllActivities(int limit, int offset, String columnName, String sortOrder) throws DaoException;
+    List<ActivityCategoryBean> findAllActivities(int limit,
+                                                 int offset,
+                                                 String columnName,
+                                                 String sortOrder) throws DaoException;
 }
 

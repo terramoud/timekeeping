@@ -35,14 +35,14 @@ public interface UserDao extends BaseDao<User, Long> {
     int getNumberUsers() throws DaoException;
 
     /**
-     * Reads the number of rows in 'users' table where {@link User}
+     * Reads the rows in 'users' table where {@link User}
      * isn't admin and returns list these users have been sorted them
      * by table column name and by sort order
      *
-     * @param limit number of records to find
-     * @param offset table row number which represents start point for limit
+     * @param limit      number of records to find
+     * @param offset     table row number which represents start point for limit
      * @param columnName table column name
-     * @param sortOrder descending or ascending order switcher
+     * @param sortOrder  descending or ascending order switcher
      * @return the sorted and truncated by limit list of {@link User} entities
      * @throws DaoException with {@link SQLException#getErrorCode()}
      *                      if {@link SQLException} was thrown by method

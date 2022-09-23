@@ -25,9 +25,9 @@ public interface IntervalDao extends BaseDao<Interval, Long> {
      * <p>Returns false when user has already started another activity.
      * Returns false when user hasn't activity yet<p/>
      *
-     * @param userId the {@link User} entity primary key
+     * @param userId     the {@link User} entity primary key
      * @param activityId the {@link Activity} entity primary key
-     * @param startTime time when user has started timekeeping of the activity
+     * @param startTime  time when user has started timekeeping of the activity
      * @return {@code true} if start time for activity was successfully set
      * @throws DaoException with {@link SQLException#getErrorCode()}
      *                      if {@link SQLException} was thrown by method
@@ -43,10 +43,10 @@ public interface IntervalDao extends BaseDao<Interval, Long> {
      * Returns false when user has already finished timekeeping of
      * current activity<p/>
      *
-     * @param userId the {@link User} entity primary key
+     * @param userId     the {@link User} entity primary key
      * @param activityId the {@link Activity} entity primary key
      * @param finishTime time when user has finished timekeeping of the activity
-     * @return {@code true} if start time for activity was successfully set
+     * @return {@code true} if finish time for activity was successfully set
      * @throws DaoException with {@link SQLException#getErrorCode()}
      *                      if {@link SQLException} was thrown by method
      */
@@ -55,7 +55,7 @@ public interface IntervalDao extends BaseDao<Interval, Long> {
     /**
      * Gets timekeeping for user's activity
      *
-     * @param userId the {@link User} entity primary key
+     * @param userId     the {@link User} entity primary key
      * @param activityId the {@link Activity} entity primary key
      * @return the {@link Interval} entity that represent start and finish time
      * @throws DaoException with {@link SQLException#getErrorCode()}
@@ -84,15 +84,18 @@ public interface IntervalDao extends BaseDao<Interval, Long> {
      * time for every users's activity
      * List has been sorted by table's column name and by sort order
      *
-     * @param limit number of records to find
-     * @param offset table row number which represents start point for limit
+     * @param limit      number of records to find
+     * @param offset     table row number which represents start point for limit
      * @param columnName table column name
-     * @param sortOrder descending or ascending order switcher
+     * @param sortOrder  descending or ascending order switcher
      * @return the sorted and truncated by limit list of
      *         the {@link UserStatistic} beans
      * @throws DaoException with {@link SQLException#getErrorCode()}
      *                      if {@link SQLException} was thrown by method
      */
-    List<UserStatistic> findUserStatistics(int limit, int offset, String columnName, String sortOrder) throws DaoException;
+    List<UserStatistic> findUserStatistics(int limit,
+                                           int offset,
+                                           String columnName,
+                                           String sortOrder) throws DaoException;
 }
 

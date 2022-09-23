@@ -7,6 +7,7 @@ import java.util.Objects;
  * Represents relevant entity from database's table
  *
  * @author Alexander Koreshev
+ * @since 1.0
  */
 public class Interval extends Entity {
     private LocalDateTime start;

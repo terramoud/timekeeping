@@ -29,14 +29,17 @@ public interface CategoryDao extends BaseDao<Category, Long> {
      * returns those activities have been sorted them by table
      * column name and by sort order
      *
-     * @param limit number of records to find
-     * @param offset table row number which represents start point for limit
+     * @param limit      number of records to find
+     * @param offset     table row number which represents start point for limit
      * @param columnName table column name
-     * @param sortOrder descending or ascending order switcher
+     * @param sortOrder  descending or ascending order switcher
      * @return the sorted and truncated by limit list of {@link Category} entities
      * @throws DaoException with {@link SQLException#getErrorCode()}
      *                      if {@link SQLException} was thrown by method
      */
-    List<Category> findAll(int limit, int offset, String columnName, String sortOrder) throws DaoException;
+    List<Category> findAll(int limit,
+                           int offset,
+                           String columnName,
+                           String sortOrder) throws DaoException;
 }
 
