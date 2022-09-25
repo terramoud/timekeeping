@@ -3,10 +3,7 @@ package ua.epam.akoreshev.finalproject.model.dao.impl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
-import ua.epam.akoreshev.finalproject.model.dao.IntervalDao;
-import ua.epam.akoreshev.finalproject.model.dao.Mapper;
-import ua.epam.akoreshev.finalproject.model.dao.RequestDao;
-import ua.epam.akoreshev.finalproject.model.dao.UserActivityDao;
+import ua.epam.akoreshev.finalproject.model.dao.*;
 import ua.epam.akoreshev.finalproject.model.entity.*;
 
 import java.sql.*;
@@ -274,7 +271,8 @@ public class RequestDaoImpl implements RequestDao {
         boolean result;
         try {
             connection.setAutoCommit(false);
-            UserActivityDao userActivityDao = new UserActivityDaoImpl(connection);
+            DaoFactory daoFactory = DaoFactory.getDaoFactory();
+            UserActivityDao userActivityDao = daoFactory.getUserActivityDao(connection);
             result = userActivityDao.delete(userId, activityId);
             if (result) {
                 try (PreparedStatement pst = connection.prepareStatement(

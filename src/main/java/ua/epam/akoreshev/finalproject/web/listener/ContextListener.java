@@ -4,7 +4,6 @@ package ua.epam.akoreshev.finalproject.web.listener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.model.dao.*;
-import ua.epam.akoreshev.finalproject.model.dao.impl.*;
 import ua.epam.akoreshev.finalproject.model.entity.Role;
 import ua.epam.akoreshev.finalproject.web.command.*;
 import ua.epam.akoreshev.finalproject.web.service.*;
@@ -54,11 +53,12 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 
 
     private void initServices(ServletContext context) {
-        UserDao userDao = new UserDaoImpl(getConnection(context));
-        ActivityDao activityDao = new ActivityDaoImpl(getConnection(context));
-        CategoryDao categoryDao = new CategoryDaoImpl(getConnection(context));
-        RequestDao requestDao = new RequestDaoImpl(getConnection(context));
-        IntervalDao intervalDao = new IntervalDaoImpl(getConnection(context));
+        DaoFactory daoFactory = DaoFactory.getDaoFactory();
+        UserDao userDao = daoFactory.getUserDao(getConnection(context));
+        ActivityDao activityDao = daoFactory.getActivityDao(getConnection(context));
+        CategoryDao categoryDao = daoFactory.getCategoryDao(getConnection(context));
+        RequestDao requestDao = daoFactory.getRequestDao(getConnection(context));
+        IntervalDao intervalDao = daoFactory.getIntervalDao(getConnection(context));
         LOG.debug("Created 'userDao' is: {}", userDao);
         LOG.debug("Created 'activityDao' is: {}", activityDao);
         LOG.debug("Created 'categoryDao' is: {}", categoryDao);

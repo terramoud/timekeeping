@@ -3,6 +3,7 @@ package ua.epam.akoreshev.finalproject.model.dao.impl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.epam.akoreshev.finalproject.exceptions.DaoException;
+import ua.epam.akoreshev.finalproject.model.dao.DaoFactory;
 import ua.epam.akoreshev.finalproject.model.dao.IntervalDao;
 import ua.epam.akoreshev.finalproject.model.dao.Mapper;
 import ua.epam.akoreshev.finalproject.model.dao.UserActivityDao;
@@ -166,7 +167,8 @@ public class IntervalDaoImpl implements IntervalDao {
                 result = false;
             }
             if (result) {
-                UserActivityDao userActivityDao = new UserActivityDaoImpl(connection);
+                DaoFactory daoFactory = DaoFactory.getDaoFactory();
+                UserActivityDao userActivityDao = daoFactory.getUserActivityDao(connection);
                 UserActivity userActivity = new UserActivity(userId, activityId, false);
                 result = userActivityDao.update(userActivity);
             }
