@@ -42,7 +42,6 @@ class RequestDaoImplTest {
 
     @AfterEach
     void tearDown() throws SQLException {
-        System.out.println("teardown");
         connection.rollback();
         connection.setAutoCommit(true);
     }
