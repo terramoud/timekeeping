@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS users
 (
     PRIMARY KEY (id),
     id       INT          NOT NULL AUTO_INCREMENT,
-    login    VARCHAR(32)  NOT NULL UNIQUE,
+    login    VARCHAR(32) COLLATE utf8_bin NOT NULL UNIQUE,
     email    VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(32)  NOT NULL,
     role_id  INT          NOT NULL,
