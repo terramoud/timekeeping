@@ -44,7 +44,11 @@ public class RequestDaoImpl implements RequestDao {
             "SELECT COUNT(*) AS numRows FROM requests WHERE status_id IN";
 
     private static final String SQL_SET_FINISH_TIME_BY_USER_AND_ACTIVITY_IDS =
-            "UPDATE intervals SET finish = ? WHERE user_id = ? AND activity_id = ? AND finish is null";
+            "UPDATE intervals SET finish = ? " +
+                    "WHERE user_id = ? AND activity_id = ? AND start IS NOT NULL AND finish IS NULL";
+
+    public static final String REMOVE_WAS_NOT_STARTED_INTERVAL =
+            "DELETE FROM intervals WHERE user_id = ? AND activity_id = ? AND start IS NULL AND finish IS NULL";
 
     private final Mapper<Request, PreparedStatement> mapRowToDB = (Request request,
                                                                    PreparedStatement preparedStatement) -> {
@@ -74,13 +78,15 @@ public class RequestDaoImpl implements RequestDao {
         List<Request> requestsList = new LinkedList<>();
         try (Statement st = connection.createStatement()) {
             ResultSet rs = st.executeQuery(SQL_FIND_ALL_REQUESTS);
-            LOG.trace("SQL query find all 'requests for activities from user' to database has already been completed successfully");
+            LOG.trace("SQL query find all 'requests for activities from user' to database has " +
+                    "already been completed successfully");
             while (rs.next()) {
                 Request request = new Request();
                 mapRowFromDB.map(rs, request);
                 requestsList.add(request);
             }
-            LOG.debug("The {} 'requests for activities from user' has already been found by query to database", requestsList.size());
+            LOG.debug("The {} 'requests for activities from user' has already been found" +
+                    " by query to database", requestsList.size());
         } catch (SQLException e) {
             LOG.error(e);
             throw new DaoException("Cannot find 'requests for activities from user'", e, e.getErrorCode());
@@ -90,21 +96,25 @@ public class RequestDaoImpl implements RequestDao {
 
     @Override
     public boolean updateRequestStatus(long requestId, long statusId) throws DaoException {
-        LOG.debug("Obtained 'request id' and 'status id' to read it from database are: {} and {}", requestId, statusId);
+        LOG.debug("Obtained 'request id' and 'status id' to read it from database are: {} and {}",
+                requestId, statusId);
         boolean result = true;
         try (PreparedStatement pst = connection.prepareStatement(SQL_UPDATE_REQUEST_BY_STATUS_ID)) {
             pst.setLong(1, statusId);
             pst.setLong(2, requestId);
-            LOG.trace("SQL query to update the 'request status by id' at database has already been completed successfully");
+            LOG.trace("SQL query to update the 'request status by id' at " +
+                    "database has already been completed successfully");
             int rowCount = pst.executeUpdate();
-            LOG.debug("The {} rows has already been changed to update 'request for activities from user'", rowCount);
+            LOG.debug("The {} rows has already been changed to update " +
+                    "'request for activities from user'", rowCount);
             if (rowCount == 0) {
                 result = false;
                 LOG.warn("The 'request status' wasn't updated by query to database");
             }
         } catch (SQLException e) {
             LOG.error(e);
-            throw new DaoException("Cannot update request for activities from user at database", e, e.getErrorCode());
+            throw new DaoException("Cannot update request for " +
+                    "activities from user at database", e, e.getErrorCode());
         }
         return result;
     }
@@ -113,13 +123,15 @@ public class RequestDaoImpl implements RequestDao {
     public boolean create(Request request) throws DaoException {
         LOG.debug("Obtained request entity to create it at database is: {}", request);
         boolean result = true;
-        try (PreparedStatement pst = connection.prepareStatement(SQL_CREATE_REQUEST, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pst = connection.prepareStatement(
+                SQL_CREATE_REQUEST, Statement.RETURN_GENERATED_KEYS)) {
             mapRowToDB.map(request, pst);
             int rowCount = pst.executeUpdate();
             ResultSet rs = pst.getGeneratedKeys();
             if (rs.next()) {
                 request.setId(rs.getLong(1));
-                LOG.debug("The source request entity has synchronized 'id' with created one at database and now represent the: {}", request);
+                LOG.debug("The source request entity has synchronized 'id' " +
+                        "with created one at database and now represent the: {}", request);
             }
             LOG.trace("SQL query to create request has already been completed successfully");
             if (rowCount == 0) {
@@ -139,7 +151,8 @@ public class RequestDaoImpl implements RequestDao {
         LOG.debug("Obtained user id, activity id, type id and status id are: {}, {}, {}, {}",
                 userId, activityId, typeId, statusId);
         Request request = new Request();
-        try (PreparedStatement pst = connection.prepareStatement(SQL_GET_REQUEST_BY_USER_ACTIVITY_TYPE_STATUS_IDS)) {
+        try (PreparedStatement pst = connection.prepareStatement(
+                SQL_GET_REQUEST_BY_USER_ACTIVITY_TYPE_STATUS_IDS)) {
             pst.setLong(1, userId);
             pst.setLong(2, activityId);
             pst.setLong(3, typeId);
@@ -207,7 +220,8 @@ public class RequestDaoImpl implements RequestDao {
                 userActivityRequest.setStatus(status);
                 requestsList.add(userActivityRequest);
             }
-            LOG.debug("The {} 'requests for activities from user' has already been found by query to database", requestsList.size());
+            LOG.debug("The {} 'requests for activities from user' has already " +
+                    "been found by query to database", requestsList.size());
         } catch (SQLException e) {
             LOG.error("Cannot find requests for activities from user by statuses sorted by: {}", sqlParameters);
             throw new DaoException("Cannot find requests for activities from user by statuses", e, e.getErrorCode());
@@ -224,7 +238,8 @@ public class RequestDaoImpl implements RequestDao {
                 .boxed()
                 .map(String::valueOf)
                 .collect(Collectors.joining(",", "(", ")"));
-        try (PreparedStatement pst = connection.prepareStatement(GET_NUM_REQUESTS_BY_STATUSES + sqlParameters)) {
+        try (PreparedStatement pst = connection.prepareStatement(
+                GET_NUM_REQUESTS_BY_STATUSES + sqlParameters)) {
             ResultSet rs = pst.executeQuery();
             LOG.trace("SQL query to database has already been completed successfully");
             if (rs.next()) {
@@ -239,7 +254,10 @@ public class RequestDaoImpl implements RequestDao {
     }
 
     @Override
-    public boolean approveAddActivityRequest(long requestId, int statusId, long userId, long activityId) throws DaoException {
+    public boolean approveAddActivityRequest(long requestId,
+                                             int statusId,
+                                             long userId,
+                                             long activityId) throws DaoException {
         boolean result;
         try {
             connection.setAutoCommit(false);
@@ -252,10 +270,9 @@ public class RequestDaoImpl implements RequestDao {
             if (result) {
                 result = this.updateRequestStatus(requestId, statusId);
             }
-            connection.commit();
-            if (!result) {
+            if (!result)
                 rollback(connection);
-            }
+            connection.commit();
         } catch (SQLException e) {
             rollback(connection);
             LOG.error(e);
@@ -267,34 +284,41 @@ public class RequestDaoImpl implements RequestDao {
     }
 
     @Override
-    public boolean approveRemovingActivityRequest(long requestId, int statusId, long userId, long activityId) throws DaoException {
+    public boolean approveRemovingActivityRequest(long requestId,
+                                                  int statusId,
+                                                  long userId,
+                                                  long activityId) throws DaoException {
         boolean result;
         try {
             connection.setAutoCommit(false);
-            DaoFactory daoFactory = DaoFactory.getDaoFactory();
-            UserActivityDao userActivityDao = daoFactory.getUserActivityDao(connection);
-            result = userActivityDao.delete(userId, activityId);
-            if (result) {
-                try (PreparedStatement pst = connection.prepareStatement(
-                        SQL_SET_FINISH_TIME_BY_USER_AND_ACTIVITY_IDS)) {
-                    pst.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
-                    pst.setLong(2, userId);
-                    pst.setLong(3, activityId);
-                    int rowCount = pst.executeUpdate();
-                    LOG.trace("SQL query to update an 'interval' from database has already been completed successfully");
-                    if (rowCount == 0) {
-                        result = false;
-                        LOG.warn("The 'interval' wasn't updated by query to database");
-                    }
+            try (PreparedStatement pst = connection.prepareStatement(
+                    SQL_SET_FINISH_TIME_BY_USER_AND_ACTIVITY_IDS)) {
+                pst.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+                pst.setLong(2, userId);
+                pst.setLong(3, activityId);
+                result = pst.executeUpdate() != 0;
+            }
+            if (!result) {
+                LOG.warn("Cannot set finish time, because start time wasn't set");
+                try (PreparedStatement pst = connection.prepareStatement(REMOVE_WAS_NOT_STARTED_INTERVAL)) {
+                    pst.setLong(1, userId);
+                    pst.setLong(2, activityId);
+                    int numberRows = pst.executeUpdate();
+                    result = numberRows != 0;
+                    LOG.debug("The {} rows was deleted by query to db", numberRows);
                 }
+            }
+            if (result) {
+                DaoFactory daoFactory = DaoFactory.getDaoFactory();
+                UserActivityDao userActivityDao = daoFactory.getUserActivityDao(connection);
+                result = userActivityDao.delete(userId, activityId);
             }
             if (result) {
                 result = this.updateRequestStatus(requestId, statusId);
             }
-            connection.commit();
-            if (!result) {
+            if (!result)
                 rollback(connection);
-            }
+            connection.commit();
         } catch (SQLException e) {
             rollback(connection);
             LOG.error(e);
@@ -336,7 +360,8 @@ public class RequestDaoImpl implements RequestDao {
                 result = false;
                 LOG.warn("The 'request for activities from user' wasn't updated by query to database");
             }
-            LOG.debug("The {} rows has already been changed to update 'request for activities from user'", rowCount);
+            LOG.debug("The {} rows has already been changed to " +
+                    "update 'request for activities from user'", rowCount);
         } catch (SQLException e) {
             LOG.error(e);
             throw new DaoException("Cannot update 'request for activity from user' at database", e, e.getErrorCode());
@@ -356,7 +381,8 @@ public class RequestDaoImpl implements RequestDao {
                 result = false;
                 LOG.warn("The 'request for activities from user' wasn't deleted by query to database");
             }
-            LOG.debug("The {} rows has already been removed to delete the 'request for activities from user'", rowCount);
+            LOG.debug("The {} rows has already been removed to delete the " +
+                    "'request for activities from user'", rowCount);
         } catch (SQLException e) {
             LOG.error(e);
             throw new DaoException("Cannot delete 'request for activity from user'", e, e.getErrorCode());
