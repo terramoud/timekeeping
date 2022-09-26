@@ -108,7 +108,9 @@ public class IntervalDaoImpl implements IntervalDao {
     }
 
     @Override
-    public boolean setStartTimeForUserActivity(long userId, long activityId, LocalDateTime startTime) throws DaoException {
+    public boolean setStartTimeForUserActivity(long userId,
+                                               long activityId,
+                                               LocalDateTime startTime) throws DaoException {
         LOG.debug("Obtained 'user id', 'activity id' and 'time' to set interval's start time are: {}, {}, {}",
                 userId, activityId, startTime);
         boolean result = true;
@@ -133,7 +135,8 @@ public class IntervalDaoImpl implements IntervalDao {
                     pst.setLong(3, activityId);
                     changedRowSetTime = pst.executeUpdate();
                 }
-                LOG.trace("SQL query to update a start time of 'interval' from database has been completed successfully");
+                LOG.trace("SQL query to update a start time of 'interval' " +
+                        "from database has been completed successfully");
             }
             if (changedRowSetIsActive == 0 || changedRowSetTime == 0) {
                 result = false;
@@ -152,7 +155,9 @@ public class IntervalDaoImpl implements IntervalDao {
     }
 
     @Override
-    public boolean setFinishTimeForUserActivity(long userId, long activityId, LocalDateTime finishTime) throws DaoException {
+    public boolean setFinishTimeForUserActivity(long userId,
+                                                long activityId,
+                                                LocalDateTime finishTime) throws DaoException {
         LOG.debug("Obtained 'user id', 'activity id' and 'time' to set interval's finish time are: {}, {}, {}",
                 userId, activityId, finishTime);
         boolean result = true;
@@ -162,7 +167,8 @@ public class IntervalDaoImpl implements IntervalDao {
             pst.setLong(2, userId);
             pst.setLong(3, activityId);
             int rowCount = pst.executeUpdate();
-            LOG.trace("SQL query to update a finish time of 'interval' from database has already been completed successfully");
+            LOG.trace("SQL query to update a finish time of 'interval' " +
+                    "from database has already been completed successfully");
             if (rowCount == 0) {
                 result = false;
             }
@@ -176,9 +182,9 @@ public class IntervalDaoImpl implements IntervalDao {
                 result = this.create(new Interval(userId, activityId));
             }
             LOG.debug("The {} rows has been changed to set finish time of 'interval'", rowCount);
-            connection.commit();
             if (!result)
                 rollback(connection);
+            connection.commit();
         } catch (SQLException e) {
             rollback(connection);
             LOG.error(e);
@@ -226,7 +232,10 @@ public class IntervalDaoImpl implements IntervalDao {
     }
 
     @Override
-    public List<UserStatistic> findUserStatistics(int limit, int offset, String columnName, String sortOrder) throws DaoException {
+    public List<UserStatistic> findUserStatistics(int limit,
+                                                  int offset,
+                                                  String columnName,
+                                                  String sortOrder) throws DaoException {
         List<UserStatistic> statistics = new LinkedList<>();
         String sqlParameters = " ORDER BY " + columnName
                 .concat(" " + sortOrder)
@@ -287,14 +296,16 @@ public class IntervalDaoImpl implements IntervalDao {
     public boolean create(Interval interval) throws DaoException {
         LOG.debug("Obtained 'interval' entity to create it at database is: {}", interval);
         boolean result = true;
-        try (PreparedStatement pst = connection.prepareStatement(SQL_CREATE_INTERVAL, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pst = connection.prepareStatement(
+                SQL_CREATE_INTERVAL, Statement.RETURN_GENERATED_KEYS)) {
             mapEntityToDB.map(interval, pst);
             int rowCount = pst.executeUpdate();
             LOG.trace("SQL query to create 'interval' has already been completed successfully");
             ResultSet rs = pst.getGeneratedKeys();
             if (rs.next()) {
                 interval.setId(rs.getLong(1));
-                LOG.debug("The source 'interval' entity has synchronized 'id' with database and now represent the: {}", interval);
+                LOG.debug("The source 'interval' entity has synchronized 'id' " +
+                        "with database and now represent the: {}", interval);
             }
             if (rowCount == 0) {
                 result = false;
